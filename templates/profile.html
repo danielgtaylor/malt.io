@@ -1,0 +1,78 @@
+{% extends 'base.html' %}
+
+{% block scripts %}
+    <script type="text/javascript" src="http://fgnass.github.com/spin.js/dist/spin.min.js"></script>
+    <script type="text/javascript">
+        Username.init();
+    </script>
+{% endblock %}
+
+{% block content %}
+    <ul class="breadcrumb">
+        <li><a href="/">home</a><span class="divider">/</span></li>
+        <li>profile settings</li>
+    </ul>
+    {% if success %}
+        <div class="alert alert-success">
+            <button class="close" data-dismiss="alert">&times;</button>
+            You have successfully updated your profile settings!
+        </div>
+    {% endif %}
+    <div class="span2 pull-right">
+        <h6>Joined</h6>
+        <p>{{ user.joined|format_date }}</p>
+        <h6>Recipes</h6>
+        <p>{{ user.recipes.count() }}</p>
+        <h6>Brewdays</h6>
+        <p>{{ user.brewdays|length }}</p>
+        <h6>Awards</h6>
+        <p>
+            {{ user.awards|render_awards }}
+        </p>
+    </div>
+    <form class="form-horizontal span9 pull-left" method="post" action="/profile">
+        <fieldset>
+            <div class="control-group">
+                <label class="control-label">Avatar</label>
+                <div class="controls">
+                    <a href="http://www.gravatar.com/" class="avatar-large" style="background-image: url({{ user.gravatar_large }});">
+                        <span class="fade">Edit</span>
+                    </a>
+                </div>
+            </div>
+        </fieldset>
+        <fieldset>
+            <div class="control-group">
+                <label class="control-label">Username</label>
+                <div class="controls">
+                    <div class="input-append">
+                        <input id="username" name="name" type="text" class="span3" value="{{ user.name }}"/><div id="username-spinner" class="add-on">&#10003;</div>
+                    </div>
+                    <p class="help-block">This is how other users see you</p>
+                </div>
+            </div>
+        </fieldset>
+        <fieldset>
+            <div class="control-group">
+                <label class="control-label">Email</label>
+                <div class="controls">
+                    <input name="email" type="email" class="span3" value="{{ user.email }}"/>
+                    <p class="help-block">Never shown to other users</p>
+                </div>
+            </div>
+        </fieldset>
+        <fieldset>
+            <div class="control-group">
+                <label class="control-label">Password</label>
+                <div class="controls">
+                    <a style="display: inline-block; margin-top: 5px;" href="https://www.google.com/settings/security">Edit your Google account password settings</a>
+                </div>
+            </div>
+        </fieldset>
+        <fieldset>
+            <div class="form-actions">
+                 <button id="profile-save" type="submit" class="btn btn-primary">Save changes</button>
+                 <a class="btn" href="/profile">Reset</a>
+        </fieldset>
+    </form>
+{% endblock %}

@@ -1,0 +1,17 @@
+<div class="recipe">
+    <span class="title ellipsize"><a href="/users/{{ recipe.owner.name }}/recipes/{{ recipe.slug }}">{{ recipe.name }}</a></span>
+    <br/>
+    <span class="ellipsize">{{ recipe.description }}</span>
+    <br/>
+    <div class="btn-group">
+        <a class="btn disabled">
+            <span class="srm" data-srm="{{ recipe.color }}"></span> {{ recipe.color }}&deg;
+        </a>
+        <a class="btn disabled">
+            {{ recipe.ibu }} IBU
+        </a>
+        <a class="btn disabled">
+            {{ recipe.alcohol }}% ABV
+        </a>
+    </div>
+</div>

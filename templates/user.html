@@ -1,0 +1,60 @@
+{% extends 'base.html' %}
+
+{% block scripts %}
+    <script type="text/javascript">
+        $(document).ready(function () {
+            Recipe.init();
+        });
+    </script>
+{% endblock %}
+
+{% block content %}
+    <ul class="breadcrumb">
+        <li><a href="/">home</a><span class="divider">/</span></li>
+        <li><a href="/users">users</a><span class="divider">/</span></li>
+        <li>{{ publicuser.name }}</li>
+    </ul>
+	<div class="span2 pull-right">
+        <h6>Joined</h6>
+        <p>{{ publicuser.joined|format_date }}</p>
+        <h6>Recipes</h6>
+        <p>{{ publicuser.recipes.count() }}</p>
+        <h6>Brewdays</h6>
+        <p>{{ publicuser.brewdays|length }}</p>
+        <h6>Awards</h6>
+        <p>
+            {{ publicuser.awards|render_awards }}
+        </p>
+    </div>
+    <div class="span9">
+        <div class="avatar-large" style="background-image: url({{ publicuser.gravatar_large }}); float: left; margin-right: 1em;"></div>
+        <h2>{{ publicuser.name }}</h2>
+        <div class="btn-group">
+            <a class="btn disabled"><i class="icon-eye-open"></i> Follow</a>
+            <a class="btn disabled"><i class="icon-envelope"></i> Send message</a>
+            <a class="btn disabled"><i class="icon-flag"></i> Report user</a>
+        </div>
+    </div>
+    <div class="clear">
+        <div class="page-header">
+            <h3>Public Recipes</h3>
+        </div>
+        {% if recipes %}
+            {% for recipe in recipes %}
+                {{ recipe|recipe_snippet }}
+            {% endfor %}
+        {% else %}
+            User has no public recipes!
+        {% endif %}
+        <br/>
+        <a href="/users/{{ publicuser.name }}/recipes">View all public recipes</a>
+    </div>
+    <div class="clear">
+        <div class="page-header">
+            <h3>Public Brewdays</h3>
+        </div>
+        User has no public brewdays!
+        <br/>
+        <a href="#">View all public brewdays</a>
+    </div>
+{% endblock %}

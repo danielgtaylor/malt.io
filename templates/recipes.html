@@ -1,0 +1,28 @@
+{% extends 'base.html' %}
+
+{% block scripts %}
+	<script type="text/javascript">
+		$(document).ready(function () {
+			Recipe.init();
+		});
+	</script>
+{% endblock %}
+
+{% block content %}
+    <ul class="breadcrumb">
+        <li><a href="/">home</a><span class="divider">/</span></li>
+        {% if publicuser %}
+            <li><a href="/users">users</a><span class="divider">/</span></li>
+            <li><a href="/users/{{ publicuser.name }}">{{ publicuser.name }}</a><span class="divider">/</span></li>
+            <li>recipes</li>
+        {% else %}
+            <li>recipes</li>
+        {% endif %}
+    </ul>
+    {% if not recipes %}
+    	This user has no public recipes!
+    {% endif %}
+	{% for recipe in recipes %}
+		{{ recipe|recipe_snippet }}
+	{% endfor %}
+{% endblock %}

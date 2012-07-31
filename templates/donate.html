@@ -1,0 +1,83 @@
+{% extends 'base.html' %}
+
+{% block scripts %}
+    <script type="text/javascript" src="https://js.stripe.com/v1/"></script>
+    <script type="text/javascript">
+        $(document).ready(function () {
+            Donate.init('{{ STRIPE_PUBLIC_KEY }}');
+        });
+    </script>
+{% endblock %}
+
+{% block content %}
+    <ul class="breadcrumb">
+        <li><a href="/">home</a><span class="divider">/</span></li>
+        <li>donate</li>
+    </ul>
+    {% if success %}
+        <div class="alert alert-success">
+            <button class="close" data-dismiss="alert">&times;</button>
+            You have successfully submitted a donation! To thank you, we have given you a <i class="icon-gift"></i> award!
+        </div>
+    {% endif %}
+    <div class="span4 pull-left">
+        Malt.io is a free community for brewers. The service will always be free, but the servers and domain cost money. The site is kept alive with donations from people just like you. Please consider a donation to help keep the site alive.
+    </div>
+    <div class="span4 pull-left">
+        Malt.io is open source software under a permissive license. Anybody can get the code and do whatever they want with it. We hope that you decide to contribute back to the community as we have.
+    </div>
+    <div class-"span4 pull-left">
+        <a class="btn btn-success btn-large" href="https://github.com/danielgtaylor/malt.io" style="margin: 1em 0 0 5em;"><i class="icon-download icon-white"></i> Get the source</a>
+    </div>
+    <div class="clear"></div>
+    <hr/>
+    <div class="span2 pull-right">
+        <h6>Top Contributors</h6>
+        {% for user in top_users %}
+            <a href="/users/{{ user.name }}">{{ user.name }}</a>
+        {% endfor %}
+    </div>
+    <form action="" method="post" id="payment-form" class="form-horizontal span9 pull-left">
+        <fieldset>
+            <div class="control-group">
+                <label class="control-label" for="amount">Amount</label>
+                <div class="controls">
+                    <div class="input-prepend input-append">
+                        <span class="add-on">$</span><input class="span1 num" type="text" id="amount" name="amount" value="10"><span class="add-on">.00</span>
+                    </div>
+                </div>
+            </div>
+        </fieldset>
+        <fieldset>
+            <div class="control-group">
+                <label class="control-label" for="card-number">Card Number</label>
+                <div class="controls">
+                    <input id="card-number" class="card-number span2" type="text" autocomplete="off"{% if debug %} value="4242424242424242"{% endif %}/>
+                </div>
+            </div>
+        </fieldset>
+        <fieldset>
+            <div class="control-group">
+                <label class="control-label" for="card-cvc">Card CVC</label>
+                <div class="controls">
+                    <input id="card-cvc" class="card-cvc span2" type="text" autocomplete="off"{% if debug %} value="123"{% endif %}/>
+                    <p class="help-block">This number is usually found on the back of your card</p>
+                </div>
+            </div>
+        </fieldset>
+        <fieldset>
+            <div class="control-group">
+                <label class="control-label" for="card-number">Expiration (MM/YYYY)</label>
+                <div class="controls">
+                    <input id="card-expiry-month" class="card-expiry-month span1" type="text"{% if debug %} value="1"{% endif %}/>
+                    <span> / </span>
+                    <input id="card-expiry-year" class="card-expiry-year span1" type="text"{% if debug %} value="2020"{% endif %}/>
+                </div>
+            </div>
+        </fieldset>
+        <div class="form-actions">
+	       <button type="submit" class="btn btn-primary submit-button">Submit Donation</button>
+        </div>
+	</form>
+    <a href="https://github.com/danielgtaylor/malt.io"><img style="position: absolute; top: 0; right: 0; border: 0; z-index: 9999" src="https://s3.amazonaws.com/github/ribbons/forkme_right_darkblue_121621.png" alt="Fork me on GitHub"></a>
+{% endblock %}

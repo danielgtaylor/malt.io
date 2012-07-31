@@ -1,0 +1,206 @@
+@import url(http://fonts.googleapis.com/css?family=Germania+One);
+
+.border-radius (@radius) {
+    -webkit-border-radius: @radius;
+    -moz-border-radius: @radius;
+    -ms-border-radius: @radius;
+    -o-border-radius: @radius;
+    border-radius: @radius;
+}
+
+.transition (@value) {
+    -webkit-transition: @value;
+    -moz-transition: @value;
+    -ms-transition: @value;
+    -o-transition: @value;
+    transition: @value;
+}
+
+.rotate (@value) {
+    -webkit-transform: rotate(@value);
+    -moz-transform: rotate(@value);
+    -o-transform: rotate(@value);
+    -ms-transform: rotate(@value);
+    transform: rotate(@value);
+}
+
+.brand, h1, h2, h3, h4, h5 {
+    font-family: 'Germania One';
+}
+
+.navbar .brand {
+    font-size: 33px;
+    padding: 5px 20px 5px;
+}
+
+.navbar .nav > li > a {
+    padding: 11px 10px 11px;
+}
+
+h1[contentEditable], p[contentEditable], span[contentEditable], td[contentEditable] {
+    color: #3A87AD;
+}
+
+a {
+    .transition(all 0.2s);
+}
+
+section {
+	clear: both;
+}
+
+table.totals {
+	width: 100%;
+	margin-top: -10px;
+	border: 1px solid white;
+	
+	td {
+		padding: 8px;
+		border-left: 1px solid white;
+	}
+}
+
+.num {
+	text-align: right;
+}
+
+td.percent {
+    color: #aaa;
+}
+
+th {
+	background-color: #eee;
+}
+
+.clear {
+    clear: both;
+}
+
+.avatar-small {
+    float: left;
+    width: 40px;
+    height: 40px;
+    margin-right: 1em;
+    margin-bottom: 1em;
+}
+
+.avatar-large {
+    position: relative;
+    display: inline-block;
+    width: 80px;
+    height: 80px;
+    .border-radius(5px);
+    overflow: hidden;
+    
+    .fade {
+        position: absolute;
+        display: inline-block;
+        width: 100%;
+        top: 100%;
+        left: 0px;
+        color: black;
+        background-color: white;
+        font-weight: bold;
+        font-size: 12pt;
+        text-align: center;
+        opacity: 0;
+        padding: 6px 0px;
+        .transition(all 0.2s);
+    }
+    
+    &:hover .fade {
+        opacity: 0.8;
+        top: 50%;
+        .transition(all 0.2s);
+    }
+}
+
+.srm {
+	display: inline-block;
+	width: 16px;
+	height: 16px;
+	border: 1px solid rgba(0, 0, 0, 0.2);
+	.border-radius(3px);
+}
+
+.btn {
+    .srm {
+        width: 12px;
+        height: 12px;
+        margin-bottom: -2px;
+    }
+}
+
+.recipe {
+    position: relative;
+    padding: 1em;
+    margin: 1em;
+    border: 1px solid #eee;
+    width: 27%;
+    float: left;
+    .border-radius(3px);
+
+    .ellipsize {
+        display: inline-block;
+        width: 100%;
+        white-space: nowrap;
+        overflow: hidden;
+        text-overflow: ellipsis;
+    }
+
+    .btn-group {
+        margin-top: 1em;
+    }
+}
+
+.price-container {
+    position: relative;
+
+    .price-tag {
+        color: white;
+        position: absolute;
+        top: 4px;
+        left: -125px;
+        width: 75px;
+        height: 40px;
+        background: #9d261d;
+        padding: 6px 12px;
+        font-size: 140%;
+        text-align: center;
+        box-shadow: 2px 2px 3px rgba(0, 0, 0, 0.25);
+        border: 1px solid rgba(0, 0, 0, 0.25);
+        .border-radius(10px);
+
+        .small {
+            font-size: 55%;
+        }
+    
+        &:after {
+            content: '';
+            background: #9d261d;
+            width: 28px;
+            height: 28px;
+            position: absolute;
+            right: -14px;
+            top: 12px;
+            z-index: 2;
+            .rotate(45deg);
+            box-shadow: 2px -2px 3px rgba(0, 0, 0, 0.25);
+            border-right: 1px solid rgba(0, 0, 0, 0.25);
+            border-top: 1px solid rgba(0, 0, 0, 0.25);
+        }
+    }
+}
+
+.footer {
+	opacity: 0.3;
+	font-size: 80%;
+	text-align: center;
+    margin-bottom: 1em;
+    .transition(all 0.2s);
+}
+
+.footer:hover {
+    opacity: 1.0;
+    .transition(all 0.2s);
+}

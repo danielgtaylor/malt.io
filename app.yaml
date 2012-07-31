@@ -1,0 +1,27 @@
+application: maltioweb
+version: 1
+runtime: python27
+api_version: 1
+threadsafe: yes
+
+default_expiration: "365d"
+
+handlers:
+- url: /static
+  static_dir: static
+
+- url: /favicon\.ico
+  static_files: static/img/wheat.gif
+  upload: /static/favicon\.ico
+
+- url: .*
+  script: main.app
+
+libraries:
+- name: webapp2
+  version: latest
+- name: jinja2
+  version: latest
+
+builtins:
+- admin_redirect: on
