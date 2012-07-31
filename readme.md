@@ -6,6 +6,7 @@ Technology
 ----------
 The following technologies are used for Malt.io:
 
+ * [Git](https://help.github.com/)
  * [Google AppEngine](https://developers.google.com/appengine/)
  * [Python](http://www.python.org/)
  * [Webapp2](http://webapp-improved.appspot.com/)
@@ -13,32 +14,38 @@ The following technologies are used for Malt.io:
  * [HTML5](http://www.html5rocks.com/)
  * [CoffeeScript](http://coffeescript.org)
  * [Less](http://www.lesscss.org/)
+ * [Gravatar](http://en.gravatar.com/)
+ * [Stripe](https://stripe.com/)
 
 Getting Started
 ---------------
 You can run a local copy of the site for development. Several prerequisites must be installed and configured first. I **highly** suggest checking out the [Sublime Text 2](http://www.sublimetext.com/2) editor, grabbing the [Sublime Package Control](http://wbond.net/sublime_packages/package_control/installation) add-on and installing the CoffeeScript, LESS, and PEP8 packages.
 
-On Ubuntu Linux:
+**On Ubuntu Linux**:
 
-	sudo apt-get install git python-pip nodejs npm
+```bash
+sudo apt-get install git python-pip nodejs npm
 
-	# Get Google AppEngine
-	wget http://googleappengine.googlecode.com/files/google_appengine_1.7.0.zip
-	unzip google_appengine_1.7.0.zip
+# Get Google AppEngine
+wget http://googleappengine.googlecode.com/files/google_appengine_1.7.0.zip
+unzip google_appengine_1.7.0.zip
 
-	# Get other dependencies
-	pip install pycco
-	npm install --global coffee-script less uglify-js
+# Get other dependencies
+pip install pycco
+npm install --global coffee-script less uglify-js
 
-	# Get Malt.io codebase
-	git clone https://github.com/danielgtaylor/malt.io.git
+# Get Malt.io codebase
+git clone https://github.com/danielgtaylor/malt.io.git
 
-	# Run the development server
-	cd malt.io
-	./genStatic.sh
-	../google_appengine/dev_appserver.py .
+# Run the development server
+cd malt.io
+./genStatic.sh
+../google_appengine/dev_appserver.py .
+```
 
-On Windows:
+You should now be able to access the site at [http://localhost:8080/](http://localhost:8080)
+
+**On Windows**:
 
  * Install [GitHub](http://windows.github.com/)
  	* Set the shell in *tools* -> *options* -> *default shell* to *Git Bash*
@@ -52,19 +59,19 @@ On Windows:
 	1. Click *Environment variables*
 	1. Select *PATH* and click *Edit* in the top half of the window
 	1. Ensure your path contains python, python scripts, app engine and npm: `...;C:\Program Files\Google\google_appengine;C:\Python27;C:\Python27\Scripts;C:\Users\username\AppData\Roaming\npm\`
+ * Click *Clone in Windows* above to clone Malt.io
  * Then run *Git Shell* from your start menu and do:
 
-		# Install other dependencies
-		easy_install pycco
-		npm install --global coffee-script less uglify-js
+ 	```bash
+	# Install other dependencies
+	easy_install pycco
+	npm install --global coffee-script less uglify-js
 
-		# Get Malt.io codebase
-		git clone https://github.com/danielgtaylor/malt.io.git
-
-		# Run the development server
-		cd malt.io
-		./genStatic.sh
-		dev_appserver.py .
+	# Run the development server
+	cd malt.io
+	./genStatic.sh
+	dev_appserver.py .
+	```
 
 You should now be able to access the site at [http://localhost:8080/](http://localhost:8080)
 
@@ -74,17 +81,23 @@ Malt.io uses CoffeeScript and Less, which are languages built on top of Javascri
 
 In order to see changes to these files in the browser you must first regenerate their compiled Javascript and CSS. A script is provided for this:
 
-	cd malt.io
-	./genStatic.sh
+```bash
+cd malt.io
+./genStatic.sh
+```
 
 This script generates a main CSS file, a main Javascript file, and updates query strings so that browser caching isn't an issue. You **must** run this script to see your changes.
+
+To see changes to the Python code or Jinja2 templates, just ensure the development server is running and reload the page in your browser. The development server handles reloading updated files automatically.
 
 Documentation
 -------------
 You can generate code documentation for both the server-side Python and client-side CoffeeScript:
 
-	cd malt.io
-	./genDocs.sh
+```bash
+cd malt.io
+./genDocs.sh
+```
 
 You will see a bunch of new HTML files in the `docs` directory. There is one documentation file per file of source code.
 
@@ -102,12 +115,12 @@ The following describes the general layout of the code within this project:
  	* img: images
 	* scripts: client-side coffeescripts and javascripts
 	* styles: less and css stylesheets
-* templates: html template files using jinja2
-* app.yaml: google appengine app definition
-* main.py: main script entrypoint
-* settings.py: site settings
-* urls.py: maps regular expressions to handlers
-* util.py: various utility methods
+ * templates: html template files using jinja2
+ * app.yaml: google appengine app definition
+ * main.py: main script entrypoint
+ * settings.py: site settings
+ * urls.py: maps regular expressions to handlers
+ * util.py: various utility methods
 
 License
 -------
