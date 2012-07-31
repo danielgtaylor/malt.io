@@ -31,3 +31,7 @@ nosetests.xml
 
 #Mr Developer
 .mr.developer.cfg
+
+# Generated static files
+static/styles/main.css
+static/scripts/main.js
