@@ -10,7 +10,7 @@
 
 {% block content %}
     <div id="saveMsg" class="alert alert-info" style="position: fixed; z-index: 999; width: 889px; top: 43px; opacity: 0.9; display: none;">
-        You are currently editing this recipe. Your changes have not yet been saved. <a class="btn btn-info btn-mini pull-right" onclick="Recipe.save();"><i class="icon-book icon-white"></i> Save recipe</a>
+        You are currently editing this recipe. Your changes have not yet been saved. <div class="pull-right"><a class="btn btn-mini" href=""><i class="icon-remove"></i> Cancel</a> <a class="btn btn-info btn-mini" onclick="Recipe.save();"><i class="icon-book icon-white"></i> Save recipe</a></div>
     </div>
     {% if publicuser %}
         <ul class="breadcrumb">
