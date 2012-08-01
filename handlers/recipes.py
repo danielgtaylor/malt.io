@@ -84,12 +84,13 @@ class RecipeLikeHandler(webapp2.RequestHandler):
         """
         Process a request to add or remove a user from the liked list.
         """
-        user = UserPrefs.all()\
-                        .filter('name = ', username)\
-                        .get()
+        user = UserPrefs.get()
+        publicuser = UserPrefs.all()\
+                              .filter('name = ', username)\
+                              .get()
 
         recipe = Recipe.all()\
-                       .filter('owner =', user)\
+                       .filter('owner =', publicuser)\
                        .filter('slug =', recipe_slug)\
                        .get()
 
