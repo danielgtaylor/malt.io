@@ -37,10 +37,10 @@
             Boil size: <span id="boilSize">{{ recipe.boil_size }}</span> average gallons
         </p>
         <div class="btn-group edit-hide">
-            {% if recipe.owner and user.name == recipe.owner.name %}
+            {% if recipe.owner and user and user.name == recipe.owner.name %}
                 <a class="btn" onclick="Recipe.enableEdit();"><i class="icon-pencil"></i> Edit</a>
             {% else %}
-                <a class="btn"><i class="icon-thumbs-up"></i> Like</a>
+                <a id="like-button" class="btn{% if user and user.user_id in recipe.likes %} active{% endif %}" data-toggle="button"><i class="icon-thumbs-up"></i> Like</a>
             {% endif %}
             <a class="btn disabled"><i class="icon-share"></i> Clone</a>
             <a class="btn disabled"><i class="icon-fire"></i> Brew</a>

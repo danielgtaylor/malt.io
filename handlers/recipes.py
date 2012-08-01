@@ -34,6 +34,55 @@ class RecipesHandler(webapp2.RequestHandler):
         })
 
 
+class RecipeLikeHandler(webapp2.RequestHandler):
+    """
+    Recipe like request handler. Handles when a user likes a particular recipe
+    by adding this user's id to the list of likes. This handler supports two
+    methods: post and delete, which add or remove the user, respectively.
+    It is invoked via URLs like:
+
+        /users/USERNAME/recipes/RECIPE-SLUG/like
+
+    """
+    def post(self, username=None, recipe_slug=None):
+        """
+        Add a user to the list of likes for a recipe.
+        """
+        return self.process('post', username, recipe_slug)
+
+    def delete(self, username=None, recipe_slug=None):
+        """
+        Remove a user from the list of likes for a recipe.
+        """
+        return self.process('delete', username, recipe_slug)
+
+    def process(self, action, username=None, recipe_slug=None):
+        """
+        Process a request to add or remove a user from the liked list.
+        """
+        user = UserPrefs.all()\
+                        .filter('name = ', username)\
+                        .get()
+
+        recipe = Recipe.all()\
+                       .filter('owner =', user)\
+                       .filter('slug =', recipe_slug)\
+                       .get()
+
+        if action == 'post':
+            if user.user_id not in recipe.likes:
+                recipe.likes.append(user.user_id)
+                recipe.put()
+        elif action == 'delete':
+            if user.user_id in recipe.likes:
+                recipe.likes.remove(user.user_id)
+                recipe.put()
+
+        return render_json(self, {
+            'status': 'ok'
+        })
+
+
 class RecipeHandler(webapp2.RequestHandler):
     """
     Recipe view handler. This handler renders a recipe and handles updating

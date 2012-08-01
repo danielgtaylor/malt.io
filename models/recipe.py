@@ -86,6 +86,9 @@ class Recipe(RecipeBase):
     ibu = db.FloatProperty(default=0.0)
     alcohol = db.FloatProperty(default=0.0)
 
+    # Users who have liked tihs recipe
+    likes = db.StringListProperty()
+
     def put_historic_version(self):
         """
         Save a historic version of this recipe in the data store. The contents

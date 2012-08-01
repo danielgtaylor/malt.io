@@ -38,6 +38,9 @@ class Recipe
         $('.srm[data-srm]').each((index, element) =>
             element.style.backgroundColor = Util.srmToRgb(element.dataset.srm)
         )
+
+        # Setup the like button
+        $('#like-button').click(@onLiked)
         
         # Setup editing delegates
         $('#fermentables_data, #hops_data, #yeast_data, .editable').on('keydown', '[contentEditable]', (event) =>
@@ -65,6 +68,20 @@ class Recipe
         if window.location.pathname is '/new' or window.location.hash is '#edit'
             @enableEdit()
     
+    # Handle clicks on the like button
+    @onLiked: (event) =>
+        if $('#like-button').hasClass('active')
+            action = 'delete'
+        else
+            action = 'post'
+
+        $.ajax(
+            url: location.href + '/like'
+            type: action
+            success: (data, status, xhr) =>
+                # TODO: handle errors here
+        )
+
     # Enable recipe edit mode
     @enableEdit: =>
         $('#recipeName, #recipeDescription, #batchSize, #boilSize, #bottling_temp, #bottling_pressure').attr('contentEditable', 'true')
