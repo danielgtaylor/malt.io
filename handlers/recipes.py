@@ -98,6 +98,10 @@ class RecipeHandler(webapp2.RequestHandler):
                            .filter('slug =', recipe_slug)\
                            .get()
 
+            if recipe:
+                # Save a historic version of this recipe
+                recipe.put_historic_version()
+
         # Ensure you own this recipe
         if not recipe or recipe.owner.name != user.name:
             render_json(self, {
