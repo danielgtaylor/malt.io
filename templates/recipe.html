@@ -22,6 +22,11 @@
         </ul>
     {% endif %}
     <div class="hero-unit editable">
+        {% if recipe.cloned_from %}
+            <p style="opacity: 0.5;">
+                Cloned from <a href="/users/{{ recipe.cloned_from.owner.name }}">{{ recipe.cloned_from.owner.name }}</a> / <a href="/users/{{ recipe.cloned_from.owner.name }}/recipes/{{ recipe.cloned_from.slug }}">{{ recipe.name }}</a>
+            </p>
+        {% endif %}
         <div class="price-container">
             <div class="price-tag">
                 $ <span id="total_cost">0.00</span>
@@ -42,7 +47,7 @@
             {% else %}
                 <a id="like-button" class="btn{% if user and user.user_id in recipe.likes %} active{% endif %}" data-toggle="button"><i class="icon-thumbs-up"></i> Like</a>
             {% endif %}
-            <a class="btn disabled"><i class="icon-share"></i> Clone</a>
+            <a id="clone-button" class="btn"><i class="icon-share"></i> Clone</a>
             <a class="btn disabled"><i class="icon-fire"></i> Brew</a>
             <a class="btn disabled"><i class="icon-signal"></i> Scale</a>
             <a class="btn disabled"><i class="icon-time"></i> View History</a>

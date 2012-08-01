@@ -39,8 +39,9 @@ class Recipe
             element.style.backgroundColor = Util.srmToRgb(element.dataset.srm)
         )
 
-        # Setup the like button
+        # Setup action buttons
         $('#like-button').click(@onLiked)
+        $('#clone-button').click(@onCloned)
         
         # Setup editing delegates
         $('#fermentables_data, #hops_data, #yeast_data, .editable').on('keydown', '[contentEditable]', (event) =>
@@ -80,6 +81,16 @@ class Recipe
             type: action
             success: (data, status, xhr) =>
                 # TODO: handle errors here
+        )
+
+    @onCloned: (event) =>
+        $.ajax(
+            url: location.href + '/clone'
+            type: 'post'
+            success: (data, status, xhr) =>
+                # TODO: handle errors here
+                if data.redirect
+                    window.location = data.redirect
         )
 
     # Enable recipe edit mode

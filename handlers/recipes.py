@@ -8,6 +8,30 @@ from util import render, render_json, slugify
 from webapp2_extras.appengine.users import login_required
 
 
+def generate_usable_slug(recipe):
+    """
+    Generate a usable slug for a given recipe. This method will try to slugify
+    the recipe name and then append an integer if needed, increasing this
+    integer until no existing recipe would be overwritten.
+    """
+    slug = slugify(recipe.name)
+    append = 0
+
+    while True:
+        count = Recipe.all()\
+                      .filter('owner =', recipe.owner)\
+                      .filter('slug =', recipe.slug)\
+                      .count()
+
+        if not count:
+            break
+
+        append += 1
+        slug = slugify(recipe.name) + str(append)
+
+    return slug
+
+
 class RecipesHandler(webapp2.RequestHandler):
     """
     Recipe list view handler. This handler renders the public recipe list for
@@ -80,6 +104,51 @@ class RecipeLikeHandler(webapp2.RequestHandler):
 
         return render_json(self, {
             'status': 'ok'
+        })
+
+
+class RecipeCloneHandler(webapp2.RequestHandler):
+    """
+    Recipe clone handler. This handler is responsible for cloning a recipe
+    to a user's account, by creating a new recipe and copying over all
+    attributes. It is invoked via URLs like:
+
+        /users/USERNAME/recipes/RECIPE-SLUG/clone
+
+    """
+    def post(self, username=None, recipe_slug=None):
+        user = UserPrefs.all()\
+                        .filter('name = ', username)\
+                        .get()
+
+        recipe = Recipe.all()\
+                       .filter('owner =', user)\
+                       .filter('slug =', recipe_slug)\
+                       .get()
+
+        new_recipe = Recipe(**{
+            'owner': UserPrefs.get(),
+            'cloned_from': recipe,
+            'color': recipe.color,
+            'ibu': recipe.ibu,
+            'alcohol': recipe.alcohol,
+            'name': recipe.name,
+            'description': recipe.description,
+            'type': recipe.type,
+            'style': recipe.style,
+            'batch_size': recipe.batch_size,
+            'boil_size': recipe.boil_size,
+            'bottling_temp': recipe.bottling_temp,
+            'bottling_pressure': recipe.bottling_pressure,
+            '_ingredients': recipe._ingredients
+        })
+
+        new_recipe.slug = generate_usable_slug(new_recipe)
+        new_recipe.put()
+
+        return render_json(self, {
+            'status': 'ok',
+            'redirect': new_recipe.url
         })
 
 
@@ -172,9 +241,7 @@ class RecipeHandler(webapp2.RequestHandler):
         recipe.ingredients = recipe_data['ingredients']
 
         # Update slug
-        # TODO: Make sure the slug is not already taken, and update with
-        # increasing integers?
-        recipe.slug = slugify(recipe.name)
+        recipe.slug = generate_usable_slug(recipe)
 
         # Save recipe to database
         recipe.put()

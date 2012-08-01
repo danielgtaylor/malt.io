@@ -89,6 +89,13 @@ class Recipe(RecipeBase):
     # Users who have liked tihs recipe
     likes = db.StringListProperty()
 
+    @property
+    def url(self):
+        return '/users/%(username)s/recipes/%(slug)s' % {
+            'username': self.owner.name,
+            'slug': self.slug
+        }
+
     def put_historic_version(self):
         """
         Save a historic version of this recipe in the data store. The contents
