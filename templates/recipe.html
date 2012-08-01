@@ -153,7 +153,7 @@
                         <th>Description</th>
                         <th class="num" width="5%"><acronym title="Points per Pound per Gallon">PPG</acronym></th>
                         <th class="num" width="8%" colspan="2">&deg;L</th>
-                        <th width="14px"></th>
+                        <th class="edit-show" width="14px"></th>
                     </tr>
                 </thead>
                 <tbody id="fermentables_data">
@@ -166,7 +166,7 @@
                             <td class="num">{{ ingredient.ppg }}</td>
                             <td class="num"><span class="srm" data-srm="{{ ingredient.color }}"></span> </td>
                             <td class="num" style="border-left: none;">{{ ingredient.color }}</td>
-                            <td><a href="#" class="remove"><i class="icon-remove"></i></a></td>
+                            <td class="edit-show"><a href="#" class="remove"><i class="icon-remove"></i></a></td>
                         </tr>
                     {% endfor %}
                 </tbody>
@@ -254,7 +254,7 @@
                         <th>Description</th>
                         <th width="10%">Form</th>
                         <th class="num" width="5%"><acronym title="Alpha Acid %">AA%</acronym></th>
-                        <th width="14px"></th>
+                        <th class="edit-show" width="14px"></th>
                     </tr>
                 </thead>
                 <tbody id="hops_data">
@@ -266,7 +266,7 @@
                             <td>{{ ingredient.description }}</td>
                             <td>{{ ingredient.form }}</td>
                             <td class="num">{{ ingredient.aa }}</td>
-                            <td><a href="#" class="remove"><i class="icon-remove"></i></a></td>
+                            <td class="edit-show"><a href="#" class="remove"><i class="icon-remove"></i></a></td>
                         </tr>
                     {% endfor %}
                 </tbody>
@@ -353,7 +353,7 @@
                         <th width="10%">Type</th>
                         <th width="10%">Form</th>
                         <th class="num" width="10%">Attenuation</th>
-                        <th width="14px"></th>
+                        <th class="edit-show" width="14px"></th>
                     </tr>
                 </thead>
                 <tbody id="yeast_data">
@@ -362,8 +362,8 @@
                             <td>{{ ingredient.description }}</td>
                             <td>{{ ingredient.type }}</td>
                             <td>{{ ingredient.form }}</td>
-                            <td>{{ ingredient.attenuation }}</td>
-                            <td><a href="#" class="remove"><i class="icon-remove"></i></a></td>
+                            <td class="num">{{ ingredient.attenuation }}</td>
+                            <td class="edit-show"><a href="#" class="remove"><i class="icon-remove"></i></a></td>
                         </tr>
                     {% endfor %}
                 </tbody>

@@ -83,7 +83,7 @@ class Recipe
     # template button item.
     @addFermentableRow: (template) =>
         table = $('#fermentables_data')[0]
-        row = '<tr><td class="num percent">?</td><td class="num" contentEditable="true">1</td><td class="num" contentEditable="true">0</td><td contentEditable="true">' + template.dataset.description + '</td><td class="num" contentEditable="true">' + template.dataset.ppg + '</td><td class="num"><span class="srm" data-srm="' + template.dataset.srm + '" style="background-color: ' + Util.srmToRgb(template.dataset.srm) + '"></span> </td><td class="num" style="border-left: none;" contentEditable="true">' + template.dataset.srm + '</td><td><a href="#" class="remove"><i class="icon-remove"></i></a></td></tr>'
+        row = '<tr><td class="num percent">?</td><td class="num" contentEditable="true">1</td><td class="num" contentEditable="true">0</td><td contentEditable="true">' + template.dataset.description + '</td><td class="num" contentEditable="true">' + template.dataset.ppg + '</td><td class="num"><span class="srm" data-srm="' + template.dataset.srm + '" style="background-color: ' + Util.srmToRgb(template.dataset.srm) + '"></span> </td><td class="num" style="border-left: none;" contentEditable="true">' + template.dataset.srm + '</td><td class="edit-show" style="display: block"><a href="#" class="remove"><i class="icon-remove"></i></a></td></tr>'
         table.innerHTML += row
         $('#fermentables_data tr:last td:nth-child(2)').focus()
         @updateStats()
@@ -102,7 +102,7 @@ class Recipe
             next = 5
             form = 'ground'
         
-        row = '<tr><td contentEditable="true">boil</td><td class="num" contentEditable="true">' + next + 'min</td><td class="num" contentEditable="true">1.00</td><td contentEditable="true">' + template.dataset.description + '</td><td contentEditable="true">' + form + '</td><td contentEditable="true">' + template.dataset.aa + '</td><td><a href="#" class="remove"><i class="icon-remove"></i></a></td></tr>'
+        row = '<tr><td contentEditable="true">boil</td><td class="num" contentEditable="true">' + next + 'min</td><td class="num" contentEditable="true">1.00</td><td contentEditable="true">' + template.dataset.description + '</td><td contentEditable="true">' + form + '</td><td contentEditable="true">' + template.dataset.aa + '</td><td class="edit-show" style="display: block"><a href="#" class="remove"><i class="icon-remove"></i></a></td></tr>'
         table.innerHTML += row
         $('#hops_data tr:last td:nth-child(1)').focus()
         @updateStats()
@@ -111,7 +111,7 @@ class Recipe
     # template button item
     @addYeastRow: (template) =>
         table = $('#yeast_data')[0]
-        row = '<tr><td contentEditable="true">' + template.dataset.description + '</td><td contentEditable="true">' + template.dataset.type + '</td><td contentEditable="true">' + template.dataset.form + '</td><td contentEditable="true">' + template.dataset.attenuation + '</td><td><a href="#" class="remove"><i class="icon-remove"></i></a></td></tr>'
+        row = '<tr><td contentEditable="true">' + template.dataset.description + '</td><td contentEditable="true">' + template.dataset.type + '</td><td contentEditable="true">' + template.dataset.form + '</td><td class="num" contentEditable="true">' + template.dataset.attenuation + '</td><td class="edit-show" style="display: block"><a href="#" class="remove"><i class="icon-remove"></i></a></td></tr>'
         table.innerHTML += row
         $('#yeast_data tr:last td:nth-child(1)').focus()
         @updateStats()
