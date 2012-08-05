@@ -21,7 +21,7 @@
         </div>
     {% endif %}
     <div class="span4 pull-left">
-        Malt.io is a free community for brewers. The service will always be free, but the servers and domain cost money. The site is kept alive with donations from people just like you. Please consider a donation to help keep the site alive.
+        Malt.io is a community for brewers. The service will always be free, but the servers and domain cost money. The site is kept alive with donations from people just like you. Please consider contributing a donation below.
     </div>
     <div class="span4 pull-left">
         Malt.io is open source software under a permissive license. Anybody can get the code and do whatever they want with it. We hope that you decide to contribute back to the community as we have.
@@ -33,17 +33,27 @@
     <hr/>
     <div class="span2 pull-right">
         <h6>Top Contributors</h6>
+        <ul class="unstyled">
         {% for user in top_users %}
-            <a href="/users/{{ user.name }}">{{ user.name }}</a>
+            <li><a href="/users/{{ user.name }}">{{ user.name }}</a></li>
         {% endfor %}
+        </ul>
     </div>
     <form action="" method="post" id="payment-form" class="form-horizontal span9 pull-left">
+        <fieldset>
+            <div class="control-group">
+                <div class="controls">
+                    <p class="help-block"><img src="/static/img/creditcards.png" alt="Visa, Mastercard, American Express, Discover"/></p>
+                </div>
+            </div>
+        </fieldset>
         <fieldset>
             <div class="control-group">
                 <label class="control-label" for="amount">Amount</label>
                 <div class="controls">
                     <div class="input-prepend input-append">
-                        <span class="add-on">$</span><input class="span1 num" type="text" id="amount" name="amount" value="10"><span class="add-on">.00</span>
+                        <span class="add-on">$</span><input class="num" style="width: 155px" type="text" id="amount" name="amount" value="10"><span class="add-on">.00</span>
+                        <p class="help-block">Please enter at least $ 1.00 to charge your card</p>
                     </div>
                 </div>
             </div>
@@ -52,7 +62,7 @@
             <div class="control-group">
                 <label class="control-label" for="card-number">Card Number</label>
                 <div class="controls">
-                    <input id="card-number" class="card-number span2" type="text" autocomplete="off"{% if debug %} value="4242424242424242"{% endif %}/>
+                    <input id="card-number" class="card-number span3 num" type="text" autocomplete="off"{% if debug %} value="4242424242424242"{% endif %}/>
                 </div>
             </div>
         </fieldset>
@@ -60,7 +70,7 @@
             <div class="control-group">
                 <label class="control-label" for="card-cvc">Card CVC</label>
                 <div class="controls">
-                    <input id="card-cvc" class="card-cvc span2" type="text" autocomplete="off"{% if debug %} value="123"{% endif %}/>
+                    <input id="card-cvc" class="card-cvc span3 num" type="text" autocomplete="off"{% if debug %} value="123"{% endif %}/>
                     <p class="help-block">This number is usually found on the back of your card</p>
                 </div>
             </div>
@@ -69,15 +79,48 @@
             <div class="control-group">
                 <label class="control-label" for="card-number">Expiration (MM/YYYY)</label>
                 <div class="controls">
-                    <input id="card-expiry-month" class="card-expiry-month span1" type="text"{% if debug %} value="1"{% endif %}/>
+                    <select id="card-expiry-month" class="card-expiry-month span1">
+                        <option value="1" selected>1</option>
+                        <option value="2">2</option>
+                        <option value="3">3</option>
+                        <option value="4">4</option>
+                        <option value="5">5</option>
+                        <option value="6">6</option>
+                        <option value="7">7</option>
+                        <option value="8">8</option>
+                        <option value="9">9</option>
+                        <option value="10">10</option>
+                        <option value="11">11</option>
+                        <option value="12">12</option>
+                    </select>
                     <span> / </span>
-                    <input id="card-expiry-year" class="card-expiry-year span1" type="text"{% if debug %} value="2020"{% endif %}/>
+                    <select id="card-expiry-year" class="card-expiry-year span2">
+                        <option value="2012">2012</option>
+                        <option value="2013" selected>2013</option>
+                        <option value="2014">2014</option>
+                        <option value="2015">2015</option>
+                        <option value="2016">2016</option>
+                        <option value="2017">2017</option>
+                        <option value="2018">2018</option>
+                        <option value="2019">2019</option>
+                        <option value="2020">2020</option>
+                        <option value="2021">2021</option>
+                        <option value="2022">2022</option>
+                    </select>
                 </div>
             </div>
         </fieldset>
         <div class="form-actions">
-	       <button type="submit" class="btn btn-primary submit-button">Submit Donation</button>
+	        <button type="submit" class="btn btn-primary submit-button" title="Securely charge your credit card through Stripe.com, a third party credit card processing service. Malt.io never sees your credit card information."><i class="icon-lock icon-white"></i> Submit Donation</button>
+            &nbsp;or&nbsp;
+            <form action="https://www.paypal.com/cgi-bin/webscr" method="post">
+                <input type="hidden" name="cmd" value="_s-xclick"/>
+                <input type="hidden" name="hosted_button_id" value="AGZZE7H3LL442"/>
+                <button type="submit" class="btn"><i class="icon-lock"></i> Donate with Paypal</button>
+                <img alt="" border="0" src="https://www.paypalobjects.com/en_US/i/scr/pixel.gif" width="1" height="1">
+            </form>
         </div>
 	</form>
+
     <a href="https://github.com/danielgtaylor/malt.io"><img style="position: absolute; top: 0; right: 0; border: 0; z-index: 9999" src="https://s3.amazonaws.com/github/ribbons/forkme_right_darkblue_121621.png" alt="Fork me on GitHub"></a>
 {% endblock %}
