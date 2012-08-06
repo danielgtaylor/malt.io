@@ -40,6 +40,8 @@ class Recipe
         )
 
         # Setup action buttons
+        $('#edit-button').click(@enableEdit)
+        $('#delete-button').click(@onDelete)
         $('#like-button').click(@onLiked)
         $('#clone-button').click(@onCloned)
         
@@ -84,6 +86,8 @@ class Recipe
                 $('.likes-tag').html(data.likes + ' likes')
         )
 
+    # Handle clicks on the clone button, creating a cloned copy of another
+    # user's recipe
     @onCloned: (event) =>
         $.ajax(
             url: location.href + '/clone'
@@ -108,6 +112,20 @@ class Recipe
         $('#saveMsg, .edit-show').hide()
         $('.edit-hide').show()
     
+    # Handle clicks on the delete button, removing a recipe
+    @onDelete: (event) =>
+        if $(event.target).hasClass('btn-danger')
+            $.ajax(
+                url: location.href
+                type: 'delete'
+                success: (data, status, xhr) =>
+                    # TODO: handle errors here
+                    if data.redirect
+                        window.location = data.redirect
+            )
+        else
+            $(event.target).addClass('btn-danger').html('<i class="icon-remove icon-white"></i> Delete?')
+
     # Add a fermentable row to the fermentables table based on a fermentable
     # template button item.
     @addFermentableRow: (template) =>

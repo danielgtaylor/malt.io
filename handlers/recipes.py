@@ -48,7 +48,8 @@ class RecipesHandler(webapp2.RequestHandler):
         publicuser = UserPrefs.all().filter('name =', username).get()
 
         if username:
-            recipes = Recipe.all().filter('owner =', publicuser)
+            recipes = Recipe.all()\
+                            .filter('owner =', publicuser)
         else:
             recipes = Recipe.all()
 
@@ -180,7 +181,8 @@ class RecipeHandler(webapp2.RequestHandler):
                            .filter('slug =', recipe_slug)\
                            .get()
 
-        # TODO: return 404 if no recipe is found?
+        if not recipe:
+            self.abort(404)
 
         render(self, 'recipe.html', {
             'publicuser': publicuser,
@@ -255,3 +257,29 @@ class RecipeHandler(webapp2.RequestHandler):
                 'slug': recipe.slug
             }
         })
+
+    def delete(self, username=None, recipe_slug=None):
+        """
+        Handle recipe delete. This will remove a recipe and return success
+        or failure.
+        """
+        user = UserPrefs.get()
+        recipe = Recipe.all()\
+                       .filter('slug = ', recipe_slug)\
+                       .filter('owner =', user)\
+                       .get()
+
+        if recipe:
+            recipe.delete()
+
+            render_json(self, {
+                'status': 'ok',
+                'redirect': '/users/%(username)s/recipes' % {
+                    'username': user.name
+                }
+            })
+        else:
+            render_json(self, {
+                'status': 'error',
+                'error': 'Unable to delete recipe'
+            })

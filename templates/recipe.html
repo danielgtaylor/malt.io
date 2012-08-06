@@ -43,7 +43,8 @@
         </p>
         <div class="btn-group edit-hide">
             {% if recipe.owner and user and user.name == recipe.owner.name %}
-                <a class="btn" onclick="Recipe.enableEdit();"><i class="icon-pencil"></i> Edit</a>
+                <a id="edit-button" class="btn"><i class="icon-pencil"></i> Edit</a>
+                <a id="delete-button" class="btn"><i class="icon-remove"></i> Delete</a>
             {% else %}
                 <a id="like-button" class="btn{% if user and user.user_id in recipe.likes %} active{% endif %}" data-toggle="button"><i class="icon-thumbs-up"></i> Like</a>
             {% endif %}
