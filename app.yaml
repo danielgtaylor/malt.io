@@ -25,3 +25,4 @@ libraries:
 
 builtins:
 - admin_redirect: on
+- appstats: on
