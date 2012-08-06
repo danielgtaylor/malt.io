@@ -104,7 +104,8 @@ class RecipeLikeHandler(webapp2.RequestHandler):
                 recipe.put()
 
         return render_json(self, {
-            'status': 'ok'
+            'status': 'ok',
+            'likes': len(recipe.likes)
         })
 
 

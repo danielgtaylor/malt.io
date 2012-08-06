@@ -52,6 +52,11 @@
             <a class="btn disabled"><i class="icon-signal"></i> Scale</a>
             <a class="btn disabled"><i class="icon-time"></i> View History</a>
         </div>
+        <div class="likes-container edit-hide">
+            <div class="likes-tag">
+                {{ recipe.likes|length }} like{% if recipe.likes != 1 %}s{% endif %}
+            </div>
+        </div>
     </div>
     <h2>
         Fermentable Sugars

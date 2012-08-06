@@ -157,6 +157,39 @@ th {
     }
 }
 
+.likes-container {
+    position: relative;
+
+    .likes-tag {
+        color: white;
+        background-color: #049cdb;
+        text-align: center;
+        font-size: 80%;
+        position: absolute;
+        left: 0px;
+        bottom: -38px;
+        width: 50px;
+        height: 16px;
+        padding: 2px;
+        border: 1px solid rgba(0, 0, 0, 0.25);
+        .border-radius(4px);
+        box-shadow: 2px 2px 3px rgba(0, 0, 0, 0.25);
+
+        &:after {
+            content: '';
+            background: #049cdb;
+            width: 10px;
+            height: 10px;
+            position: absolute;
+            top: -6px;
+            left: 5px;
+            border-left: 1px solid rgba(0, 0, 0, 0.25);
+            border-top: 1px solid rgba(0, 0, 0, 0.25);
+            .rotate(45deg);
+        }
+    }
+}
+
 .price-container {
     position: relative;
 

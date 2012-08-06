@@ -81,6 +81,7 @@ class Recipe
             type: action
             success: (data, status, xhr) =>
                 # TODO: handle errors here
+                $('.likes-tag').html(data.likes + ' likes')
         )
 
     @onCloned: (event) =>
