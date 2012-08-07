@@ -46,7 +46,7 @@
         {% else %}
             User has no public recipes!
         {% endif %}
-        <br/>
+        <div style="clear: both;"></div>
         <a href="/users/{{ publicuser.name }}/recipes">View all public recipes</a>
     </div>
     <div class="clear">
@@ -54,7 +54,7 @@
             <h3>Public Brewdays</h3>
         </div>
         User has no public brewdays!
-        <br/>
+        <div style="clear: both;"></div>
         <a href="#">View all public brewdays</a>
     </div>
 {% endblock %}
