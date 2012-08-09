@@ -41,7 +41,7 @@ class RecipeBase(db.Model):
     bottling_pressure = db.FloatProperty(default=2.5)
 
     # Serialized JSON data for the ingredients
-    _ingredients = db.StringProperty(default=json.dumps({
+    _ingredients = db.TextProperty(default=json.dumps({
         'fermentables': [],
         'spices': [],
         'yeast': []
