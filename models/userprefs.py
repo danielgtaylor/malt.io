@@ -112,15 +112,6 @@ class UserPrefs(db.Model):
         return self.gravatar(40)
 
     @property
-    def recipes(self):
-        """
-        Get a query of recipe objects for this user.
-        """
-        from models.recipe import Recipe
-        return Recipe.all()\
-                     .filter('owner =', self)
-
-    @property
     def brewdays(self):
         """
         Get a query of brewday objects for this user.

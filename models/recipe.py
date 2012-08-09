@@ -71,7 +71,7 @@ class Recipe(RecipeBase):
     slug = db.StringProperty()
 
     # The user who owns this recipe
-    owner = db.ReferenceProperty(UserPrefs)
+    owner = db.ReferenceProperty(UserPrefs, collection_name='recipes')
 
     # Created and edited date/time, automatically populated
     created = db.DateTimeProperty(auto_now_add=True)
