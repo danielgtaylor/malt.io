@@ -1,5 +1,6 @@
 from handlers.donate import DonateHandler
 from handlers.index import MainHandler
+from handlers.messages import MessagesHandler
 from handlers.profile import ProfileHandler
 from handlers.recipes import RecipesHandler, RecipeLikeHandler, \
                              RecipeCloneHandler, RecipeHandler
@@ -16,6 +17,7 @@ urls = [
     ('/users', UsersHandler),
     ('/username', UsernameCheckHandler),
     ('/recipes', RecipesHandler),
+    ('/messages', MessagesHandler),
     ('/profile', ProfileHandler),
     ('/new', RecipeHandler),
     ('/donate', DonateHandler),

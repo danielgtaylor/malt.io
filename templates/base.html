@@ -4,7 +4,7 @@
 	<title>{% block title %}Malt.io{% endblock %}</title>
 	<meta name="viewport" content="width=device-width, initial-scale=1.0">
 	<link rel="stylesheet" type="text/css" href="/static/styles/bootstrap.min.css"/>
-	<link rel="stylesheet" type="text/css" href="/static/styles/main.css?v=1344283219"/>
+	<link rel="stylesheet" type="text/css" href="/static/styles/main.css?v=1344522409"/>
 	{% block head %}{% endblock %}
 </head>
 <body>
@@ -34,17 +34,19 @@
 				<ul class="nav pull-right">
                     <li><a href="/donate">Donate</a></li>
                     {% if user %}
-                        {% if is_admin %}
-                            <li><a href="/_ah/admin">Admin</a></li>
-                        {% endif %}
                         <li class="dropdown">
                             <a href="#" class="dropdown-toggle" data-toggle="dropdown">
-                            Profile
+                            {{ user.name }}{% if user.unread_messages %} <span class="badge badge-info">{{ user.unread_messages }}</span>{% endif %}
                             <b class="caret"></b>
                             </a>
                             <ul class="dropdown-menu">
-                                <li><a href="/users/{{ user.name }}">My public profile</a></li>
-                                <li><a href="/profile">Settings</a></li>
+                                <li><a href="/messages">Private Messages</a></li>
+                                <li><a href="/users/{{ user.name }}">Public profile</a></li>
+                                <li><a href="/profile">User Settings</a></li>
+                                {% if is_admin %}
+                                    <li><a href="/_ah/stats">App Stats</a></li>
+                                    <li><a href="/_ah/admin">Admin</a></li>
+                                {% endif %}
                             </ul>
                         </li>
                         <li><a href="{{ logout_url }}">Logout</a></li>
@@ -66,7 +68,7 @@
     <script type="text/javascript" src="http://code.jquery.com/jquery-1.7.2.min.js"></script>
     <!--<script type="text/javascript" src="/static/scripts/jquery.js"></script>-->
 	<script type="text/javascript" src="/static/scripts/bootstrap.min.js"></script>
-	<script type="text/javascript" src="/static/scripts/main.js?v=1344283219"></script>
+	<script type="text/javascript" src="/static/scripts/main.js?v=1344522409"></script>
     {% block scripts %}{% endblock %}
 </body>
 </html>

@@ -1,0 +1,72 @@
+{% extends 'base.html' %}
+
+{% block scripts %}
+    <script src="/static/scripts/marked.min.js"></script>
+    <script type="text/javascript">
+        Messages.init();
+    </script>
+{% endblock %}
+
+{% block content %}
+    <ul class="breadcrumb">
+        <li><a href="/">home</a><span class="divider">/</span></li>
+        <li><a href="/users">users</a><span class="divider">/</span></li>
+        <li><a href="/users/{{ user.name }}">{{ user.name }}</a><span class="divider">/</span></li>
+        <li>messages</li>
+    </ul>
+    <div class="tabbable tabs-left span6">
+        <ul class="nav nav-tabs">
+            <li class="active"><a href="#tabInbox" data-toggle="tab">Inbox</a></li>
+            <li><a href="#tabSent" data-toggle="tab">Sent</a></li>
+        </ul>
+        <div class="tab-content">
+            <div id="tabInbox" class="tab-pane active">
+                {% set messages = user.messages %}
+                <table class="table table-bordered table-striped">
+                    <thead>
+                        <tr>
+                            <th width="55%">Sender</th>
+                            <th width="45%">Date</th>
+                        </tr>
+                    </thead>
+                    <tbody class="messageList">
+                        {% for message in messages %}
+                            <tr data-body="{{ message.body }}"{% if message.unread %} class="unread"{% endif %}>
+                                <td>{{ message.user_from.name }}</td>
+                                <td>{{ message.created|format_date('%d %b %Y at %H:%M') }}</td>
+                            </tr>
+                        {% endfor %}
+                        {% if not messages.count() %}
+                            <tr><td colspan="2">You have no new messages!</td></tr>
+                        {% endif %}
+                    </tbody>
+                </table>
+            </div>
+            <div id="tabSent" class="tab-pane">
+                {% set messages = user.messages_sent %}
+                <table class="table table-bordered table-striped">
+                    <thead>
+                        <tr>
+                            <th width="55%">Recipient</th>
+                            <th width="45%">Date</th>
+                        </tr>
+                    </thead>
+                    <tbody class="messageList">
+                        {% for message in messages %}
+                            <tr data-body="{{ message.body }}"{% if message.unread %} class="unread"{% endif %}>
+                                <td>{{ message.user_to.name }}</td>
+                                <td>{{ message.created|format_date('%d %b %Y at %H:%M') }}</td>
+                            </tr>
+                        {% endfor %}
+                        {% if not messages.count() %}
+                            <tr><td colspan="2">You have no sent messages!</td></tr>
+                        {% endif %}
+                    </tbody>
+                </table>
+            </div>
+        </div>
+    </div>
+    <div id="messagePreview" class="span5">
+        <!-- Message preview gets rendered here -->
+    </div>
+{% endblock %}

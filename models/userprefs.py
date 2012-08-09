@@ -20,6 +20,7 @@ class UserPrefs(db.Model):
     joined = db.DateProperty()
     awards = db.StringListProperty()
     donated = db.FloatProperty(default=0.0)
+    unread_messages = db.IntegerProperty(default=0)
 
     @staticmethod
     def get():
