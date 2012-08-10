@@ -273,7 +273,7 @@ class Recipe
         fg_plato = (-463.37) + (668.72 * fg) - (205.35 * (fg * fg))
         real_extract = (0.1808 * gu_plato) + (0.8192 * fg_plato)
         abw = 0.79 * abv / fg
-        calories = ((6.9 * abv) + 4.0 * (real_extract - 0.10)) * fg * bottle
+        calories = ((6.9 * abw) + 4.0 * (real_extract - 0.10)) * fg * bottle
         $('#calories').html(Math.round(calories))
         
         # Update brew color
