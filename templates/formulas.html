@@ -1,0 +1,88 @@
+{% extends 'base.html' %}
+
+{% block scripts %}
+    <script type="text/javascript" src="http://cdn.mathjax.org/mathjax/latest/MathJax.js?config=AM_HTMLorMML-full"></script>
+{% endblock %}
+
+{% block content %}
+    <ul class="breadcrumb">
+        <li><a href="/">home</a><span class="divider">/</span></li>
+        <li>homebrew formulas</li>
+    </ul>
+    <h1>Original Gravity</h1>
+    <p class="span6">
+        Original gravity is a measure of the amount of sugar in a wort that has the potential of becoming alcohol through fermentation. You can caluclate the original gravity `o` with the following formula, where `p` is the parts per pound per gallon of sugar, `w` is the weight in pounds and `g` is the batch size in gallons:
+    </p>
+    <p class="span5">
+        `o = 1 + (sum((p * w) / g)) / 1000`
+    </p>
+    <div class="clear"></div>
+    <h1>Final Gravity</h1>
+    <p class="span6">
+        Final gravity is a measure of the amount of sugar remaining in a wort after fermentation has converted much of the sugar to alcohol. You can calculate the final gravity `f` with the following formula, where `o` is the original gravity and `a_1`, `a_2`, `a_3`, etc are the percentage attenuation values of the yeast in the recipe:
+    </p>
+    <p class="span5">
+        `f = o - ((o - 1) * (max(a_1, a_2, a_3, ...)) / 100)`
+    </p>
+    <div class="clear"></div>
+    <h1>Brew Color</h1>
+    <p class="span6">
+        Brew color is usually given in degrees SRM, and is a function of the colors of each fermentable sugar. You can calculate the SRM color value `c` with the following formula, where `s` is the fermentable color value, `w` is the weight in pounds, and `g` is the batch size in gallons:
+    </p>
+    <p class="span5">
+        `c = sum((s * w) / g)`
+    </p>
+    <div class="clear"></div>
+    <h1>SRM to RGB</h1>
+    <p class="span6">
+        The brew color is usually given in degrees SRM, which can be problematic if it is to be displayed on a digital screen. Digital screens usually use red, green, and blue value triplets. You can calculate approximate red, green, and blue 8-bit values `r`, `g`, and `b` with the following formulas, where `c` is the SRM color value in degrees:
+    </p>
+    <p class="span5">
+        `r = min(255, max(0, 255 * 0.975^c))`<br/>
+        `g = min(255, max(0, 245 * 0.88^c))`<br/>
+        `b = min(255, max(0, 220 * 0.7^c))`
+    </p>
+    <div class="clear"></div>
+    <h1>Alcohol By Volume</h1>
+    <p class="span6">
+        Alcohol by volume is a percentage of the brew's volume that is alcohol compared to that which is not. You can calculate the amount of alcohol `a` with the following formula, where `o` is the original gravity and `f` is the final gravity:
+    </p>
+    <p class="span5">
+        `a = (1.05 * (o - f)) / (.0079f)`
+    </p>
+    <div class="clear"></div>
+    <h1>Real Extract</h1>
+    <p class="span6">
+        Real extract is an intermediate value based on gravities converted to units plato that is used in other calculations, such as the number of calories. You can calculate the real extract `r` with the following formulas, where `o` is the original gravity and `f` is the final gravity.
+    </p>
+    <p class="span5">
+        `p = -205.35o^2 + 668.72o - 463.37`<br/>
+        `q = -205.35f^2 + 668.72f - 463.37`<br/>
+        `r = 0.1808p + 0.8192q`
+    </p>
+    <div class="clear"></div>
+    <h1>Calories Per Bottle</h1>
+    <p class="span6">
+        Calories are a measure of energy that is available per bottle of finished brew. You can calculate the calorie content `k` with the following formula, where `a` is the alcohol percentage by volume, `b` is the bottle size in ml, `f` is the final gravity, and `r` is the real extract:
+    </p>
+    <p class="span5">
+        `k = (6.9 (0.79a / f) + 4 (r - 0.1)) * f * b / 100`
+    </p>
+    <div class="clear"></div>
+    <h1>Bitterness Units</h1>
+    <p class="span6">
+        Bitterness is usually measured in IBUs, and international measure of how bitter something tastes. Malt.io uses the Tinseth formula for accurate IBU calculation. You can calculate the IBU value `i` with the following formula, where `o` is the original gravity, `t` is the time in minutes that hops are boiled, `d` is the hop alpha acid percentage, `z` is the weight of the hops in ounces, `h` is the average boil size in gallons, and `u` is the utilization factor (1.0 for whole hops, 1.15 for pellet hops):
+    </p>
+    <p class="span5">
+        `i = sum(1.65 * 0.000125^(o - 1) * (1 - 2.718^(-0.04t) / 4.15) * (7490duz) / (100h))`
+    </p>
+    <div class="clear"></div>
+    <h1>Bitterness Ratio</h1>
+    <p class="span6">
+        The bitterness ratio BU:GU is a measure of how bitter a brew is in comparison to the original gravity, i.e. the alcohol potential of a recipe. You can calculate the ratio `v` using the following formula, where `i` is the recipe bitterness in IBU and `o` is the original gravity:
+    </p>
+    <p class="span5">
+        `v = i / (1000(o - 1))`
+    </p>
+    <div class="clear"></div>
+{% endblock %}

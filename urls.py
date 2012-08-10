@@ -1,4 +1,5 @@
 from handlers.donate import DonateHandler
+from handlers.formulas import FormulasHandler
 from handlers.index import MainHandler
 from handlers.messages import MessagesHandler
 from handlers.profile import ProfileHandler
@@ -20,6 +21,7 @@ urls = [
     ('/messages', MessagesHandler),
     ('/profile', ProfileHandler),
     ('/new', RecipeHandler),
+    ('/homebrew-formulas', FormulasHandler),
     ('/donate', DonateHandler),
     ('/', MainHandler)
 ]
