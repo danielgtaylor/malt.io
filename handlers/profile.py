@@ -39,8 +39,13 @@ class ProfileHandler(webapp2.RequestHandler):
         if not name or len(name) < 4 or name in settings.RESERVED_USERNAMES:
             return webapp2.redirect('/profile')
 
-        # Set the values and save to the data store
+        # Get the current user and ensure he/she exists
         user = UserPrefs.get()
+
+        if not user:
+            return webapp2.redirect('/profile')
+
+        # Set the values and save to the data store
         user.name = name
         user.email = email
         user.put()

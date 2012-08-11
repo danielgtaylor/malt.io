@@ -45,12 +45,12 @@ class RecipesHandler(webapp2.RequestHandler):
         """
         Render the public recipe list for a user or all users.
         """
-        publicuser = UserPrefs.all().filter('name =', username).get()
-
         if username:
+            publicuser = UserPrefs.all().filter('name =', username).get()
             recipes = Recipe.all()\
                             .filter('owner =', publicuser)
         else:
+            publicuser = None
             recipes = Recipe.all()
 
         render(self, 'recipes.html', {
@@ -90,10 +90,24 @@ class RecipeLikeHandler(webapp2.RequestHandler):
                               .filter('name = ', username)\
                               .get()
 
+        if not publicuser:
+            render_json(self, {
+                'status': 'error',
+                'error': 'User not found'
+            })
+            return
+
         recipe = Recipe.all()\
                        .filter('owner =', publicuser)\
                        .filter('slug =', recipe_slug)\
                        .get()
+
+        if not recipe:
+            render_json(self, {
+                'status': 'error',
+                'error': 'Recipe not found'
+            })
+            return
 
         if action == 'post':
             if user.user_id not in recipe.likes:
@@ -120,14 +134,28 @@ class RecipeCloneHandler(webapp2.RequestHandler):
 
     """
     def post(self, username=None, recipe_slug=None):
-        user = UserPrefs.all()\
-                        .filter('name = ', username)\
-                        .get()
+        publicuser = UserPrefs.all()\
+                              .filter('name = ', username)\
+                              .get()
+
+        if not publicuser:
+            render_json(self, {
+                'status': 'error',
+                'error': 'User not found'
+            })
+            return
 
         recipe = Recipe.all()\
-                       .filter('owner =', user)\
+                       .filter('owner =', publicuser)\
                        .filter('slug =', recipe_slug)\
                        .get()
+
+        if not recipe:
+            render_json(self, {
+                'status': 'error',
+                'error': 'Recipe not found'
+            })
+            return
 
         new_recipe = Recipe(**{
             'owner': UserPrefs.get(),
@@ -177,13 +205,17 @@ class RecipeHandler(webapp2.RequestHandler):
             recipe.owner = publicuser
         else:
             publicuser = UserPrefs.all().filter('name =', username).get()
+
+            if not publicuser:
+                self.abort(404)
+
             recipe = Recipe.all()\
                            .filter('owner =', publicuser)\
                            .filter('slug =', recipe_slug)\
                            .get()
 
-        if not recipe:
-            self.abort(404)
+            if not recipe:
+                self.abort(404)
 
         render(self, 'recipe.html', {
             'publicuser': publicuser,
@@ -211,7 +243,7 @@ class RecipeHandler(webapp2.RequestHandler):
             })
             return
 
-        # Load recipe from db
+        # Load recipe from db or create a new one
         if not recipe_slug:
             recipe = Recipe()
             recipe.owner = user
@@ -224,6 +256,12 @@ class RecipeHandler(webapp2.RequestHandler):
             if recipe:
                 # Save a historic version of this recipe
                 recipe.put_historic_version()
+            else:
+                render_json(self, {
+                    'status': 'error',
+                    'error': 'Recipe not found'
+                })
+                return
 
         # Ensure you own this recipe
         if not recipe or recipe.owner.name != user.name:
@@ -265,6 +303,13 @@ class RecipeHandler(webapp2.RequestHandler):
         or failure.
         """
         user = UserPrefs.get()
+
+        if not user:
+            render_json(self, {
+                'status': 'error',
+                'error': 'User not logged in'
+            })
+
         recipe = Recipe.all()\
                        .filter('slug = ', recipe_slug)\
                        .filter('owner =', user)\

@@ -3,6 +3,7 @@ import webapp2
 from models.message import Message
 from models.userprefs import UserPrefs
 from util import render
+from webapp2_extras.appengine.users import login_required
 
 
 class MessagesHandler(webapp2.RequestHandler):
@@ -12,6 +13,7 @@ class MessagesHandler(webapp2.RequestHandler):
         /messages
 
     """
+    @login_required
     def get(self):
         """
         Render the messages page. This includes all messages relevant

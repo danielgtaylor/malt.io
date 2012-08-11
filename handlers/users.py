@@ -38,6 +38,9 @@ class UserHandler(webapp2.RequestHandler):
         """
         user = UserPrefs.all().filter('name =', username).get()
 
+        if not user:
+            self.abort(404)
+
         recipes = Recipe.all()\
                         .filter('owner =', user)\
                         .order('-edited')\
@@ -74,6 +77,10 @@ class UsernameCheckHandler(webapp2.RequestHandler):
         simple JSON response.
         """
         user = UserPrefs.get()
+
+        if not user:
+            self.abort(404)
+
         username = cgi.escape(self.request.get('username'))
         count = 0
 
