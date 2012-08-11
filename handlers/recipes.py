@@ -170,12 +170,13 @@ class RecipeHandler(webapp2.RequestHandler):
         Render the recipe view. If no slug is given then create a new recipe
         and render it in edit mode.
         """
-        publicuser = UserPrefs.all().filter('name =', username).get()
-
         # Create a new recipe if we have no slug, otherwise query
         if not recipe_slug:
+            publicuser = UserPrefs.get()
             recipe = Recipe()
+            recipe.owner = publicuser
         else:
+            publicuser = UserPrefs.all().filter('name =', username).get()
             recipe = Recipe.all()\
                            .filter('owner =', publicuser)\
                            .filter('slug =', recipe_slug)\
