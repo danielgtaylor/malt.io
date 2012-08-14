@@ -31,7 +31,7 @@
                     </thead>
                     <tbody class="messageList">
                         {% for message in messages %}
-                            <tr id="message{{ message.key().id() }}" data-body="{{ message.body }}"{% if not message.read %} class="unread"{% endif %}>
+                            <tr id="message{{ message.key().id() }}" data-body="{{ message.body|e }}"{% if not message.read %} class="unread"{% endif %}>
                                 <td>{{ message.user_from.name }}</td>
                                 <td>{{ message.created|format_date('%d %b %Y at %H:%M') }}</td>
                             </tr>
