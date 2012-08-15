@@ -15,8 +15,12 @@ def generate_usable_slug(recipe):
     integer until no existing recipe would be overwritten.
     """
     slug = slugify(recipe.name)
-    append = 0
 
+    # Reuse existing slug if we can
+    if recipe.slug and recipe.slug == slug:
+        return recipe.slug
+
+    append = 0
     while True:
         count = Recipe.all()\
                       .filter('owner =', recipe.owner)\
