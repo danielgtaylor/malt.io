@@ -14,13 +14,26 @@ class UserPrefs(db.Model):
     the username, email, when the user joined, earned awards, etc and links
     them all to a global Google account ID.
     """
+    # Unique ID, user-chosen name and email
     user_id = db.StringProperty()
     name = db.StringProperty()
     email = db.StringProperty()
+
+    # The date when the user joined
     joined = db.DateProperty()
+
+    # A list of award names given to this user
     awards = db.StringListProperty()
+
+    # The amount this user has donated
     donated = db.FloatProperty(default=0.0)
+
+    # Cached number of unread messages, used to display a tag by the
+    # user's name when logged in.
     unread_messages = db.IntegerProperty(default=0)
+
+    # List of user IDs that this user is following
+    following = db.StringListProperty()
 
     @staticmethod
     def get():

@@ -52,6 +52,58 @@ class UserHandler(webapp2.RequestHandler):
         })
 
 
+class UserFollowHandler(webapp2.RequestHandler):
+    """
+    Follow another user to see when they create or like recipes, etc via
+    the following URLs:
+
+        /users/USERNAME/follow
+
+    """
+    def post(self, username):
+        self.process(username, 'post')
+
+    def delete(self, username):
+        self.process(username, 'delete')
+
+    def process(self, username, action):
+        """
+        Follow the given user.
+        """
+        user = UserPrefs.get()
+        publicuser = UserPrefs.all().filter('name =', username).get()
+
+        if not user or not publicuser:
+            return render_json(self, {
+                'status': 'error',
+                'error': 'User not found'
+            })
+
+        if action == 'post':
+            if publicuser.user_id in user.following:
+                return render_json(self, {
+                    'status': 'error',
+                    'error': 'Already following user'
+                })
+
+            user.following.append(publicuser.user_id)
+        else:
+            if publicuser.user_id not in user.following:
+                return render_json(self, {
+                    'status': 'error',
+                    'error': 'User not being followed'
+                })
+
+            user.following.remove(publicuser.user_id)
+
+        # Save updated following list
+        user.put()
+
+        render_json(self, {
+            'status': 'ok'
+        })
+
+
 class UsernameCheckHandler(webapp2.RequestHandler):
     """
     This handler checks a proposed username and returns information on

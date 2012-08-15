@@ -5,7 +5,8 @@ from handlers.messages import MessagesHandler
 from handlers.profile import ProfileHandler
 from handlers.recipes import RecipesHandler, RecipeLikeHandler, \
                              RecipeCloneHandler, RecipeHandler
-from handlers.users import UsersHandler, UserHandler, UsernameCheckHandler
+from handlers.users import UsersHandler, UserHandler, UserFollowHandler, \
+                           UsernameCheckHandler
 
 # The following maps regular expressions to specific handlers.
 # Matched groups become positional arguments to the handler's methods.
@@ -14,6 +15,7 @@ urls = [
     ('/users/(.*?)/recipes/(.*?)/clone', RecipeCloneHandler),
     ('/users/(.*?)/recipes/(.*)', RecipeHandler),
     ('/users/(.*?)/recipes', RecipesHandler),
+    ('/users/(.*?)/follow', UserFollowHandler),
     ('/users/(.*)', UserHandler),
     ('/users', UsersHandler),
     ('/username', UsernameCheckHandler),

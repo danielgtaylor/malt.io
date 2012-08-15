@@ -5,6 +5,7 @@
         $(document).ready(function () {
             Recipe.init();
             Messages.init();
+            User.init();
         });
     </script>
 {% endblock %}
@@ -31,7 +32,7 @@
         <div class="avatar-large" style="background-image: url({{ publicuser.gravatar_large }}); float: left; margin-right: 1em;"></div>
         <h2>{{ publicuser.name }}</h2>
         <div class="btn-group">
-            <a class="btn disabled"><i class="icon-eye-open"></i> Follow</a>
+            <a id="followButton" class="btn{% if user and publicuser.user_id in user.following %} active{% endif %}" data-toggle="button"><i class="icon-eye-open"></i> Follow</a>
             <a class="btn" data-toggle="modal" href="#messageModal"><i class="icon-envelope"></i> Send message</a>
             <a class="btn disabled"><i class="icon-flag"></i> Report user</a>
         </div>
