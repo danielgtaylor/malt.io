@@ -20,7 +20,7 @@ def generate_usable_slug(recipe):
     while True:
         count = Recipe.all()\
                       .filter('owner =', recipe.owner)\
-                      .filter('slug =', recipe.slug)\
+                      .filter('slug =', slug)\
                       .count()
 
         if not count:
