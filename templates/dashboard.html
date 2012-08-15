@@ -1,0 +1,35 @@
+{% extends 'base.html' %}
+
+{% block scripts %}
+    <script type="text/javascript">
+        Recipe.init();
+    </script>
+{% endblock %}
+
+{% block content %}
+    <ul class="breadcrumb">
+        <li>home</li>
+    </ul>
+    <ul class="nav nav-list span2 pull-right">
+        <li class="nav-header">Top Recipes</li>
+        {% for recipe in user.top_interesting_recipes %}
+            <li class="ellipsize"><a href="/users/{{ recipe.owner.name }}/recipes/{{ recipe.slug }}" title="{{ recipe.owner.name }} / {{ recipe.likes_count }} likes"><span class="srm" data-srm="{{ recipe.color }}"></span> {{ recipe.name }}</a></li>
+        {% endfor %}
+    </ul>
+    <ul class="nav nav-list span2">
+        <li class="nav-header">Recipes</li>
+        <li><a href="/users/{{ user.name }}/recipes"><i class="icon-book"></i> My recipes</a></li>
+        <li><a href="/recipes"><i class="icon-th-list"></i> All recipes</a></li>
+        <li><a href="/new"><i class="icon-plus-sign"></i> New recipe</a></li>
+        <li class="nav-header">My Account</li>
+        <li><a href="/users/{{ user.name }}"><i class="icon-user"></i> Public profile</a></li>
+        <li><a href="/profile"><i class="icon-cog"></i> User settings</a></li>
+        <li class="nav-header">Following</li>
+        {% for u in user.following_users %}
+            <li><a href="/users/{{ u.name }}"><div class="avatar-tiny" style="background-image: url({{ u.gravatar_tiny }});"></div> {{ u.name }}</a></li>
+        {% endfor %}
+    </ul>
+    <div>
+        Events placeholder
+    </div>
+{% endblock %}

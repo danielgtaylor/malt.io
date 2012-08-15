@@ -88,6 +88,7 @@ class Recipe(RecipeBase):
 
     # Users who have liked tihs recipe
     likes = db.StringListProperty()
+    likes_count = db.IntegerProperty(default=0)
 
     @property
     def url(self):
@@ -95,6 +96,17 @@ class Recipe(RecipeBase):
             'username': self.owner.name,
             'slug': self.slug
         }
+
+    def put(self, *args):
+        """
+        Save this recipe, updating any caches as needed before writing
+        to the data store.
+        """
+        # Update the cached number of likes so we can sort on this field
+        # later for displaying the most popular recipes
+        self.likes_count = len(self.likes)
+
+        return super(Recipe, self).put(*args)
 
     def put_historic_version(self):
         """

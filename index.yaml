@@ -21,3 +21,14 @@ indexes:
   - name: owner
   - name: edited
     direction: desc
+
+- kind: Recipe
+  properties:
+  - name: owner
+  - name: likes_count
+
+- kind: Recipe
+  properties:
+  - name: owner
+  - name: likes_count
+    direction: desc

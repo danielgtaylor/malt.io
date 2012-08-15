@@ -1,5 +1,6 @@
 import webapp2
 
+from models.userprefs import UserPrefs
 from util import render
 
 
@@ -13,4 +14,9 @@ class MainHandler(webapp2.RequestHandler):
         Render the index page. Currently this renders a 'Coming soon' landing
         page that will eventually be replaced with a proper home page.
         """
-        render(self, 'index.html')
+        user = UserPrefs.get()
+
+        if user:
+            render(self, 'dashboard.html')
+        else:
+            render(self, 'index.html')

@@ -126,6 +126,39 @@ class UserPrefs(db.Model):
         return self.gravatar(40)
 
     @property
+    def gravatar_tiny(self):
+        """
+        Get an avatar image link that is 14x14, useful for menus.
+        """
+        return self.gravatar(14)
+
+    @property
+    def following_users(self):
+        """
+        Get a list of UserPref objects for the users that this user is
+        currently following.
+        """
+        return UserPrefs.all()\
+                        .filter('user_id IN', self.following)
+
+    @property
+    def top_interesting_recipes(self):
+        """
+        Get a list of the top recipes that are interesting for this user,
+        meaning that either the recipes belong to this user or any user
+        that she is following. The list is ranked by the number of likes
+        that each recipe has.
+        """
+        from models.recipe import Recipe
+
+        following = self.following_users.run(batch_size=100)
+
+        return Recipe.all()\
+                     .filter('owner IN', [self] + list(following))\
+                     .order('-likes_count')\
+                     .fetch(15)
+
+    @property
     def brewdays(self):
         """
         Get a query of brewday objects for this user.
