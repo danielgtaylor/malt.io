@@ -31,8 +31,12 @@
     </ul>
     <div class="span7">
         <h6>Recent events</h6>
-        {% for event in user.top_interesting_events %}
+        {% set events = user.top_interesting_events %}
+        {% for event in events %}
             {{ event|render_action }}
         {% endfor %}
+        {% if not events %}
+            No recent events
+        {% endif %}
     </div>
 {% endblock %}
