@@ -32,3 +32,9 @@ indexes:
   - name: owner
   - name: likes_count
     direction: desc
+
+- kind: UserAction
+  properties:
+  - name: owner
+  - name: created
+    direction: desc

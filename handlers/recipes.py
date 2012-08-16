@@ -3,6 +3,7 @@ import json
 import webapp2
 
 from models.recipe import Recipe
+from models.useraction import UserAction
 from models.userprefs import UserPrefs
 from util import render, render_json, slugify
 from webapp2_extras.appengine.users import login_required
@@ -117,10 +118,33 @@ class RecipeLikeHandler(webapp2.RequestHandler):
             if user.user_id not in recipe.likes:
                 recipe.likes.append(user.user_id)
                 recipe.put()
+
+                existing = UserAction.all()\
+                                     .filter('owner =', user)\
+                                     .filter('type =', UserAction.TYPE_RECIPE_LIKED)\
+                                     .filter('object_id =', recipe.key().id())\
+                                     .count()
+
+                if not existing:
+                    user_action = UserAction()
+                    user_action.owner = user
+                    user_action.type = user_action.TYPE_RECIPE_LIKED
+                    user_action.object_id = recipe.key().id()
+                    user_action.put()
+
         elif action == 'delete':
             if user.user_id in recipe.likes:
                 recipe.likes.remove(user.user_id)
                 recipe.put()
+
+                existing = UserAction.all()\
+                                     .filter('owner =', user)\
+                                     .filter('type =', UserAction.TYPE_RECIPE_LIKED)\
+                                     .filter('object_id =', recipe.key().id())\
+                                     .get()
+
+                if existing:
+                    existing.delete()
 
         return render_json(self, {
             'status': 'ok',
@@ -180,6 +204,12 @@ class RecipeCloneHandler(webapp2.RequestHandler):
 
         new_recipe.slug = generate_usable_slug(new_recipe)
         new_recipe.put()
+
+        action = UserAction()
+        action.owner = UserPrefs.get()
+        action.type = action.TYPE_RECIPE_CLONED
+        action.object_id = new_recipe.key().id()
+        action.put()
 
         return render_json(self, {
             'status': 'ok',
@@ -291,7 +321,18 @@ class RecipeHandler(webapp2.RequestHandler):
         recipe.slug = generate_usable_slug(recipe)
 
         # Save recipe to database
-        recipe.put()
+        key = recipe.put()
+
+        action = UserAction()
+        action.owner = user
+        action.object_id = key.id()
+
+        if not recipe_slug:
+            action.type = action.TYPE_RECIPE_CREATED
+        else:
+            action.type = action.TYPE_RECIPE_EDITED
+
+        action.put()
 
         render_json(self, {
             'status': 'ok',

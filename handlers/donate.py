@@ -3,6 +3,7 @@ import settings
 import webapp2
 
 from contrib import stripe
+from models.useraction import UserAction
 from models.userprefs import UserPrefs
 from util import render
 
@@ -50,10 +51,16 @@ class DonateHandler(webapp2.RequestHandler):
             'description': 'Donation from ' + (user and user.name or 'Anonymous')
         })
 
-        # Add an award to this user for donating
-        user = UserPrefs.get()
-        if user and 'donated' not in user.awards:
-            user.awards.append('donated')
-            user.put()
+        if user:
+            # Add an award to this user for donating
+            if user and 'donated' not in user.awards:
+                user.awards.append('donated')
+                user.put()
+
+            # Log action
+            action = UserAction()
+            action.owner = user
+            action.type = action.TYPE_USER_DONATED
+            action.put()
 
         return webapp2.redirect('/donate?success=true')

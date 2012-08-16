@@ -3,6 +3,7 @@ import settings
 import webapp2
 
 from models.recipe import Recipe
+from models.useraction import UserAction
 from models.userprefs import UserPrefs
 from util import render, render_json
 
@@ -87,6 +88,19 @@ class UserFollowHandler(webapp2.RequestHandler):
                 })
 
             user.following.append(publicuser.user_id)
+
+            existing = UserAction.all()\
+                                 .filter('owner =', user)\
+                                 .filter('type =', UserAction.TYPE_USER_FOLLOWED)\
+                                 .filter('object_id =', publicuser.key().id())\
+                                 .count()
+
+            if not existing:
+                user_action = UserAction()
+                user_action.owner = user
+                user_action.type = user_action.TYPE_USER_FOLLOWED
+                user_action.object_id = publicuser.key().id()
+                user_action.put()
         else:
             if publicuser.user_id not in user.following:
                 return render_json(self, {
@@ -95,6 +109,15 @@ class UserFollowHandler(webapp2.RequestHandler):
                 })
 
             user.following.remove(publicuser.user_id)
+
+            existing = UserAction.all()\
+                                 .filter('owner =', user)\
+                                 .filter('type =', UserAction.TYPE_USER_FOLLOWED)\
+                                 .filter('object_id =', publicuser.key().id())\
+                                 .get()
+
+            if existing:
+                existing.delete()
 
         # Save updated following list
         user.put()

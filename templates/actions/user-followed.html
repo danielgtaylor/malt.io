@@ -1,0 +1,7 @@
+<div class="action">
+    {% set u = action.object %}
+    <a href="/users/{{ action.owner.name }}">{{ action.owner.name }}</a> followed another user {{ action.created|timesince }} ago
+    <div class="content">
+        <a href="/users/{{ u.name }}"><div class="avatar-tiny" style="background-image: url({{ u.gravatar_tiny }});"></div> {{ u.name }}</a> - {{ u.recipes.count() }} recipes
+    </div>
+</div>

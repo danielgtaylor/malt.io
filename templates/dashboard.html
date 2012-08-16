@@ -16,7 +16,7 @@
             <li class="ellipsize"><a href="/users/{{ recipe.owner.name }}/recipes/{{ recipe.slug }}" title="{{ recipe.owner.name }} / {{ recipe.likes_count }} likes"><span class="srm" data-srm="{{ recipe.color }}"></span> {{ recipe.name }}</a></li>
         {% endfor %}
     </ul>
-    <ul class="nav nav-list span2">
+    <ul class="nav nav-list span2 pull-left">
         <li class="nav-header">Recipes</li>
         <li><a href="/users/{{ user.name }}/recipes"><i class="icon-book"></i> My recipes</a></li>
         <li><a href="/recipes"><i class="icon-th-list"></i> All recipes</a></li>
@@ -29,7 +29,10 @@
             <li><a href="/users/{{ u.name }}"><div class="avatar-tiny" style="background-image: url({{ u.gravatar_tiny }});"></div> {{ u.name }}</a></li>
         {% endfor %}
     </ul>
-    <div>
-        Events placeholder
+    <div class="span7">
+        <h6>Recent events</h6>
+        {% for event in user.top_interesting_events %}
+            {{ event|render_action }}
+        {% endfor %}
     </div>
 {% endblock %}

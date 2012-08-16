@@ -4,7 +4,7 @@
 	<title>{% block title %}Malt.io{% endblock %}</title>
 	<meta name="viewport" content="width=device-width, initial-scale=1.0">
 	<link rel="stylesheet" type="text/css" href="/static/styles/bootstrap.min.css"/>
-	<link rel="stylesheet" type="text/css" href="/static/styles/main.css?v=1345043714"/>
+	<link rel="stylesheet" type="text/css" href="/static/styles/main.css?v=1345083629"/>
 	{% block head %}{% endblock %}
 </head>
 <body>
@@ -37,7 +37,7 @@
                     {% if user %}
                         <li class="dropdown">
                             <a href="#" class="dropdown-toggle" data-toggle="dropdown">
-                            {{ user.name }}{% if user.unread_messages %} <span class="badge badge-info">{{ user.unread_messages }}</span>{% endif %}
+                            <div class="avatar-tiny" style="background-image: url({{ user.gravatar_tiny }});"></div> {{ user.name }}{% if user.unread_messages %} <span class="badge badge-info">{{ user.unread_messages }}</span>{% endif %}
                             <b class="caret"></b>
                             </a>
                             <ul class="dropdown-menu">
@@ -69,7 +69,7 @@
     <script type="text/javascript" src="http://code.jquery.com/jquery-1.7.2.min.js"></script>
     <!--<script type="text/javascript" src="/static/scripts/jquery.js"></script>-->
 	<script type="text/javascript" src="/static/scripts/bootstrap.min.js"></script>
-	<script type="text/javascript" src="/static/scripts/main.js?v=1345043714"></script>
+	<script type="text/javascript" src="/static/scripts/main.js?v=1345083629"></script>
     {% block scripts %}{% endblock %}
 </body>
 </html>

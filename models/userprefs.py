@@ -43,6 +43,8 @@ class UserPrefs(db.Model):
         memcache, falling back to the database and then updating
         memcache for the next time the object is needed.
         """
+        from models.useraction import UserAction
+
         user = users.get_current_user()
 
         prefs = None
@@ -81,6 +83,11 @@ class UserPrefs(db.Model):
                     'joined': Date().date
                 })
                 prefs.put()
+
+                action = UserAction()
+                action.owner = prefs
+                action.type = action.TYPE_USER_JOINED
+                action.put()
 
         return prefs
 
@@ -157,6 +164,22 @@ class UserPrefs(db.Model):
                      .filter('owner IN', [self] + list(following))\
                      .order('-likes_count')\
                      .fetch(15)
+
+    @property
+    def top_interesting_events(self):
+        """
+        Get a list of interesting events ordered by date from most
+        recent to least. Interesting events are events that either belong
+        to this user or any user she is following.
+        """
+        from models.useraction import UserAction
+
+        following = self.following_users.run(batch_size=100)
+
+        return UserAction.all()\
+                         .filter('owner IN', [self] + list(following))\
+                         .order('-created')\
+                         .fetch(50)
 
     @property
     def brewdays(self):
