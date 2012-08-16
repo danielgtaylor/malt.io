@@ -179,7 +179,7 @@ class UserPrefs(db.Model):
         return UserAction.all()\
                          .filter('owner IN', [self] + list(following))\
                          .order('-created')\
-                         .fetch(50)
+                         .fetch(25)
 
     @property
     def brewdays(self):
