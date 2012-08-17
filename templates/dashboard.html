@@ -10,13 +10,13 @@
     <ul class="breadcrumb">
         <li>home</li>
     </ul>
-    <ul class="nav nav-list span2 pull-right">
+    <ul class="nav nav-list span2 pull-right" style="margin-bottom: 1em;">
         <li class="nav-header">Top Recipes</li>
         {% for recipe in user.top_interesting_recipes %}
             <li><a class="ellipsize" href="/users/{{ recipe.owner.name }}/recipes/{{ recipe.slug }}" title="{{ recipe.owner.name }} / {{ recipe.likes_count }} likes"><span class="srm" data-srm="{{ recipe.color }}"></span> {{ recipe.name }}</a></li>
         {% endfor %}
     </ul>
-    <ul class="nav nav-list span2 pull-left">
+    <ul class="nav nav-list span2 pull-left" style="margin-bottom: 1em;">
         <li class="nav-header">Recipes</li>
         <li><a href="/users/{{ user.name }}/recipes"><i class="icon-book"></i> My recipes</a></li>
         <li><a href="/recipes"><i class="icon-th-list"></i> All recipes</a></li>
