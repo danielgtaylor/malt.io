@@ -1,5 +1,5 @@
 <div class="action">
-    <a href="/users/{{ action.owner.name }}">{{ action.owner.name }}</a> donated to Malt.io {{ action.created|timesince }} ago
+    <a href="/users/{{ action.owner.name }}"><div class="avatar-tiny" style="background-image: url({{ action.owner.gravatar_tiny }});"></div> {{ action.owner.name }}</a> donated to Malt.io {{ action.created|timesince }} ago
     <div class="content">
         Everyone should buy {{ action.owner.name }} a beer! Thanks for supporting the site!
     </div>
