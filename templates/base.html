@@ -4,7 +4,7 @@
 	<title>{% block title %}Malt.io{% endblock %}</title>
 	<meta name="viewport" content="width=device-width, initial-scale=1.0">
 	<link rel="stylesheet" type="text/css" href="/static/styles/bootstrap.min.css"/>
-	<link rel="stylesheet" type="text/css" href="/static/styles/main.css?v=1345219653"/>
+	<link rel="stylesheet" type="text/css" href="/static/styles/main.css?v=1345227369"/>
 	{% block head %}{% endblock %}
 </head>
 <body>
@@ -29,8 +29,8 @@
 						</ul>
 					</li>
 				</ul>
-				<form class="navbar-search pull-left">
-					<input type="text" class="search-query" placeholder="Recipe search">
+				<form id="searchForm" class="navbar-search pull-left">
+                    <input id="searchQuery" type="text" class="search-query" placeholder="Search"/>
 				</form>
 				<ul class="nav pull-right">
                     <li><a href="/donate">Donate</a></li>
@@ -107,7 +107,7 @@
     <script type="text/javascript" src="http://code.jquery.com/jquery-1.7.2.min.js"></script>
     <!--<script type="text/javascript" src="/static/scripts/jquery.js"></script>-->
 	<script type="text/javascript" src="/static/scripts/bootstrap.min.js"></script>
-	<script type="text/javascript" src="/static/scripts/main.js?v=1345219653"></script>
+	<script type="text/javascript" src="/static/scripts/main.js?v=1345227369"></script>
     {% block scripts %}{% endblock %}
 </body>
 </html>
