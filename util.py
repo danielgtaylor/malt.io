@@ -141,7 +141,7 @@ def render_awards(values):
     return ' '.join(['<i class="icon-%(image)s" title="%(title)s"></i>' % {
         'image': AWARDS[item][0],
         'title': AWARDS[item][1]
-    } for item in values]) or 'No Awards!'
+    } for item in values]) or ''
 
 JINJA_ENV.filters['render_awards'] = render_awards
 

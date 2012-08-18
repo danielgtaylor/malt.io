@@ -33,6 +33,11 @@ indexes:
   - name: likes_count
     direction: desc
 
+- kind: Recipe
+  properties:
+  - name: owner
+  - name: name
+
 - kind: UserAction
   properties:
   - name: owner

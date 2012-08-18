@@ -16,49 +16,34 @@
         <li><a href="/users">users</a><span class="divider">/</span></li>
         <li>{{ publicuser.name }}</li>
     </ul>
-	<div class="span2 pull-right">
-        <h6>Joined</h6>
-        <p>{{ publicuser.joined|format_date }}</p>
-        <h6>Recipes</h6>
-        <p>{{ publicuser.recipes.count() }}</p>
-        <h6>Brewdays</h6>
-        <p>{{ publicuser.brewdays|length }}</p>
-        <h6>Awards</h6>
-        <p>
-            {{ publicuser.awards|render_awards }}
-        </p>
-    </div>
-    <div class="span9">
-        <div class="avatar-large" style="background-image: url({{ publicuser.gravatar_large }}); float: left; margin-right: 1em;"></div>
-        <h2>{{ publicuser.name }}</h2>
-        <div class="btn-group">
+    <div class="btn-group pull-right">
+        {% if user and user.user_id == publicuser.user_id %}
+            <a class="btn" href="/profile">Edit profile</a>
+        {% else %}
             <a id="followButton" class="btn{% if user and publicuser.user_id in user.following %} active{% endif %}" data-toggle="button"><i class="icon-eye-open"></i> Follow</a>
             <a class="btn" data-toggle="modal" href="#messageModal"><i class="icon-envelope"></i> Send message</a>
             <a class="btn disabled"><i class="icon-flag"></i> Report user</a>
-        </div>
-    </div>
-    <div class="clear">
-        <div class="page-header">
-            <h3>Public Recipes</h3>
-        </div>
-        {% if recipes %}
-            {% for recipe in recipes %}
-                {{ recipe|recipe_snippet }}
-            {% endfor %}
-        {% else %}
-            User has no public recipes!
         {% endif %}
-        <div style="clear: both;"></div>
-        <a href="/users/{{ publicuser.name }}/recipes">View all public recipes</a>
     </div>
-    <div class="clear">
-        <div class="page-header">
-            <h3>Public Brewdays</h3>
-        </div>
-        User has no public brewdays!
-        <div style="clear: both;"></div>
-        <a href="#">View all public brewdays</a>
+    <h2><div class="avatar-small" style="background-image: url({{ publicuser.gravatar_small }});"></div> {{ publicuser.name }} {{ publicuser.awards|render_awards }}</h2>
+    <hr class="clear"/>
+    <div class="span7 pull-right" style="margin-left: 0;">
+        <h6>Public Actions</h6>
+        {% for action in user.actions.order('-created').fetch(25) %}
+            {{ action|render_action }}
+        {% endfor %}
     </div>
+    <div class="vert-recipe-list span4 pull-left" style="margin-left: 0;">
+        {% set recipes = publicuser.recipes.order('name') %}
+        <h6>Recipes ({{ recipes.count() }} total)</h6>
+        {% for recipe in recipes %}
+            {{ recipe|recipe_snippet }}
+        {% endfor %}
+        {% if user and user.user_id == publicuser.user_id and not recipes.count() %}
+            <a class="btn btn-large btn-primary" href="/new">Create new recipe</a>
+        {% endif %}
+    </div>
+    <div class="clear"></div>
     <div id="messageModal" class="modal fade hide">
         <div class="modal-header">
             <button type="button" class="close" data-dismiss="modal">×</button>
