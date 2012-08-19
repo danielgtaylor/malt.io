@@ -273,7 +273,7 @@ class Recipe
         fg_plato = (-463.37) + (668.72 * fg) - (205.35 * (fg * fg))
         real_extract = (0.1808 * gu_plato) + (0.8192 * fg_plato)
         abw = 0.79 * abv / fg
-        calories = ((6.9 * abw) + 4.0 * (real_extract - 0.10)) * fg * bottle
+        calories = Math.max(0, ((6.9 * abw) + 4.0 * (real_extract - 0.10)) * fg * bottle)
         $('#calories').html(Math.round(calories))
         
         # Update brew color
@@ -303,7 +303,7 @@ class Recipe
         )
         $('#ibu').html(ibu.toFixed(1))
         
-        buToGu = ibu / ((gu - 1.0) * 1000)
+        buToGu = (ibu / ((gu - 1.0) * 1000)) or 0.0
         $('#buToGu').html(buToGu.toFixed(2))
         
         # Update priming sugar
