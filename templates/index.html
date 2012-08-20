@@ -1,42 +1,29 @@
-<!DOCTYPE html>
-<html lang="en">
-    <head>
-        <title>Malt.io - Coming soon!</title>
-        <style type="text/css">
-            @import url(http://fonts.googleapis.com/css?family=Germania+One);
-            
-            html {
-                background-image: -webkit-radial-gradient(rgba(255, 255, 255, 1.0), rgba(200, 200, 200, 1.0));
-                background-image: -moz-radial-gradient(rgba(255, 255, 255, 1.0), rgba(200, 200, 200, 1.0));
-                background-image: -ms-radial-gradient(rgba(255, 255, 255, 1.0), rgba(200, 200, 200, 1.0));
-                background-image: -o-radial-gradient(rgba(255, 255, 255, 1.0), rgba(200, 200, 200, 1.0));
-                background-image: radial-gradient(rgba(255, 255, 255, 1.0), rgba(200, 200, 200, 1.0));
-                width: 100%;
-                height: 100%;
-            }
-            
-            h1 {
-                font-family: 'Germania One';
-                text-align: center;
-                margin-top: 2.5em;
-                font-size: 80pt;
-                text-shadow: 1px 1px 0px rgba(255, 255, 255, 0.5), -1px -1px 0px rgba(0, 0, 0, 0.5);
-            }
-            
-            p {
-                font-family: sans-serif;
-                color: rgb(200, 200, 200);
-                text-align: center;
-                font-size: 28pt;
-                margin-top: -2em;
-                text-shadow: 1px 1px 1px rgba(255, 255, 255, 0.25), -1px -1px 1px rgba(0, 0, 0, 0.25);
-            }
-        </style>
-    </head>
-    <body>
-        <h1>Malt<span style="opacity: 0.5">.io</span></h1>
-        <p>
-            Coming soon
-        </p>
-    </body>
-</html>
+{% extends 'base.html' %}
+
+{% block scripts %}
+    <script type="text/javascript">
+        $(document).ready(function () {
+            Recipe.init();
+        })
+    </script>
+{% endblock %}
+
+{% block content %}
+    <div class="hero-unit" style="text-align: center;">
+        <h1 style="font-size: 800%;">Malt<span style="color: #999">.io</span></h1>
+        <span style="font-size: 150%;">the free community for brewers</span>
+        <div class="btn-toolbar">
+            <div class="btn-group">
+                <a class="btn" href="/profile">Join / Login</a>
+                <a class="btn" href="/donate">Donate</a>
+                <a class="btn" href="/new">New recipe</a>
+            </div>
+        </div>
+    </div>
+    <div>
+        <h6 style="padding-left: 16px;">Top Recipes</h6>
+        {% for recipe in recipes %}
+            {{ recipe|recipe_snippet }}
+        {% endfor %}
+    </div>
+{% endblock %}

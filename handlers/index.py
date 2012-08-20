@@ -1,5 +1,6 @@
 import webapp2
 
+from models.recipe import Recipe
 from models.userprefs import UserPrefs
 from util import render
 
@@ -19,4 +20,9 @@ class MainHandler(webapp2.RequestHandler):
         if user:
             render(self, 'dashboard.html')
         else:
-            render(self, 'index.html')
+            recipes = Recipe.all()\
+                            .order('-likes_count')\
+                            .fetch(15)
+            render(self, 'index.html', {
+                'recipes': recipes
+            })
