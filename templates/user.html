@@ -29,8 +29,10 @@
     <hr class="clear"/>
     <div class="span7 pull-right" style="margin-left: 0;">
         <h6>Public Actions</h6>
-        {% for action in user.actions.order('-created').fetch(25) %}
-            {{ action|render_action }}
+        {% for action in publicuser.actions.order('-created').fetch(15) %}
+            {% include "action.html" %}
+        {% else %}
+            No recent events
         {% endfor %}
     </div>
     <div class="vert-recipe-list span4 pull-left" style="margin-left: 0;">

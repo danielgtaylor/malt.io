@@ -25,16 +25,8 @@ class UserAction(db.Model):
     object_id = db.IntegerProperty()
 
     @property
-    def render_template(self):
-        return 'actions/' + {
-            self.TYPE_USER_JOINED: 'user-joined',
-            self.TYPE_USER_DONATED: 'user-donated',
-            self.TYPE_USER_FOLLOWED: 'user-followed',
-            self.TYPE_RECIPE_CREATED: 'recipe-created',
-            self.TYPE_RECIPE_EDITED: 'recipe-edited',
-            self.TYPE_RECIPE_CLONED: 'recipe-cloned',
-            self.TYPE_RECIPE_LIKED: 'recipe-liked'
-        }.get(self.type, 'unknown') + '.html'
+    def owner_key(self):
+        return UserAction.owner.get_value_for_datastore(self)
 
     @property
     def object(self):

@@ -13,7 +13,7 @@
     <ul class="nav nav-list span2 pull-right" style="margin-bottom: 1em;">
         <li class="nav-header">Top Recipes</li>
         {% for recipe in user.top_interesting_recipes %}
-            <li><a class="ellipsize" href="/users/{{ recipe.owner.name }}/recipes/{{ recipe.slug }}" title="{{ recipe.owner.name }} / {{ recipe.likes_count }} likes"><span class="srm" data-srm="{{ recipe.color }}"></span> {{ recipe.name }}</a></li>
+            <li><a class="ellipsize" href="/users/{{ user_map[recipe.owner_key.id()].name }}/recipes/{{ recipe.slug }}" title="{{ user_map[recipe.owner_key.id()].name }} / {{ recipe.likes_count }} likes"><span class="srm" data-srm="{{ recipe.color }}"></span> {{ recipe.name }}</a></li>
         {% endfor %}
     </ul>
     <ul class="nav nav-list span2 pull-left" style="margin-bottom: 1em;">
@@ -25,18 +25,16 @@
         <li><a href="/users/{{ user.name }}"><i class="icon-user"></i> Public profile</a></li>
         <li><a href="/profile"><i class="icon-cog"></i> User settings</a></li>
         <li class="nav-header">Following</li>
-        {% for u in user.following_users %}
+        {% for u in following %}
             <li><a href="/users/{{ u.name }}"><div class="avatar-tiny" style="background-image: url({{ u.gravatar_tiny }});"></div> {{ u.name }}</a></li>
         {% endfor %}
     </ul>
     <div class="span7">
         <h6>Recent events</h6>
-        {% set events = user.top_interesting_events %}
-        {% for event in events %}
-            {{ event|render_action }}
-        {% endfor %}
-        {% if not events %}
+        {% for action in interesting_events %}
+            {% include "action.html" %}
+        {% else %}
             No recent events
-        {% endif %}
+        {% endfor %}
     </div>
 {% endblock %}

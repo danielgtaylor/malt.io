@@ -43,3 +43,8 @@ indexes:
   - name: owner
   - name: created
     direction: desc
+
+- kind: UserPrefs
+  properties:
+  - name: user_id
+  - name: name

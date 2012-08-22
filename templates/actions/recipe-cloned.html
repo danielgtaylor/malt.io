@@ -1,7 +1,0 @@
-<div class="action">
-    {% set recipe = action.object %}
-    <a href="/users/{{ action.owner.name }}"><div class="avatar-tiny" style="background-image: url({{ action.owner.gravatar_tiny }});"></div> {{ action.owner.name }}</a> cloned a recipe {{ action.created|timesince }} ago
-    <div class="content">
-        <span class="srm" data-srm="{{ recipe.color }}"></span> <a href="/users/{{ recipe.owner.name }}/recipes/{{ recipe.slug }}">{{ recipe.name }}</a> - {{ recipe.description }}
-    </div>
-</div>

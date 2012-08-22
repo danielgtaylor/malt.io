@@ -37,19 +37,22 @@ class UserHandler(webapp2.RequestHandler):
         """
         Render a user page.
         """
-        user = UserPrefs.all().filter('name =', username).get()
+        publicuser = UserPrefs.all().filter('name =', username).get()
 
-        if not user:
+        if not publicuser:
             self.abort(404)
 
         recipes = Recipe.all()\
-                        .filter('owner =', user)\
+                        .filter('owner =', publicuser)\
                         .order('-edited')\
                         .fetch(6)
 
         render(self, 'user.html', {
-            'publicuser': user,
-            'recipes': recipes
+            'publicuser': publicuser,
+            'recipes': recipes,
+            'user_map': {
+                publicuser.key().id(): publicuser
+            }
         })
 
 

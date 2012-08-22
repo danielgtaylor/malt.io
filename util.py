@@ -230,12 +230,3 @@ def recipe_snippet(value):
     })
 
 JINJA_ENV.filters['recipe_snippet'] = recipe_snippet
-
-
-def render_action(action):
-    return JINJA_ENV.get_template(action.render_template).render({
-        'user': UserPrefs.get(),
-        'action': action
-    })
-
-JINJA_ENV.filters['render_action'] = render_action

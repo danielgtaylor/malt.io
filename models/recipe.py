@@ -91,6 +91,10 @@ class Recipe(RecipeBase):
     likes_count = db.IntegerProperty(default=0)
 
     @property
+    def owner_key(self):
+        return Recipe.owner.get_value_for_datastore(self)
+
+    @property
     def url(self):
         return '/users/%(username)s/recipes/%(slug)s' % {
             'username': self.owner.name,
