@@ -27,8 +27,8 @@ You can run a local copy of the site for development. Several prerequisites must
 sudo apt-get install git python-pip nodejs npm
 
 # Get Google AppEngine
-wget http://googleappengine.googlecode.com/files/google_appengine_1.7.0.zip
-unzip google_appengine_1.7.0.zip
+wget http://googleappengine.googlecode.com/files/google_appengine_1.7.1.zip
+unzip google_appengine_1.7.1.zip
 
 # Get other dependencies
 pip install pycco
