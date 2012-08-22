@@ -39,7 +39,9 @@ def render(handler, template, params=None):
     })
 
     t = JINJA_ENV.get_template(template)
-    handler.response.out.write(t.render(p))
+    rendered = t.render(p)
+    handler.response.out.write(rendered)
+    return rendered
 
 
 def render_json(handler, value):

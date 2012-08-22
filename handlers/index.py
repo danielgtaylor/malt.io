@@ -1,5 +1,6 @@
 import webapp2
 
+from google.appengine.api import memcache
 from models.recipe import Recipe
 from models.useraction import UserAction
 from models.userprefs import UserPrefs
@@ -19,6 +20,11 @@ class MainHandler(webapp2.RequestHandler):
         user = UserPrefs.get()
 
         if user:
+            # Try to get rendered output from memcache
+            rendered = memcache.get('dashboard-' + user.user_id)
+            if rendered:
+                return self.response.out.write(rendered)
+
             following = user.following_users.order('name')
             user_map = {
                 user.key().id(): user
@@ -32,15 +38,23 @@ class MainHandler(webapp2.RequestHandler):
                                            .order('-created')\
                                            .fetch(15)
 
-            render(self, 'dashboard.html', {
+            # Render and cache for 5 minutes
+            memcache.set('dashboard-' + user.user_id, render(self, 'dashboard.html', {
                 'following': following,
                 'user_map': user_map,
                 'interesting_events': interesting_events
-            })
+            }), 300)
         else:
+            # Try to get rendered output from memcache
+            rendered = memcache.get('index')
+            if rendered:
+                return self.response.out.write(rendered)
+
             recipes = Recipe.all()\
                             .order('-likes_count')\
                             .fetch(15)
-            render(self, 'index.html', {
+
+            # Render and cache for 15 minutes
+            memcache.set('index', render(self, 'index.html', {
                 'recipes': recipes
-            })
+            }), 900)
