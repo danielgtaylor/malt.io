@@ -8,6 +8,10 @@ class User
     # Handle clicks on the follow button, by either following or stopping
     # to follow another user.
     @onFollow: (event) =>
+        if not user
+            window.location.href = '/profile'
+            return
+
         if $('#followButton').hasClass('active')
             action = 'delete'
         else

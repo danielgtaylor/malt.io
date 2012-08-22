@@ -73,6 +73,10 @@ class Recipe
     
     # Handle clicks on the like button
     @onLiked: (event) =>
+        if not user
+            window.location.href = '/profile'
+            return
+
         if $('#like-button').hasClass('active')
             action = 'delete'
         else
@@ -89,6 +93,10 @@ class Recipe
     # Handle clicks on the clone button, creating a cloned copy of another
     # user's recipe
     @onCloned: (event) =>
+        if not user
+            window.location.href = '/profile'
+            return
+
         $.ajax(
             url: location.href + '/clone'
             type: 'post'
