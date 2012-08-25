@@ -39,7 +39,7 @@
         {% endfor %}
         </ul>
     </div>
-    <form action="" method="post" id="payment-form" class="form-horizontal span9 pull-left">
+    <form action="" method="post" id="payment-form" class="form-horizontal span9 pull-left" style="margin-left: 0">
         <fieldset>
             <div class="control-group">
                 <div class="controls">
@@ -113,12 +113,7 @@
         <div class="form-actions">
 	        <button type="submit" class="btn btn-primary submit-button" title="Securely charge your credit card through Stripe.com, a third party credit card processing service. Malt.io never sees your credit card information."><i class="icon-lock icon-white"></i> Submit Donation</button>
             &nbsp;or&nbsp;
-            <form action="https://www.paypal.com/cgi-bin/webscr" method="post">
-                <input type="hidden" name="cmd" value="_s-xclick"/>
-                <input type="hidden" name="hosted_button_id" value="AGZZE7H3LL442"/>
-                <button type="submit" class="btn"><i class="icon-lock"></i> Donate with Paypal</button>
-                <img alt="" border="0" src="https://www.paypalobjects.com/en_US/i/scr/pixel.gif" width="1" height="1">
-            </form>
+            <button id="donatePaypal" class="btn"><i class="icon-lock"></i> Donate with Paypal</button>
         </div>
 	</form>
 

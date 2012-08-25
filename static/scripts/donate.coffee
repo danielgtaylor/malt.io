@@ -20,6 +20,12 @@ class Donate
             return false
         )
 
+        # Redirecto to paypal when clicked
+        $('#donatePaypal').click((event) =>
+            window.location.href = 'https://www.paypal.com/cgi-bin/webscr?cmd=_s-xclick&hosted_button_id=AGZZE7H3LL442'
+            return false
+        )
+
     # A Stripe token has been created. Use it to post data to the server
     # and make the actual charge to the customer's card.
     @tokenCreated: (status, response) =>
