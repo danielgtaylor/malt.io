@@ -8,6 +8,8 @@
 	</script>
 {% endblock %}
 
+{% block title %}Recipes - {% if publicuser %}{{ publicuser.name }} - {% endif %}Malt.io{% endblock %}
+
 {% block content %}
     <ul class="breadcrumb">
         <li><a href="/">home</a><span class="divider">/</span></li>

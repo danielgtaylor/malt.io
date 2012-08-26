@@ -8,6 +8,8 @@
     </script>
 {% endblock %}
 
+{% block title %}{{ recipe.name }} - {% if publicuser %}{{ publicuser.name }} - {% endif %}Malt.io{% endblock %}
+
 {% block content %}
     <div id="saveMsg" class="alert alert-info" style="position: fixed; z-index: 999; width: 889px; top: 43px; opacity: 0.9; display: none;">
         {% if user %}
