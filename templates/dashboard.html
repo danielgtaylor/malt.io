@@ -12,7 +12,7 @@
     </ul>
     <ul class="nav nav-list span2 pull-right" style="margin-bottom: 1em;">
         <li class="nav-header">Top Recipes</li>
-        {% for recipe in user.top_interesting_recipes %}
+        {% for recipe in top_recipes %}
             <li><a class="ellipsize" href="/users/{{ user_map[recipe.owner_key.id()].name }}/recipes/{{ recipe.slug }}" title="{{ user_map[recipe.owner_key.id()].name }} / {{ recipe.likes_count }} likes"><span class="srm" data-srm="{{ recipe.color }}"></span> {{ recipe.name }}</a></li>
         {% endfor %}
     </ul>

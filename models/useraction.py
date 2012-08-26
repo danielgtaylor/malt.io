@@ -24,6 +24,28 @@ class UserAction(db.Model):
     type = db.IntegerProperty()
     object_id = db.IntegerProperty()
 
+    @staticmethod
+    def gather_object_ids(actions):
+        """
+        Gather a mapping of object types and ids from a list of actions,
+        making it easy to bulk-query for these objects later.
+        """
+        ids = {
+            'users': set(),
+            'recipes': set()
+        }
+
+        for action in actions:
+            if action.type in [UserAction.TYPE_USER_FOLLOWED]:
+                ids['users'].add(action.object_id)
+            elif action.type in [UserAction.TYPE_RECIPE_CREATED,
+                                 UserAction.TYPE_RECIPE_EDITED,
+                                 UserAction.TYPE_RECIPE_CLONED,
+                                 UserAction.TYPE_RECIPE_LIKED]:
+                ids['recipes'].add(action.object_id)
+
+        return ids
+
     @property
     def owner_key(self):
         return UserAction.owner.get_value_for_datastore(self)

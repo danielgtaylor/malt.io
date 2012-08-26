@@ -8,31 +8,31 @@
             Everyone should buy {{ owner.name }} a beer! Thanks for supporting the site!
         </div>
     {% elif action.type == action.TYPE_USER_FOLLOWED %}
-        {% set u = action.object %}
+        {% set u = user_map[action.object_id] %}
         <a href="/users/{{ owner.name }}"><div class="avatar-tiny" style="background-image: url({{ owner.gravatar_tiny }});"></div> {{ owner.name }}</a> followed another user {{ action.created|timesince }} ago
         <div class="content">
             <a href="/users/{{ u.name }}"><div class="avatar-tiny" style="background-image: url({{ u.gravatar_tiny }});"></div> {{ u.name }}</a> - {{ u.recipes.count() }} recipes
         </div>
     {% elif action.type == action.TYPE_RECIPE_CREATED %}
-        {% set recipe = action.object %}
+        {% set recipe = recipe_map[action.object_id] %}
         <a href="/users/{{ owner.name }}"><div class="avatar-tiny" style="background-image: url({{ owner.gravatar_tiny }});"></div> {{ owner.name }}</a> created a recipe {{ action.created|timesince }} ago
         <div class="content">
             <span class="srm" data-srm="{{ recipe.color }}"></span> <a href="/users/{{ recipe.owner.name }}/recipes/{{ recipe.slug }}">{{ recipe.name }}</a> - {{ recipe.description }}
         </div>
     {% elif action.type == action.TYPE_RECIPE_EDITED %}
-        {% set recipe = action.object %}
+        {% set recipe = recipe_map[action.object_id] %}
         <a href="/users/{{ owner.name }}"><div class="avatar-tiny" style="background-image: url({{ owner.gravatar_tiny }});"></div> {{ owner.name }}</a> edited a recipe {{ action.created|timesince }} ago
         <div class="content">
             <span class="srm" data-srm="{{ recipe.color }}"></span> <a href="/users/{{ recipe.owner.name }}/recipes/{{ recipe.slug }}">{{ recipe.name }}</a> - {{ recipe.description }}
         </div>
     {% elif action.type == action.TYPE_RECIPE_CLONED %}
-        {% set recipe = action.object %}
+        {% set recipe = recipe_map[action.object_id] %}
         <a href="/users/{{ owner.name }}"><div class="avatar-tiny" style="background-image: url({{ owner.gravatar_tiny }});"></div> {{ owner.name }}</a> cloned a recipe {{ action.created|timesince }} ago
         <div class="content">
             <span class="srm" data-srm="{{ recipe.color }}"></span> <a href="/users/{{ recipe.owner.name }}/recipes/{{ recipe.slug }}">{{ recipe.name }}</a> - {{ recipe.description }}
         </div>
     {% elif action.type == action.TYPE_RECIPE_LIKED %}
-        {% set recipe = action.object %}
+        {% set recipe = recipe_map[action.object_id] %}
         <a href="/users/{{ owner.name }}"><div class="avatar-tiny" style="background-image: url({{ owner.gravatar_tiny }});"></div> {{ owner.name }}</a> liked a recipe {{ action.created|timesince }} ago
         <div class="content">
             <span class="srm" data-srm="{{ recipe.color }}"></span> <a href="/users/{{ recipe.owner.name }}/recipes/{{ recipe.slug }}">{{ recipe.name }}</a> - {{ recipe.description }}

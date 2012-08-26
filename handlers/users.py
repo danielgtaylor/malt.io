@@ -42,17 +42,42 @@ class UserHandler(webapp2.RequestHandler):
         if not publicuser:
             self.abort(404)
 
+        actions = UserAction.all()\
+                            .filter('owner =', publicuser)\
+                            .order('-created')\
+                            .fetch(15)
+
+        object_ids = UserAction.gather_object_ids(actions)
+
         recipes = Recipe.all()\
                         .filter('owner =', publicuser)\
-                        .order('-edited')\
-                        .fetch(6)
+                        .order('name')\
+                        .fetch(25)
+
+        recipe_ids = [recipe.key().id() for recipe in recipes]
+        object_ids['recipes'] = [id for id in object_ids['recipes'] if id not in recipe_ids]
+
+        user_map = {
+            publicuser.key().id(): publicuser
+        }
+
+        for user in UserPrefs.get_by_id(object_ids['users']):
+            user_map[user.key().id()] = user
+
+        recipe_map = {}
+
+        for recipe in recipes:
+            recipe_map[recipe.key().id()] = recipe
+
+        for recipe in Recipe.get_by_id(object_ids['recipes']):
+            recipe_map[recipe.key().id()] = recipe
 
         render(self, 'user.html', {
             'publicuser': publicuser,
             'recipes': recipes,
-            'user_map': {
-                publicuser.key().id(): publicuser
-            }
+            'actions': actions,
+            'user_map': user_map,
+            'recipe_map': recipe_map
         })
 
 

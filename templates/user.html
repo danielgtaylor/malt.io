@@ -29,19 +29,18 @@
     <hr class="clear"/>
     <div class="span7 pull-right" style="margin-left: 0;">
         <h6>Public Actions</h6>
-        {% for action in publicuser.actions.order('-created').fetch(15) %}
+        {% for action in actions %}
             {% include "action.html" %}
         {% else %}
             No recent events
         {% endfor %}
     </div>
     <div class="vert-recipe-list span4 pull-left" style="margin-left: 0;">
-        {% set recipes = publicuser.recipes.order('name') %}
-        <h6>Recipes ({{ recipes.count() }} total)</h6>
+        <h6>Recipes ({{ recipes|length }} total)</h6>
         {% for recipe in recipes %}
             {{ recipe|recipe_snippet }}
         {% endfor %}
-        {% if user and user.user_id == publicuser.user_id and not recipes.count() %}
+        {% if user and user.user_id == publicuser.user_id and not recipes %}
             <a class="btn btn-large btn-primary" href="/new">Create new recipe</a>
         {% endif %}
     </div>
