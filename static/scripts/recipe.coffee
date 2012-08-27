@@ -157,7 +157,7 @@ class Recipe
             next = 5
             form = 'ground'
         
-        row = '<tr><td contentEditable="true">boil</td><td class="num" contentEditable="true">' + next + 'min</td><td class="num" contentEditable="true">1.00</td><td contentEditable="true">' + template.dataset.description + '</td><td contentEditable="true">' + form + '</td><td contentEditable="true">' + template.dataset.aa + '</td><td class="edit-show" style="display: block"><a href="#" class="remove"><i class="icon-remove"></i></a></td></tr>'
+        row = '<tr><td contentEditable="true">boil</td><td class="num" contentEditable="true">' + next + 'min</td><td class="num" contentEditable="true">1.00</td><td contentEditable="true">' + template.dataset.description + '</td><td contentEditable="true">' + form + '</td><td class="num" contentEditable="true">' + template.dataset.aa + '</td><td class="edit-show" style="display: block"><a href="#" class="remove"><i class="icon-remove"></i></a></td></tr>'
         table.innerHTML += row
         $('#hops_data tr:last td:nth-child(1)').focus()
         @updateStats()
