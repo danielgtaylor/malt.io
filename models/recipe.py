@@ -29,8 +29,9 @@ class RecipeBase(db.Model):
     # The recipe type, one of the constants above like TYPE_EXTRACT
     type = db.IntegerProperty()
 
-    # The BJCP Style that this recipe is matching, if any
-    style = db.StringProperty(default='None')
+    # The BJCP category / style that this recipe is matching, if any
+    category = db.StringProperty(default='')
+    style = db.StringProperty(default='')
 
     # Batch and average boil sizes in gallons
     batch_size = db.FloatProperty(default=5.0)
@@ -64,6 +65,13 @@ class RecipeBase(db.Model):
         """
         self._ingredients = json.dumps(value)
         self._ingredients_decoded = value
+
+    @property
+    def style_display(self):
+        if self.category and self.style:
+            return self.category + ' - ' + self.style
+
+        return 'No style'
 
 
 class Recipe(RecipeBase):

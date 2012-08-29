@@ -4,6 +4,7 @@
     <script type="text/javascript">
         $(document).ready(function () {
             Recipe.init();
+            BeerStyles.init();
         })
     </script>
 {% endblock %}
@@ -43,6 +44,8 @@
         <h1 id="recipeName">{{ recipe.name }}</h1>
         <p id="recipeDescription">{{ recipe.description }}</p>
         <p style="font-size: 100%; line-height: 12pt;">
+            Style: <span id="styleName" data-category="{{ recipe.category }}" data-style="{{ recipe.style }}">{{ recipe.style_display }}</span> <button class="btn btn-inverse btn-mini edit-show" data-toggle="modal" href="#styleModal" style="display: none; margin-top: -2px">Edit</button>
+            <br/>
             Batch size: <span id="batchSize">{{ recipe.batch_size }}</span> gallons
             <br/>
             Boil size: <span id="boilSize">{{ recipe.boil_size }}</span> average gallons
@@ -194,17 +197,17 @@
         </div>
         <div class="span2">
             <h6>Original Gravity</h6>
-            <p id="original_gravity">
+            <span id="original_gravity" title="">
                 1.000
-            </p>
+            </span>
             <h6>Final Gravity</h6>
-            <p id="final_gravity">
+            <span id="final_gravity" title="">
                 1.000
-            </p>
+            </span>
             <h6>Color</h6>
-            <p>
-                <span id="recipe_color" class="srm" data-srm="1"></span> <span id="recipe_color_value">1</span>&deg; <acronym title="Standard Reference Method">SRM</acronym>
-            <p>
+            <span>
+                <span id="recipe_color" class="srm" data-srm="1"></span> <span id="recipe_color_value" title="">1</span>&deg; <acronym title="Standard Reference Method">SRM</acronym>
+            <span>
         </div>
     </div>
     <h2>Bittering &amp; Spices</h2>
@@ -298,7 +301,7 @@
         <div class="span2">
             <h6>Bitterness</h6>
             <p>
-                <span id="ibu">0.0</span> <acronym title="International Bitterness Units">IBU</acronym>
+                <span id="ibu" title="">0.0</span> <acronym title="International Bitterness Units">IBU</acronym>
                 <br/>
                 <small><strong>&fnof;</strong>: Tinseth</small>
             </p>
@@ -398,7 +401,7 @@
         <div class="span2">
             <h6>Alcohol</h6>
             <p>
-                <span id="abv">0.0</span>% <acronym title="Alcohol By Volume">ABV</acronym>
+                <span id="abv" title="">0.0</span>% <acronym title="Alcohol By Volume">ABV</acronym>
             </p>
             <h6>Calories</h6>
             <p>
@@ -464,6 +467,16 @@
             <p id="bottle_count">
                 0
             </p>
+        </div>
+    </div>
+    <div id="styleModal" class="modal fade hide">
+        <div class="modal-header">
+            <button type="button" class="close" data-dismiss="modal">×</button>
+            <h3>Select Style</h3>
+        </div>
+        <div id="styleList" class="modal-body"></div>
+        <div class="modal-footer">
+            <a href="#" class="btn" data-dismiss="modal">Close</a>
         </div>
     </div>
 {% endblock %}

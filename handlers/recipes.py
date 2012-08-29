@@ -308,6 +308,8 @@ class RecipeHandler(webapp2.RequestHandler):
         # Update recipe
         recipe.name = recipe_data['name']
         recipe.description = recipe_data['description']
+        recipe.category = recipe_data['category']
+        recipe.style = recipe_data['style']
         recipe.batch_size = float(recipe_data['batchSize'])
         recipe.boil_size = float(recipe_data['boilSize'])
         recipe.color = int(recipe_data['color'])

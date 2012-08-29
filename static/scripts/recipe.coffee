@@ -199,6 +199,12 @@ class Recipe
         total_weight = 0.0
         approx_cost = 0.0
 
+        og_element = $('#original_gravity')
+        fg_element = $('#final_gravity')
+        color_element = $('#recipe_color_value')
+        ibu_element = $('#ibu')
+        abv_element = $('#abv')
+
         # Update breadcrumb name
         $('#crumbName').html($('#recipeName').html())
 
@@ -247,7 +253,7 @@ class Recipe
         
         # Update original gravity
         gu = 1.0 + (gu / 1000.0)
-        $('#original_gravity').html(gu.toFixed(3))
+        og_element.html(gu.toFixed(3))
         
         # Update final gravity
         attenuation = 0
@@ -269,11 +275,11 @@ class Recipe
         attenuation = 75 if attenuation is 0
         
         fg = gu - ((gu - 1.0) * attenuation / 100.0)
-        $('#final_gravity').html(fg.toFixed(3))
+        fg_element.html(fg.toFixed(3))
         
         # Update alcohol percentage by volume
         abv = ((1.05 * (gu - fg)) / fg) / 0.79 * 100.0
-        $('#abv').html(abv.toFixed(1))
+        abv_element.html(abv.toFixed(1))
         
         # Update calories
         bottle = 3.55 # 355 ml, aka standard 12oz bottle
@@ -286,7 +292,7 @@ class Recipe
         
         # Update brew color
         color = 1.4922 * Math.pow(mcu, 0.6859)
-        $('#recipe_color_value').html(Math.round(color))
+        color_element.html(Math.round(color))
         $('#recipe_color').attr('data-srm', color)
         $('#recipe_color').css('background-color', Util.srmToRgb(color))
         
@@ -309,7 +315,7 @@ class Recipe
                     approx_cost += Math.ceil(oz) * cost
                     break
         )
-        $('#ibu').html(ibu.toFixed(1))
+        ibu_element.html(ibu.toFixed(1))
         
         buToGu = (ibu / ((gu - 1.0) * 1000)) or 0.0
         $('#buToGu').html(buToGu.toFixed(2))
@@ -347,6 +353,41 @@ class Recipe
         $('#total_cost').html(approx_cost.toFixed(2))
         $('#bottle_cost').html(Math.round(approx_cost / bottleCount * 100))
 
+        # Update style matching information
+        styleName = $('#styleName').get(0)
+        style = BeerStyles.get(styleName.dataset.category, styleName.dataset.style)
+        if style
+            og_element.attr('data-original-title', style.gu[0].toFixed(3) + ' - ' + style.gu[1].toFixed(3))
+            fg_element.attr('data-original-title', style.fg[0].toFixed(3) + ' - ' + style.fg[1].toFixed(3))
+            color_element.attr('data-original-title', style.srm[0].toFixed(1) + ' - ' + style.srm[1].toFixed(1))
+            ibu_element.attr('data-original-title', style.ibu[0].toFixed(1) + ' - ' + style.ibu[1].toFixed(1))
+            abv_element.attr('data-original-title', style.abv[0].toFixed(1) + ' - ' + style.abv[1].toFixed(1))
+
+            if style.gu[0] > gu or gu > style.gu[1]
+                og_element.addClass('styleError')
+            else
+                og_element.removeClass('styleError')
+
+            if style.fg[0] > fg or fg > style.fg[1]
+                fg_element.addClass('styleError')
+            else
+                fg_element.removeClass('styleError')
+
+            if style.srm[0] > color or color > style.srm[1]
+                color_element.addClass('styleError')
+            else
+                color_element.removeClass('styleError')
+
+            if style.ibu[0] > ibu or ibu > style.ibu[1]
+                ibu_element.addClass('styleError')
+            else
+                ibu_element.removeClass('styleError')
+
+            if style.abv[0] > abv or abv > style.abv[1]
+                abv_element.addClass('styleError')
+            else
+                abv_element.removeClass('styleError')
+
     # Get a recipe object from the current page. This converts the various HTML tables
     # and other elements into an object suitable for JSON-encoding to be sent to the
     # server for processing, e.g. saving the recipe.
@@ -355,6 +396,8 @@ class Recipe
         recipe =
             name: $('#recipeName').html()
             description: $('#recipeDescription').html()
+            category: $('#styleName').get(0).dataset.category or ''
+            style: $('#styleName').get(0).dataset.style or ''
             batchSize: parseFloat($('#batchSize').html()) or 5.0
             boilSize: parseFloat($('#boilSize').html()) or 5.5
             color: parseInt($('#recipe_color_value').html()) or 1
