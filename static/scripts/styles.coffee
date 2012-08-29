@@ -488,3 +488,49 @@ class BeerStyles
                 srm: [10, 19]
                 ibu: [50, 120]
                 abv: [8, 12]
+        'Fruit Beer':
+            'Fruit Beer':
+                gu: [1.000, 1.120]
+                fg: [1.000, 1.160]
+                srm: [1, 40]
+                ibu: [0, 120]
+                abv: [0, 14]
+        'Spice / Herb / Vegetable Beer':
+            'Spice, Herb, or Vegetable Beer':
+                gu: [1.000, 1.120]
+                fg: [1.000, 1.160]
+                srm: [1, 40]
+                ibu: [0, 120]
+                abv: [0, 14]
+            'Christmas / Winter Specialty Spiced Beer':
+                gu: [1.000, 1.120]
+                fg: [1.000, 1.160]
+                srm: [8, 40]
+                ibu: [0, 120]
+                abv: [6, 14]
+        'Smoke-Flavored and Wood-Aged Beer':
+            'Classic Rauchbier':
+                gu: [1.050, 1.056]
+                fg: [1.012, 1.016]
+                srm: [14, 22]
+                ibu: [20, 30]
+                abv: [4.8, 6]
+            'Other Smoked Beer':
+                gu: [1.000, 1.120]
+                fg: [1.000, 1.160]
+                srm: [1, 40]
+                ibu: [0, 120]
+                abv: [0, 14]
+            'Wood-Aged Beer':
+                gu: [1.000, 1.120]
+                fg: [1.000, 1.160]
+                srm: [1, 40]
+                ibu: [0, 120]
+                abv: [0, 14]
+        'Specialty Beer':
+            'Specialty Beer':
+                gu: [1.000, 1.120]
+                fg: [1.000, 1.160]
+                srm: [1, 40]
+                ibu: [0, 120]
+                abv: [0, 14]
