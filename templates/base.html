@@ -111,6 +111,9 @@
             </div>
             <div class="clear"></div>
         </div>
+        <div class="clear" style="text-align: center;">
+			<div class="g-plus" data-height="69" data-href="//plus.google.com/111944532575819203216" data-rel="publisher"></div>
+		</div>
 		<div class="footer clear">
 			Copyright &copy; 2012 Daniel G. Taylor
 		</div>
@@ -123,5 +126,12 @@
         user = '{% if user %}{{ user.name }}{% else %}{% endif %}';
     </script>
     {% block scripts %}{% endblock %}
+    <script type="text/javascript">
+      (function() {
+        var po = document.createElement('script'); po.type = 'text/javascript'; po.async = true;
+        po.src = 'https://apis.google.com/js/plusone.js';
+        var s = document.getElementsByTagName('script')[0]; s.parentNode.insertBefore(po, s);
+      })();
+    </script>
 </body>
 </html>
