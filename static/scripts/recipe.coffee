@@ -466,6 +466,16 @@ class Recipe
                     if window.history
                         @disableEdit()
                         window.history.replaceState(null, null, data.redirect)
+
+                        # Reset comments
+                        DISQUS?.reset(
+                            reload: true,
+                            config: =>
+                                this.page.identifier = undefined
+                                this.page.url = data.redirect
+                        )
+
+                        $('#disqus_thread').show()
                     else
                         window.location = data.redirect
         )

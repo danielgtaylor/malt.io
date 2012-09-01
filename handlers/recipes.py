@@ -237,6 +237,7 @@ class RecipeHandler(webapp2.RequestHandler):
             publicuser = UserPrefs.get()
             recipe = Recipe()
             recipe.owner = publicuser
+            recipe.new = True
         else:
             publicuser = UserPrefs.all().filter('name =', username).get()
 

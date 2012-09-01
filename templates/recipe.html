@@ -6,6 +6,18 @@
             Recipe.init();
             BeerStyles.init();
         })
+
+        var disqus_shortname = 'maltio';
+        {% if debug %}
+            var disqus_developer = 1;
+        {% endif %}
+
+        /* * * DON'T EDIT BELOW THIS LINE * * */
+        (function() {
+            var dsq = document.createElement('script'); dsq.type = 'text/javascript'; dsq.async = true;
+            dsq.src = 'http://' + disqus_shortname + '.disqus.com/embed.js';
+            (document.getElementsByTagName('head')[0] || document.getElementsByTagName('body')[0]).appendChild(dsq);
+        })();
     </script>
 {% endblock %}
 
@@ -474,6 +486,7 @@
             </p>
         </div>
     </div>
+    <div id="disqus_thread" {% if recipe.new %}style="display: none;"{% endif %}></div>
     <div id="styleModal" class="modal fade hide">
         <div class="modal-header">
             <button type="button" class="close" data-dismiss="modal">×</button>
