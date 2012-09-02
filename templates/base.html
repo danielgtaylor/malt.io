@@ -59,9 +59,9 @@
                                     <li><a href="/_ah/stats">App Stats</a></li>
                                     <li><a href="/_ah/admin">Admin</a></li>
                                 {% endif %}
+                                <li><a href="{{ logout_url }}">Logout</a></li>
                             </ul>
                         </li>
-                        <li><a href="{{ logout_url }}">Logout</a></li>
                     {% else %}
                         <li><a href="/profile">Login / Register</a></li>
                     {% endif %}
