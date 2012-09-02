@@ -1,5 +1,11 @@
 {% extends 'base.html' %}
 
+{% block head %}
+    <meta name="description" content="{{ recipe.description }}"/>
+    <meta name="og:title" content="{{ recipe.name }} - {% if publicuser %}{{ publicuser.name }} - {% endif %}Malt.io"/>
+    <meta name="og:description" content="{{ recipe.description }}"/>
+{% endblock %}
+
 {% block scripts %}
     <script type="text/javascript">
         $(document).ready(function () {
