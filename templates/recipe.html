@@ -2,8 +2,8 @@
 
 {% block head %}
     <meta name="description" content="{{ recipe.description }}"/>
-    <meta name="og:title" content="{{ recipe.name }} - {% if publicuser %}{{ publicuser.name }} - {% endif %}Malt.io"/>
-    <meta name="og:description" content="{{ recipe.description }}"/>
+    <meta property="og:title" content="{{ recipe.name }} - {% if publicuser %}{{ publicuser.name }} - {% endif %}Malt.io"/>
+    <meta property="og:description" content="{{ recipe.description }}"/>
 {% endblock %}
 
 {% block scripts %}
