@@ -288,6 +288,52 @@ textarea.large {
     }
 }
 
+#timeline {
+    position: relative;
+
+    ol {
+        list-style: none;
+    }
+
+    li {
+        position: relative;
+        margin-left: 100px;
+        margin-bottom: 8px;
+
+        .label {
+            position: absolute;
+            display: block;
+            width: 80px;
+            height: 100%;
+            left: -100px;
+            text-align: right;
+            padding: 4px 4px 0px 4px;
+        }
+
+        .unknown-time {
+            position: absolute;
+            display: block;
+            color: white;
+            background-color: #333;
+            position: absolute;
+            left: 40px;
+            margin-left: -109px;
+            padding: 1px 5px;
+            .border-radius(10px);
+        }
+    }
+
+    .line {
+        position: absolute;
+        z-index: -1;
+        top: 16px;
+        bottom: 16px;
+        left: 61px;
+        width: 2px;
+        background-color: #333;
+    }
+}
+
 #disqus_thread {
     margin-top: 1em;
 }

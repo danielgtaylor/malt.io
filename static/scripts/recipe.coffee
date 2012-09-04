@@ -29,6 +29,14 @@ class Recipe
         [/wyeast|white labs|wlp/i, 7.00],
         [/.*/i, 3.50]
     ]
+
+    # Regular expressions to match for steeping grains, such as caramel malts.
+    # This is used to create the recipe timeline.
+    @STEEP_FERMENTABLES = /biscuit|black|cara|chocolate|crystal|munich|roast|special ?b|toast|victory|vienna|steep/i
+
+    # Regular expressions to match for boiling sugars (DME, LME, etc).
+    # This is used to create the recipe timeline.
+    @BOIL_FERMENTABLES = /candi|candy|dme|dry|extract|honey|lme|liquid|sugar|syrup|turbinado|boil/i
     
     # Initialize the recipe by rendering color swatches on the page and
     # setting up event delegates to handle editing if the recipe is put
@@ -205,6 +213,13 @@ class Recipe
         ibu_element = $('#ibu')
         abv_element = $('#abv')
 
+        timeline_map = 
+            fermentables:
+                mash: []
+                steep: []
+                boil: []
+            times: {}
+
         # Update breadcrumb name
         $('#crumbName').html($('#recipeName').html())
 
@@ -231,6 +246,13 @@ class Recipe
                 if regex.exec(desc)
                     approx_cost += weight * cost
                     break
+
+            if @BOIL_FERMENTABLES.exec(desc)
+                timeline_map['fermentables']['boil'].push([lb, oz, desc, ppg * weight / gallons])
+            else if @STEEP_FERMENTABLES.exec(desc)
+                timeline_map['fermentables']['steep'].push([lb, oz, desc, ppg * weight / gallons])
+            else
+                timeline_map['fermentables']['mash'].push([lb, oz, desc, ppg * weight / gallons])
 
             rows.push([weight, element]);
         )
@@ -307,13 +329,17 @@ class Recipe
             if form is 'pellet'
                 utilization_factor = 1.15
             aa = parseFloat(element.children[5].innerHTML) or 0.0
-            ibu += 1.65 * Math.pow(0.000125, gu - 1.0) * ((1 - Math.pow(2.718, -0.04 * time)) / 4.15) * ((aa / 100.0 * oz * 7490.0) / boilGallons) * utilization_factor
+            bitterness = 1.65 * Math.pow(0.000125, gu - 1.0) * ((1 - Math.pow(2.718, -0.04 * time)) / 4.15) * ((aa / 100.0 * oz * 7490.0) / boilGallons) * utilization_factor
+            ibu += bitterness
 
             # Update cost
             for [regex, cost] in @HOP_PRICES
                 if regex.exec(desc)
                     approx_cost += Math.ceil(oz) * cost
                     break
+
+            timeline_map['times'][time] ?= []
+            timeline_map['times'][time].push([oz, desc, bitterness])
         )
         ibu_element.html(ibu.toFixed(1))
         
@@ -352,6 +378,86 @@ class Recipe
         # Update approximate cost
         $('#total_cost').html(approx_cost.toFixed(2))
         $('#bottle_cost').html(Math.round(approx_cost / bottleCount * 100))
+
+        # Update timeline
+        totalTime = 0
+
+        get_items = (fermentables, spices) =>
+            items = []
+            for sugar in fermentables
+                item = ''
+
+                if sugar[0]
+                    item += sugar[0] + 'lb '
+
+                if sugar[1]
+                    item += sugar[1] + 'oz '
+
+                item += sugar[2] + ' (' + Math.round(sugar[3]) + ' GU)'
+                items.push(item)
+
+            for spice in spices
+                item = spice[0] + 'oz ' + spice[1]
+
+                if spice[2]
+                    item += ' (' + spice[2].toFixed(1) + ' IBU)'
+
+                items.push(item)
+
+            if items.length > 1
+                output = items.reduce((x, y) -> x + ', ' + y)
+            else if items.length
+                output = items[0]
+
+            return output
+
+        timeline = '<li><span class="label label-inverse">start</span> Get ready to brew!'
+
+        if timeline_map.fermentables.mash.length
+            timeline += '<li><span class="label label-info">mash</span> Mash '
+
+            mashing = timeline_map.fermentables.mash
+            if timeline_map.fermentables.steep.length
+                mashing = mashing.concat(timeline_map.fermentables.steep)
+
+            timeline += get_items(mashing, [])
+            timeline += ' for 60 minutes at 154&deg;F'
+            totalTime += 60
+        else if timeline_map.fermentables.steep.length
+            timeline += '<li><span class="label label-info">steep</span> Steep '
+            timeline += get_items(timeline_map.fermentables.steep, [])
+            timeline += ' for 20 minutes in warm water (less than 150&deg;F)'
+            totalTime += 20
+
+        timeline += '<li><span class="label label-info">boil</span> Bring ' + boilGallons + ' average gallons of water to a boil (~' + Math.round(boilGallons * 10) + ' minutes)</li>'
+        totalTime += parseFloat(boilGallons * 10)
+
+        times = (key for key, value of timeline_map.times)
+        times.sort().reverse()
+
+        for time, i in times
+            timeline += '<li><span class="label label-info">-' + time + ' minutes</span> Add '
+
+            if i is 0 and timeline_map.fermentables.boil.length
+                timeline += get_items(timeline_map.fermentables.boil, timeline_map.times[time])
+                totalTime += parseInt(time)
+            else
+                timeline += get_items([], timeline_map.times[time])
+            timeline += '</li>'
+
+        # Add cooling time
+        totalTime += 30
+
+        timeline += '<li><span class="label label-info">0 minutes</span> Flame out; begin chilling to 100&deg;F</li>
+            <li><span class="label label-info">30 minutes</span> Chilling complete; aerate and pitch yeast</li>
+            <li><span class="unknown-time">...</span>&nbsp;</li>
+            <li><span class="label label-info">14 days</span> Prime and bottle about ' + bottleCount + ' bottles</li>
+            <li><span class="unknown-time">...</span>&nbsp;</li>
+            <li><span class="label label-inverse">28 days</span> Relax, don\'t worry, and have a homebrew!</li>'
+
+        $('#timeline ol').html(timeline)
+        console.debug(totalTime)
+        $('#brewTime').html((totalTime / 60).toFixed(1) + ' hours')
 
         # Update style matching information
         styleName = $('#styleName').get(0)
