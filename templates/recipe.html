@@ -13,6 +13,14 @@
             BeerStyles.init();
         })
 
+        (function(d, s, id) {
+          var js, fjs = d.getElementsByTagName(s)[0];
+          if (d.getElementById(id)) return;
+          js = d.createElement(s); js.id = id;
+          js.src = "//connect.facebook.net/en_US/all.js#xfbml=1&appId=414221561958592";
+          fjs.parentNode.insertBefore(js, fjs);
+        }(document, 'script', 'facebook-jssdk'));
+
         var disqus_shortname = 'maltio';
         {% if debug %}
             var disqus_developer = 1;
@@ -80,9 +88,10 @@
             <a class="btn disabled"><i class="icon-signal"></i> Scale</a>
             <a class="btn disabled"><i class="icon-time"></i> View History</a>
         </div>
-        <div class="edit-hide" style="float: left; margin-left: 1em; margin-top: 4px;">
+        <div class="edit-hide" style="float: left; margin-left: 1em; margin-top: 4px; position: relative;">
             <div class="g-plusone" data-size="medium" data-annotation="none"></div>&nbsp;
-            <div class="g-plus" data-action="share" data-annotation="bubble"></div>
+            <div class="g-plus" data-action="share" data-annotation="bubble"></div>&nbsp;
+            <div class="fb-like" data-layout="button_count" data-width="90" data-show-faces="false" style="top: -3px;"></div>
         </div>
         <div class="clear"></div>
         <div class="likes-container edit-hide">
@@ -519,4 +528,5 @@
             <a href="#" class="btn" data-dismiss="modal">Close</a>
         </div>
     </div>
+    <div id="fb-root"></div>
 {% endblock %}
