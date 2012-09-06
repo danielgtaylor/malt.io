@@ -219,6 +219,7 @@ class Recipe
                 steep: []
                 boil: []
             times: {}
+            yeast: []
 
         # Update breadcrumb name
         $('#crumbName').html($('#recipeName').html())
@@ -292,6 +293,8 @@ class Recipe
                 if regex.exec(desc)
                     approx_cost += cost
                     break
+
+            timeline_map.yeast.push(desc)
         )
         
         attenuation = 75 if attenuation is 0
@@ -382,7 +385,7 @@ class Recipe
         # Update timeline
         totalTime = 0
 
-        get_items = (fermentables, spices) =>
+        get_items = (fermentables, spices, yeasts) =>
             items = []
             for sugar in fermentables
                 item = ''
@@ -404,6 +407,9 @@ class Recipe
 
                 items.push(item)
 
+            for yeast in yeasts
+                items.push(yeast)
+
             if items.length > 1
                 output = items.reduce((x, y) -> x + ', ' + y)
             else if items.length
@@ -420,12 +426,12 @@ class Recipe
             if timeline_map.fermentables.steep.length
                 mashing = mashing.concat(timeline_map.fermentables.steep)
 
-            timeline += get_items(mashing, [])
+            timeline += get_items(mashing, [], [])
             timeline += ' for 60 minutes at 154&deg;F'
             totalTime += 60
         else if timeline_map.fermentables.steep.length
             timeline += '<li><span class="label label-info">steep</span> Steep '
-            timeline += get_items(timeline_map.fermentables.steep, [])
+            timeline += get_items(timeline_map.fermentables.steep, [], [])
             timeline += ' for 20 minutes in warm water (less than 150&deg;F)'
             totalTime += 20
 
@@ -439,17 +445,17 @@ class Recipe
             timeline += '<li><span class="label label-info">-' + time + ' minutes</span> Add '
 
             if i is 0 and timeline_map.fermentables.boil.length
-                timeline += get_items(timeline_map.fermentables.boil, timeline_map.times[time])
+                timeline += get_items(timeline_map.fermentables.boil, timeline_map.times[time], [])
                 totalTime += parseInt(time)
             else
-                timeline += get_items([], timeline_map.times[time])
+                timeline += get_items([], timeline_map.times[time], [])
             timeline += '</li>'
 
         # Add cooling time
         totalTime += 30
 
         timeline += '<li><span class="label label-info">0 minutes</span> Flame out; begin chilling to 100&deg;F</li>
-            <li><span class="label label-info">30 minutes</span> Chilling complete; aerate and pitch yeast</li>
+            <li><span class="label label-info">30 minutes</span> Chilling complete; top up with water to total ' + gallons + ' gallons; aerate and pitch ' + get_items([], [], timeline_map.yeast) + '</li>
             <li><span class="unknown-time">...</span>&nbsp;</li>
             <li><span class="label label-info">14 days</span> Prime and bottle about ' + bottleCount + ' bottles</li>
             <li><span class="unknown-time">...</span>&nbsp;</li>
