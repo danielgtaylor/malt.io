@@ -44,7 +44,7 @@ class Recipe
     @init: =>
         # Setup color swatches
         $('.srm[data-srm]').each((index, element) =>
-            element.style.backgroundColor = Util.srmToRgb(element.dataset.srm)
+            element.style.backgroundColor = Util.srmToRgb(element.getAttribute('data-srm'))
         )
 
         # Setup action buttons
@@ -116,6 +116,10 @@ class Recipe
 
     # Enable recipe edit mode
     @enableEdit: =>
+        if window.brokenBrowser
+            $('#badBrowserModal').modal('show')
+            return
+
         $('#recipeName, #recipeDescription, #batchSize, #boilSize, #bottling_temp, #bottling_pressure').attr('contentEditable', 'true')
         $('#fermentables_data tr td:nth-child(2), #fermentables_data tr td:nth-child(3), #fermentables_data tr td:nth-child(4), #fermentables_data tr td:nth-child(5), #fermentables_data tr td:nth-child(7), #hops_data tr td:nth-child(1), #hops_data tr td:nth-child(2), #hops_data tr td:nth-child(3), #hops_data tr td:nth-child(4), #hops_data tr td:nth-child(5), #hops_data tr td:nth-child(6), #yeast_data tr td:nth-child(1), #yeast_data tr td:nth-child(2), #yeast_data tr td:nth-child(3), #yeast_data tr td:nth-child(4)').attr('contentEditable', 'true')
         $('#saveMsg, .edit-show').show()
@@ -146,7 +150,7 @@ class Recipe
     # template button item.
     @addFermentableRow: (template) =>
         table = $('#fermentables_data')[0]
-        row = '<tr><td class="num percent">?</td><td class="num" contentEditable="true">1</td><td class="num" contentEditable="true">0</td><td contentEditable="true">' + template.dataset.description + '</td><td class="num" contentEditable="true">' + template.dataset.ppg + '</td><td class="num"><span class="srm" data-srm="' + template.dataset.srm + '" style="background-color: ' + Util.srmToRgb(template.dataset.srm) + '"></span> </td><td class="num" style="border-left: none;" contentEditable="true">' + template.dataset.srm + '</td><td class="edit-show" style="display: block"><a href="#" class="remove"><i class="icon-remove"></i></a></td></tr>'
+        row = '<tr><td class="num percent">?</td><td class="num" contentEditable="true">1</td><td class="num" contentEditable="true">0</td><td contentEditable="true">' + template.getAttribute('data-description') + '</td><td class="num" contentEditable="true">' + template.getAttribute('data-ppg') + '</td><td class="num"><span class="srm" data-srm="' + template.getAttribute('data-srm') + '" style="background-color: ' + Util.srmToRgb(template.getAttribute('data-srm')) + '"></span> </td><td class="num" style="border-left: none;" contentEditable="true">' + template.getAttribute('data-srm') + '</td><td class="edit-show" style="display: block"><a href="#" class="remove"><i class="icon-remove"></i></a></td></tr>'
         table.innerHTML += row
         $('#fermentables_data tr:last td:nth-child(2)').focus()
         @updateStats()
@@ -157,7 +161,7 @@ class Recipe
         table = $('#hops_data')[0]
         
         # Try to guess a reasonable time for the next addition
-        if parseFloat(template.dataset.aa)
+        if parseFloat(template.getAttribute('data-aa'))
             latest = parseInt($('#hops_data tr:last td:nth-child(2)').html?()) || 90
             next = Recipe.NEXT_HOP_SCHEDULE[latest]
             form = 'pellet'
@@ -165,7 +169,7 @@ class Recipe
             next = 5
             form = 'ground'
         
-        row = '<tr><td contentEditable="true">boil</td><td class="num" contentEditable="true">' + next + 'min</td><td class="num" contentEditable="true">1.00</td><td contentEditable="true">' + template.dataset.description + '</td><td contentEditable="true">' + form + '</td><td class="num" contentEditable="true">' + template.dataset.aa + '</td><td class="edit-show" style="display: block"><a href="#" class="remove"><i class="icon-remove"></i></a></td></tr>'
+        row = '<tr><td contentEditable="true">boil</td><td class="num" contentEditable="true">' + next + 'min</td><td class="num" contentEditable="true">1.00</td><td contentEditable="true">' + template.getAttribute('data-description') + '</td><td contentEditable="true">' + form + '</td><td class="num" contentEditable="true">' + template.getAttribute('data-aa') + '</td><td class="edit-show" style="display: block"><a href="#" class="remove"><i class="icon-remove"></i></a></td></tr>'
         table.innerHTML += row
         $('#hops_data tr:last td:nth-child(1)').focus()
         @updateStats()
@@ -174,7 +178,7 @@ class Recipe
     # template button item
     @addYeastRow: (template) =>
         table = $('#yeast_data')[0]
-        row = '<tr><td contentEditable="true">' + template.dataset.description + '</td><td contentEditable="true">' + template.dataset.type + '</td><td contentEditable="true">' + template.dataset.form + '</td><td class="num" contentEditable="true">' + template.dataset.attenuation + '</td><td class="edit-show" style="display: block"><a href="#" class="remove"><i class="icon-remove"></i></a></td></tr>'
+        row = '<tr><td contentEditable="true">' + template.getAttribute('data-description') + '</td><td contentEditable="true">' + template.getAttribute('data-type') + '</td><td contentEditable="true">' + template.getAttribute('data-form') + '</td><td class="num" contentEditable="true">' + template.getAttribute('data-attenuation') + '</td><td class="edit-show" style="display: block"><a href="#" class="remove"><i class="icon-remove"></i></a></td></tr>'
         table.innerHTML += row
         $('#yeast_data tr:last td:nth-child(1)').focus()
         @updateStats()
@@ -234,7 +238,7 @@ class Recipe
             
             # Update color
             srmspan = element.children[5].children[0]
-            srmspan.dataset.srm = srm
+            srmspan.setAttribute('data-srm', srm)
             srmspan.style.backgroundColor = Util.srmToRgb(srm)
             
             weight = lb + (oz / 16.0)
@@ -467,7 +471,7 @@ class Recipe
 
         # Update style matching information
         styleName = $('#styleName').get(0)
-        style = BeerStyles.get(styleName.dataset.category, styleName.dataset.style)
+        style = BeerStyles.get(styleName.getAttribute('data-category'), styleName.getAttribute('data-style'))
         if style
             og_element.attr('data-original-title', style.gu[0].toFixed(3) + ' - ' + style.gu[1].toFixed(3))
             fg_element.attr('data-original-title', style.fg[0].toFixed(3) + ' - ' + style.fg[1].toFixed(3))
@@ -508,8 +512,8 @@ class Recipe
         recipe =
             name: $('#recipeName').html()
             description: $('#recipeDescription').html()
-            category: $('#styleName').get(0).dataset.category or ''
-            style: $('#styleName').get(0).dataset.style or ''
+            category: $('#styleName').get(0).getAttribute('data-category') or ''
+            style: $('#styleName').get(0).getAttribute('data-style')or ''
             batchSize: parseFloat($('#batchSize').html()) or 5.0
             boilSize: parseFloat($('#boilSize').html()) or 5.5
             color: parseInt($('#recipe_color_value').html()) or 1
