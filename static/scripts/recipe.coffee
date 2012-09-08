@@ -72,9 +72,6 @@ class Recipe
             Util.selectAll(event)
         )
 
-        # Update the page stats, like color, bitterness, alcohol, etc
-        @updateStats()
-
         # Was the page loaded in edit mode? If so, enable editing!
         if window.location.pathname is '/new' or window.location.hash is '#edit'
             @enableEdit()
