@@ -83,7 +83,7 @@
             {% else %}
                 <a id="like-button" class="btn{% if user and user.user_id in recipe.likes %} active{% endif %}" data-toggle="button"><i class="icon-thumbs-up"></i> Like</a>
             {% endif %}
-            <a id="clone-button" class="btn"><i class="icon-share"></i> Clone</a>
+            <a class="btn" data-toggle="modal" href="#cloneModal"><i class="icon-share"></i> Clone</a>
             <a class="btn disabled"><i class="icon-fire"></i> Brew</a>
             <a class="btn disabled"><i class="icon-signal"></i> Scale</a>
             <a class="btn disabled"><i class="icon-time"></i> View History</a>
@@ -526,6 +526,19 @@
         <div id="styleList" class="modal-body"></div>
         <div class="modal-footer">
             <a href="#" class="btn" data-dismiss="modal">Close</a>
+        </div>
+    </div>
+    <div id="cloneModal" class="modal fade hide">
+        <div class="modal-header">
+            <button type="button" class="close" data-dismiss="modal">×</button>
+            <h3>Clone Recipe</h3>
+        </div>
+        <div class="modal-body">
+            Cloning this recipe will create a copy of it in your own account with the same name. You will own the copy and be able to edit, brew, and share your clone.
+        </div>
+        <div class="modal-footer">
+            <a href="#" class="btn" data-dismiss="modal">Cancel</a>
+            <a id="clone-button" href="#" class="btn btn-primary" data-dismiss="modal">Clone</a>
         </div>
     </div>
     <div id="badBrowserModal" class="modal fade hide">
