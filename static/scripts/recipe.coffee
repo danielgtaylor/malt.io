@@ -240,7 +240,7 @@ class Recipe
             
             weight = lb + (oz / 16.0)
             total_weight += weight;
-            gu += ppg * weight / gallons
+            gravity = ppg * weight / gallons
             mcu += srm * weight / gallons
             
             # Update approximate cost
@@ -253,8 +253,17 @@ class Recipe
                 timeline_map['fermentables']['boil'].push([lb, oz, desc, ppg * weight / gallons])
             else if @STEEP_FERMENTABLES.exec(desc)
                 timeline_map['fermentables']['steep'].push([lb, oz, desc, ppg * weight / gallons])
+                
+                # Steeped grains have considerably lower efficiency of 30%
+                gravity *= 0.3
             else
                 timeline_map['fermentables']['mash'].push([lb, oz, desc, ppg * weight / gallons])
+                
+                # Mashed grains have an average efficiency of about 75%
+                # TODO: Make this configurable later
+                gravity *= 0.75
+
+            gu += gravity
 
             rows.push([weight, element]);
         )
