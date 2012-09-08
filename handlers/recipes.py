@@ -252,9 +252,16 @@ class RecipeHandler(webapp2.RequestHandler):
             if not recipe:
                 self.abort(404)
 
+        cloned_from = None
+        try:
+            cloned_from = recipe.cloned_from
+        except Exception, e:
+            pass
+
         render(self, 'recipe.html', {
             'publicuser': publicuser,
-            'recipe': recipe
+            'recipe': recipe,
+            'cloned_from': cloned_from
         })
 
     def post(self, username=None, recipe_slug=None):
@@ -364,6 +371,19 @@ class RecipeHandler(webapp2.RequestHandler):
                        .get()
 
         if recipe:
+            # Delete all actions pointing to this recipe
+            actions = UserAction.all()\
+                                .filter('type IN', [UserAction.TYPE_RECIPE_CREATED,
+                                                    UserAction.TYPE_RECIPE_EDITED,
+                                                    UserAction.TYPE_RECIPE_CLONED,
+                                                    UserAction.TYPE_RECIPE_LIKED])\
+                                .filter('object_id =', recipe.key().id())\
+                                .fetch(1000)
+
+            for action in actions:
+                action.delete()
+
+            # Delete the actual recipe itself
             recipe.delete()
 
             render_json(self, {

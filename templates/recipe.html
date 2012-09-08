@@ -55,9 +55,9 @@
         </ul>
     {% endif %}
     <div class="hero-unit editable">
-        {% if recipe.cloned_from %}
+        {% if cloned_from %}
             <p style="opacity: 0.5;">
-                Cloned from <a href="/users/{{ recipe.cloned_from.owner.name }}">{{ recipe.cloned_from.owner.name }}</a> / <a href="/users/{{ recipe.cloned_from.owner.name }}/recipes/{{ recipe.cloned_from.slug }}">{{ recipe.name }}</a>
+                Cloned from <a href="/users/{{ recipe.cloned_from.owner.name }}">{{ cloned_from.owner.name }}</a> / <a href="/users/{{ cloned_from.owner.name }}/recipes/{{ cloned_from.slug }}">{{ recipe.name }}</a>
             </p>
         {% endif %}
         <div class="price-container">
