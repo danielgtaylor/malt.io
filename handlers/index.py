@@ -90,7 +90,7 @@ class MainHandler(webapp2.RequestHandler):
 
             recipes = Recipe.all()\
                             .order('-likes_count')\
-                            .fetch(15)
+                            .run(limit=15)
 
             # Render and cache for 15 minutes
             memcache.set('index', render(self, 'index.html', {
