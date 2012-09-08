@@ -204,8 +204,8 @@ class Recipe
         gu = 0.0
         earlyGu = 0.0
         mcu = 0.0
-        gallons = $('#batchSize').html()
-        boilGallons = $('#boilSize').html()
+        gallons = parseFloat($('#batchSize').text())
+        boilGallons = parseFloat($('#boilSize').text())
         total_weight = 0.0
         approx_cost = 0.0
 
@@ -229,12 +229,12 @@ class Recipe
 
         rows = []
         $('#fermentables_data tr').each((index, element) =>
-            lb = parseInt(element.children[1].innerHTML) or 0
-            oz = parseInt(element.children[2].innerHTML) or 0
-            desc = element.children[3].innerHTML
-            late = (element.children[4].innerHTML or '') in ['y', 'yes']
-            ppg = parseInt(element.children[5].innerHTML) or 0
-            srm = parseInt(element.children[7].innerHTML) or 0
+            lb = parseInt($(element.children[1]).text()) or 0
+            oz = parseInt($(element.children[2]).text()) or 0
+            desc = $(element.children[3]).text()
+            late = ($(element.children[4]).text() or '') in ['y', 'yes']
+            ppg = parseInt($(element.children[5]).text()) or 0
+            srm = parseInt($(element.children[7]).text()) or 0
             
             # Update color
             srmspan = element.children[6].children[0]
@@ -316,8 +316,8 @@ class Recipe
         
         # Get yeast attenuation
         $('#yeast_data tr').each((index, element) =>
-            desc = element.children[0].innerHTML or ''
-            atten = parseInt(element.children[3].innerHTML) or 0
+            desc = $(element.children[0]).text() or ''
+            atten = parseInt($(element.children[3]).text()) or 0
             if atten > attenuation
                 attenuation = atten
 
@@ -357,14 +357,14 @@ class Recipe
         # Update bitterness units
         ibu = 0.0
         $('#hops_data tr').each((index, element) =>
-            time = parseInt(element.children[1].innerHTML) or 0.0
-            oz = parseFloat(element.children[2].innerHTML) or 0.0
-            desc = element.children[3].innerHTML or ''
-            form = element.children[4].innerHTML or 'pellet'
+            time = parseInt($(element.children[1]).text()) or 0.0
+            oz = parseFloat($(element.children[2]).text()) or 0.0
+            desc = $(element.children[3]).text() or ''
+            form = $(element.children[4]).text() or 'pellet'
             utilization_factor = 1.0
             if form is 'pellet'
                 utilization_factor = 1.15
-            aa = parseFloat(element.children[5].innerHTML) or 0.0
+            aa = parseFloat($(element.children[5]).text()) or 0.0
             bitterness = 1.65 * Math.pow(0.000125, earlyGu - 1.0) * ((1 - Math.pow(2.718, -0.04 * time)) / 4.15) * ((aa / 100.0 * oz * 7490.0) / boilGallons) * utilization_factor
             ibu += bitterness
 
@@ -546,17 +546,17 @@ class Recipe
     @getFromPage: =>
         # Setup basic recipe object
         recipe =
-            name: $('#recipeName').html()
-            description: $('#recipeDescription').html()
+            name: $('#recipeName').text()
+            description: $('#recipeDescription').text()
             category: $('#styleName').get(0).getAttribute('data-category') or ''
             style: $('#styleName').get(0).getAttribute('data-style')or ''
-            batchSize: parseFloat($('#batchSize').html()) or 5.0
-            boilSize: parseFloat($('#boilSize').html()) or 5.5
-            color: parseInt($('#recipe_color_value').html()) or 1
-            ibu: parseFloat($('#ibu').html()) or 0.0
-            alcohol: parseFloat($('#abv').html()) or 0.0
-            bottlingTemp: parseInt($('#bottling_temp').html()) or 70
-            bottlingPressure: parseFloat($('#bottling_pressure').html()) or 2.5
+            batchSize: parseFloat($('#batchSize').text()) or 5.0
+            boilSize: parseFloat($('#boilSize').text()) or 5.5
+            color: parseInt($('#recipe_color_value').text()) or 1
+            ibu: parseFloat($('#ibu').text()) or 0.0
+            alcohol: parseFloat($('#abv').text()) or 0.0
+            bottlingTemp: parseInt($('#bottling_temp').text()) or 70
+            bottlingPressure: parseFloat($('#bottling_pressure').text()) or 2.5
             ingredients:
                 fermentables: []
                 spices: []
@@ -564,37 +564,37 @@ class Recipe
 
         # Add fermentables data
         $('#fermentables_data tr').each((index, element) =>
-            lb = parseInt(element.children[1].innerHTML) or 0
-            oz = parseInt(element.children[2].innerHTML) or 0
+            lb = parseInt($(element.children[1]).text()) or 0
+            oz = parseInt($(element.children[2]).text()) or 0
 
             recipe.ingredients.fermentables.push(
                 weight: lb + (oz / 16.0)
-                description: element.children[3].innerHTML or ''
-                late: element.children[4].innerHTML or ''
-                ppg: parseInt(element.children[5].innerHTML) or 0
-                color: parseInt(element.children[7].innerHTML) or 1
+                description: $(element.children[3]).text() or ''
+                late: $(element.children[4]).text() or ''
+                ppg: parseInt($(element.children[5]).text()) or 0
+                color: parseInt($(element.children[7]).text()) or 1
             )
         )
 
         # Add hops data
         $('#hops_data tr').each((index, element) =>
             recipe.ingredients.spices.push(
-                use: element.children[0].innerHTML or ''
-                time: element.children[1].innerHTML or ''
-                oz: parseFloat(element.children[2].innerHTML) or 0.0
-                description: element.children[3].innerHTML or ''
-                form: element.children[4].innerHTML or 'pellet'
-                aa: parseFloat(element.children[5].innerHTML) or 0.0
+                use: $(element.children[0]).text() or ''
+                time: $(element.children[1]).text() or ''
+                oz: parseFloat($(element.children[2]).text()) or 0.0
+                description: $(element.children[3]).text() or ''
+                form: $(element.children[4]).text() or 'pellet'
+                aa: parseFloat($(element.children[5]).text()) or 0.0
             )
         )
 
         # Add yeast data
         $('#yeast_data tr').each((index, element) =>
             recipe.ingredients.yeast.push(
-                description: element.children[0].innerHTML or ''
-                type: element.children[1].innerHTML or ''
-                form: element.children[2].innerHTML or ''
-                attenuation: parseInt(element.children[3].innerHTML) or 0.0
+                description: $(element.children[0]).text() or ''
+                type: $(element.children[1]).text() or ''
+                form: $(element.children[2]).text() or ''
+                attenuation: parseInt($(element.children[3]).text()) or 0.0
             )
         )
 
