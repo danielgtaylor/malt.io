@@ -208,6 +208,7 @@
                         <th class="num" width="5%">LB</th>
                         <th class="num" width="5%">OZ</th>
                         <th>Description</th>
+                        <th width="5%">Late</th>
                         <th class="num" width="5%"><acronym title="Points per Pound per Gallon">PPG</acronym></th>
                         <th class="num" width="8%" colspan="2">&deg;L</th>
                         <th class="edit-show" width="14px"></th>
@@ -220,6 +221,7 @@
                             <td class="num">{{ ingredient.weight|weight_whole }}</td>
                             <td class="num">{{ ingredient.weight|weight_fractional(16) }}</td>
                             <td>{{ ingredient.description }}</td>
+                            <td>{{ ingredient.late }}</td>
                             <td class="num">{{ ingredient.ppg }}</td>
                             <td class="num"><span class="srm" data-srm="{{ ingredient.color }}"></span> </td>
                             <td class="num" style="border-left: none;">{{ ingredient.color }}</td>

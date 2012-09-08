@@ -147,7 +147,7 @@ class Recipe
     # template button item.
     @addFermentableRow: (template) =>
         table = $('#fermentables_data')[0]
-        row = '<tr><td class="num percent">?</td><td class="num" contentEditable="true">1</td><td class="num" contentEditable="true">0</td><td contentEditable="true">' + template.getAttribute('data-description') + '</td><td class="num" contentEditable="true">' + template.getAttribute('data-ppg') + '</td><td class="num"><span class="srm" data-srm="' + template.getAttribute('data-srm') + '" style="background-color: ' + Util.srmToRgb(template.getAttribute('data-srm')) + '"></span> </td><td class="num" style="border-left: none;" contentEditable="true">' + template.getAttribute('data-srm') + '</td><td class="edit-show" style="display: block"><a href="#" class="remove"><i class="icon-remove"></i></a></td></tr>'
+        row = '<tr><td class="num percent">?</td><td class="num" contentEditable="true">1</td><td class="num" contentEditable="true">0</td><td contentEditable="true">' + template.getAttribute('data-description') + '</td><td contentEditable="true"></td><td class="num" contentEditable="true">' + template.getAttribute('data-ppg') + '</td><td class="num"><span class="srm" data-srm="' + template.getAttribute('data-srm') + '" style="background-color: ' + Util.srmToRgb(template.getAttribute('data-srm')) + '"></span> </td><td class="num" style="border-left: none;" contentEditable="true">' + template.getAttribute('data-srm') + '</td><td class="edit-show" style="display: block"><a href="#" class="remove"><i class="icon-remove"></i></a></td></tr>'
         table.innerHTML += row
         $('#fermentables_data tr:last td:nth-child(2)').focus()
         @updateStats()
@@ -202,6 +202,7 @@ class Recipe
     # and more. This should be called anytime the recipe changes in some way.
     @updateStats: =>
         gu = 0.0
+        earlyGu = 0.0
         mcu = 0.0
         gallons = $('#batchSize').html()
         boilGallons = $('#boilSize').html()
@@ -219,6 +220,7 @@ class Recipe
                 mash: []
                 steep: []
                 boil: []
+                boilEnd: []
             times: {}
             yeast: []
 
@@ -230,11 +232,12 @@ class Recipe
             lb = parseInt(element.children[1].innerHTML) or 0
             oz = parseInt(element.children[2].innerHTML) or 0
             desc = element.children[3].innerHTML
-            ppg = parseInt(element.children[4].innerHTML) or 0
-            srm = parseInt(element.children[6].innerHTML) or 0
+            late = (element.children[4].innerHTML or '') in ['y', 'yes']
+            ppg = parseInt(element.children[5].innerHTML) or 0
+            srm = parseInt(element.children[7].innerHTML) or 0
             
             # Update color
-            srmspan = element.children[5].children[0]
+            srmspan = element.children[6].children[0]
             srmspan.setAttribute('data-srm', srm)
             srmspan.style.backgroundColor = Util.srmToRgb(srm)
             
@@ -249,21 +252,40 @@ class Recipe
                     approx_cost += weight * cost
                     break
 
-            if @BOIL_FERMENTABLES.exec(desc)
-                timeline_map['fermentables']['boil'].push([lb, oz, desc, ppg * weight / gallons])
+            if /mash/i.exec(desc)
+                addition = 'mash'
+            else if /steep/i.exec(desc)
+                addition = 'steep'
+            else if /boil/i.exec(desc)
+                addition = 'boil'
+            else if @BOIL_FERMENTABLES.exec(desc)
+                addition = 'boil'
             else if @STEEP_FERMENTABLES.exec(desc)
-                timeline_map['fermentables']['steep'].push([lb, oz, desc, ppg * weight / gallons])
-                
+                addition = 'steep'
+            else
+                addition = 'mash'
+
+            if addition is 'boil'
+                if not late
+                    timeline_map.fermentables.boil.push([lb, oz, desc, gravity])
+                else
+                    timeline_map.fermentables.boilEnd.push([lb, oz, desc, gravity])
+            else if addition is 'steep'
                 # Steeped grains have considerably lower efficiency of 30%
                 gravity *= 0.3
-            else
-                timeline_map['fermentables']['mash'].push([lb, oz, desc, ppg * weight / gallons])
-                
+
+                timeline_map.fermentables.steep.push([lb, oz, desc, gravity])
+            else if addition is 'mash'
                 # Mashed grains have an average efficiency of about 75%
                 # TODO: Make this configurable later
                 gravity *= 0.75
 
+                timeline_map.fermentables.mash.push([lb, oz, desc, gravity])
+
             gu += gravity
+
+            if not late
+                earlyGu += gravity
 
             rows.push([weight, element]);
         )
@@ -286,6 +308,7 @@ class Recipe
         
         # Update original gravity
         gu = 1.0 + (gu / 1000.0)
+        earlyGu = 1.0 + (earlyGu / 1000.0)
         og_element.html(gu.toFixed(3))
         
         # Update final gravity
@@ -342,7 +365,7 @@ class Recipe
             if form is 'pellet'
                 utilization_factor = 1.15
             aa = parseFloat(element.children[5].innerHTML) or 0.0
-            bitterness = 1.65 * Math.pow(0.000125, gu - 1.0) * ((1 - Math.pow(2.718, -0.04 * time)) / 4.15) * ((aa / 100.0 * oz * 7490.0) / boilGallons) * utilization_factor
+            bitterness = 1.65 * Math.pow(0.000125, earlyGu - 1.0) * ((1 - Math.pow(2.718, -0.04 * time)) / 4.15) * ((aa / 100.0 * oz * 7490.0) / boilGallons) * utilization_factor
             ibu += bitterness
 
             # Update cost
@@ -420,6 +443,7 @@ class Recipe
             for yeast in yeasts
                 items.push(yeast)
 
+            output = ''
             if items.length > 1
                 output = items.reduce((x, y) -> x + ', ' + y)
             else if items.length
@@ -448,15 +472,21 @@ class Recipe
         timeline += '<li><span class="label label-info">boil</span> Bring ' + boilGallons + ' average gallons of water to a boil (~' + Math.round(boilGallons * 10) + ' minutes)</li>'
         totalTime += parseFloat(boilGallons * 10)
 
-        times = (key for key, value of timeline_map.times)
-        times.sort().reverse()
+        times = (parseInt(key) for key, value of timeline_map.times)
 
-        for time, i in times
+        # If we have late additions and no late addition time, add it
+        if timeline_map.fermentables.boilEnd.length and 5 not in times
+            timeline_map.times[5] = []
+            times.push(5)
+
+        for time, i in times.sort((x, y) -> y - x)
             timeline += '<li><span class="label label-info">-' + time + ' minutes</span> Add '
 
             if i is 0 and timeline_map.fermentables.boil.length
                 timeline += get_items(timeline_map.fermentables.boil, timeline_map.times[time], [])
                 totalTime += parseInt(time)
+            else if time is 5 and timeline_map.fermentables.boilEnd.length
+                timeline += get_items(timeline_map.fermentables.boilEnd, timeline_map.times[time], [])
             else
                 timeline += get_items([], timeline_map.times[time], [])
             timeline += '</li>'
@@ -472,7 +502,7 @@ class Recipe
             <li><span class="label label-inverse">28 days</span> Relax, don\'t worry, and have a homebrew!</li>'
 
         $('#timeline ol').html(timeline)
-        console.debug(totalTime)
+
         $('#brewTime').html((totalTime / 60).toFixed(1) + ' hours')
 
         # Update style matching information
@@ -540,8 +570,9 @@ class Recipe
             recipe.ingredients.fermentables.push(
                 weight: lb + (oz / 16.0)
                 description: element.children[3].innerHTML or ''
-                ppg: parseInt(element.children[4].innerHTML) or 0
-                color: parseInt(element.children[6].innerHTML) or 1
+                late: element.children[4].innerHTML or ''
+                ppg: parseInt(element.children[5].innerHTML) or 0
+                color: parseInt(element.children[7].innerHTML) or 1
             )
         )
 
