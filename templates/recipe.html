@@ -77,7 +77,7 @@
             Boil size: <span id="boilSize">{{ recipe.boil_size }}</span> average gallons
         </p>
         <div class="btn-group edit-hide" style="float: left;">
-            {% if recipe.owner and user and user.name == recipe.owner.name %}
+            {% if publicuser and user and user.name == publicuser.name %}
                 <a id="edit-button" class="btn"><i class="icon-pencil"></i> Edit</a>
                 <a id="delete-button" class="btn"><i class="icon-remove"></i> Delete</a>
             {% else %}
