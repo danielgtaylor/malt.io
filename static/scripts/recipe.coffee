@@ -482,6 +482,9 @@ class Recipe
         for time, i in times.sort((x, y) -> y - x)
             timeline += '<li><span class="label label-info">-' + time + ' minutes</span> Add '
 
+            if i is 0
+                totalTime += time
+
             if i is 0 and timeline_map.fermentables.boil.length
                 timeline += get_items(timeline_map.fermentables.boil, timeline_map.times[time], [])
                 totalTime += parseInt(time)
