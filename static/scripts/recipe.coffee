@@ -272,7 +272,7 @@ class Recipe
                     timeline_map.fermentables.boilEnd.push([lb, oz, desc, gravity])
             else if addition is 'steep'
                 # Steeped grains have considerably lower efficiency of 30%
-                gravity *= 0.3
+                gravity *= 0.5
 
                 timeline_map.fermentables.steep.push([lb, oz, desc, gravity])
             else if addition is 'mash'
