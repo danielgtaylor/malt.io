@@ -21,7 +21,7 @@
             <li>recipes</li>
         {% endif %}
     </ul>
-    {% if not recipes %}
+    {% if not recipes.count() %}
     	This user has no public recipes!
     {% endif %}
 	{% for recipe in recipes %}
