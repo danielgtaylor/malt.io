@@ -13,10 +13,10 @@
     </ul>
     <h1>Original Gravity</h1>
     <p class="span6">
-        Original gravity is a measure of the amount of sugar in a wort that has the potential of becoming alcohol through fermentation. You can caluclate the original gravity `o` with the following formula, where `p` is the parts per pound per gallon of sugar, `w` is the weight in pounds and `g` is the batch size in gallons:
+        Original gravity is a measure of the amount of sugar in a wort that has the potential of becoming alcohol through fermentation. You can caluclate the original gravity `o` with the following formula, where `p` is the parts per pound per gallon of sugar, `w` is the weight in pounds, `g` is the batch size in gallons and `e` is the efficiency where the default efficiencies for mashed, steeped, and boiled fermentables are 75%, 50%, and 100% respectively:
     </p>
     <p class="span5">
-        `o = 1 + (sum((p * w) / g)) / 1000`
+        `o = 1 + (sum((p * w * e) / g)) / 1000`
     </p>
     <div class="clear"></div>
     <h1>Final Gravity</h1>
