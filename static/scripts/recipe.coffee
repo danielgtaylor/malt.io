@@ -193,6 +193,18 @@ class Recipe
             when 13  # Enter
                 event.preventDefault()
                 @updateStats()
+
+    # Reorder the rows of a table based on an attribute and custom sort
+    # function. Rows should be an array of [[attribute, element],
+    # [attribute, element], ...].
+    @reorderRows: (tbody, rows, sortFunc = (x, y) -> y[0] - x[0]) =>
+        active = document.activeElement
+        rows.sort(sortFunc)
+        for [attrib, row] in rows
+            tbody.append(row)
+            for child in row.children
+                if child is active
+                    $(child).focus();
     
     # Update the recipe info. This calculates color, alcohol percentage,
     # original and final gravity, bitterness, calories, priming information,
@@ -311,16 +323,7 @@ class Recipe
             row.children[0].innerHTML = Math.round(weight / total_weight * 100)
         
         # Reorder rows based on descending weight percentage
-        active = document.activeElement
-        rows.sort((x, y) ->
-            return y[0] - x[0]
-        )
-        tbody = $('#fermentables_data')
-        for [weight, row] in rows
-            tbody.append(row)
-            for child in row.children
-                if child is active
-                    $(child).focus();
+        @reorderRows($('#fermentables_data'), rows)
         
         # Update original gravity
         gu = 1.0 + (gu / 1000.0)
@@ -331,6 +334,7 @@ class Recipe
         attenuation = 0
         
         # Get yeast attenuation
+        rows = []
         $('#yeast_data tr').each((index, element) =>
             desc = $(element.children[0]).text() or ''
             atten = parseInt($(element.children[3]).text()) or 0
@@ -344,7 +348,10 @@ class Recipe
                     break
 
             timeline_map.yeast.push(desc)
+
+            rows.push([atten, element])
         )
+        @reorderRows($('#yeast_data'), rows)
         
         attenuation = 75 if attenuation is 0
         
@@ -371,6 +378,7 @@ class Recipe
         $('#recipe_color').css('background-color', Util.srmToRgb(color))
         
         # Update bitterness units
+        rows = []
         ibu = 0.0
         $('#hops_data tr').each((index, element) =>
             time = parseInt($(element.children[1]).text()) or 0.0
@@ -392,7 +400,11 @@ class Recipe
 
             timeline_map['times'][time] ?= []
             timeline_map['times'][time].push([oz, desc, bitterness])
+
+            rows.push([time, element])
         )
+        @reorderRows($('#hops_data'), rows)
+        
         ibu_element.html(ibu.toFixed(1))
         
         buToGu = (ibu / ((gu - 1.0) * 1000)) or 0.0
