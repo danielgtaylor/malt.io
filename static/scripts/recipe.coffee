@@ -131,17 +131,14 @@ class Recipe
     
     # Handle clicks on the delete button, removing a recipe
     @onDelete: (event) =>
-        if $(event.target).hasClass('btn-danger')
-            $.ajax(
-                url: location.href
-                type: 'delete'
-                success: (data, status, xhr) =>
-                    # TODO: handle errors here
-                    if data.redirect
-                        window.location = data.redirect
-            )
-        else
-            $(event.target).addClass('btn-danger').html('<i class="icon-remove icon-white"></i> Delete?')
+        $.ajax(
+            url: location.href
+            type: 'delete'
+            success: (data, status, xhr) =>
+                # TODO: handle errors here
+                if data.redirect
+                    window.location = data.redirect
+        )
 
     # Add a fermentable row to the fermentables table based on a fermentable
     # template button item.

@@ -80,7 +80,7 @@
         <div class="btn-group edit-hide" style="float: left;">
             {% if publicuser and user and user.name == publicuser.name %}
                 <a id="edit-button" class="btn"><i class="icon-pencil"></i> Edit</a>
-                <a id="delete-button" class="btn"><i class="icon-remove"></i> Delete</a>
+                <a class="btn" data-toggle="modal" href="#deleteModal"><i class="icon-remove"></i> Delete</a>
             {% else %}
                 <a id="like-button" class="btn{% if user and user.user_id in recipe.likes %} active{% endif %}" data-toggle="button"><i class="icon-thumbs-up"></i> Like</a>
             {% endif %}
@@ -534,6 +534,19 @@
             <a href="#" class="btn" data-dismiss="modal">Close</a>
         </div>
     </div>
+    <div id="deleteModal" class="modal fade hide">
+        <div class="modal-header">
+            <button type="button" class="close" data-dismiss="modal">×</button>
+            <h3>Delete Recipe</h3>
+        </div>
+        <div class="modal-body">
+            Are you sure you want to permanently delete this recipe?
+        </div>
+        <div class="modal-footer">
+            <a href="#" class="btn" data-dismiss="modal">Cancel</a>
+            <a id="delete-button" href="#" class="btn btn-danger" data-dismiss="modal"><i class="icon-remove icon-white"></i> Confirm Delete</a>
+        </div>
+    </div>
     <div id="cloneModal" class="modal fade hide">
         <div class="modal-header">
             <button type="button" class="close" data-dismiss="modal">×</button>
@@ -544,7 +557,7 @@
         </div>
         <div class="modal-footer">
             <a href="#" class="btn" data-dismiss="modal">Cancel</a>
-            <a id="clone-button" href="#" class="btn btn-primary" data-dismiss="modal">Clone</a>
+            <a id="clone-button" href="#" class="btn btn-success" data-dismiss="modal"><i class="icon-share icon-white"></i> Clone</a>
         </div>
     </div>
     <div id="badBrowserModal" class="modal fade hide">
