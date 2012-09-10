@@ -227,6 +227,15 @@ class Recipe
         # Update breadcrumb name
         $('#crumbName').html($('#recipeName').html())
 
+        # Are we mashing?
+        mashing = false
+        $('#fermentables_data tr').each((index, element) =>
+            desc = $(element.children[3]).text()
+
+            if /mash/i.exec(desc) or not (@BOIL_FERMENTABLES.exec(desc) or @STEEP_FERMENTABLES.exec(desc))
+                mashing = true
+        )
+
         rows = []
         $('#fermentables_data tr').each((index, element) =>
             lb = parseInt($(element.children[1]).text()) or 0
@@ -252,17 +261,27 @@ class Recipe
                     approx_cost += weight * cost
                     break
 
+            forced = false
             if /mash/i.exec(desc)
                 addition = 'mash'
+                forced = true
             else if /steep/i.exec(desc)
                 addition = 'steep'
+                forced = true
             else if /boil/i.exec(desc)
                 addition = 'boil'
+                forced = true
             else if @BOIL_FERMENTABLES.exec(desc)
                 addition = 'boil'
             else if @STEEP_FERMENTABLES.exec(desc)
                 addition = 'steep'
             else
+                addition = 'mash'
+
+            # If this grain is normally steeped but we are mashing, then
+            # let's be sure to include this as a mashed grain unless the
+            # author forced the inclusion of a steeping step.
+            if mashing and addition is 'steep' and not forced
                 addition = 'mash'
 
             if addition is 'boil'
@@ -455,15 +474,11 @@ class Recipe
 
         if timeline_map.fermentables.mash.length
             timeline += '<li><span class="label label-info">mash</span> Mash '
-
-            mashing = timeline_map.fermentables.mash
-            if timeline_map.fermentables.steep.length
-                mashing = mashing.concat(timeline_map.fermentables.steep)
-
-            timeline += get_items(mashing, [], [])
+            timeline += get_items(timeline_map.fermentables.mash, [], [])
             timeline += ' for 60 minutes at 154&deg;F'
             totalTime += 60
-        else if timeline_map.fermentables.steep.length
+        
+        if timeline_map.fermentables.steep.length
             timeline += '<li><span class="label label-info">steep</span> Steep '
             timeline += get_items(timeline_map.fermentables.steep, [], [])
             timeline += ' for 20 minutes in warm water (less than 150&deg;F)'
