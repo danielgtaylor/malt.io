@@ -479,21 +479,35 @@ class Recipe
 
             return output
 
+        boilName = 'water'
         timeline = '<li><span class="label label-inverse">start</span> Get ready to brew!'
 
         if timeline_map.fermentables.mash.length
-            timeline += '<li><span class="label label-info">mash</span> Mash '
+            boilName = 'wort'
+            mashWeight = (item[0] + (item[1] / 16) for item in timeline_map.fermentables.mash).reduce((x, y) -> x + y)
+            mashGallons = 0.375 * mashWeight
+            strikeTemp = (0.2 / 1.5) * (154 - 70) + 154
+            timeline += '<li><span class="label label-info">mash</span> Bring ' + mashGallons.toFixed(1) + ' gallons of water to ' + Math.round(strikeTemp) + '&deg;F (~' + Math.round(mashGallons * 5) + ' minutes)<br/>Mash '
             timeline += get_items(timeline_map.fermentables.mash, [], [])
-            timeline += ' for 60 minutes at 154&deg;F'
-            totalTime += 60
+            timeline += ' for 60 minutes at 154&deg;F<br/>Mashout to 170&deg;F and sparge with ' + (mashGallons / 2).toFixed(1) + ' gallons of water.'
+            totalTime += Math.round(mashGallons * 5) + 60 + 15
         
         if timeline_map.fermentables.steep.length
-            timeline += '<li><span class="label label-info">steep</span> Steep '
+            boilName = 'wort'
+            steepWeight = (item[0] + (item[1] / 16) for item in timeline_map.fermentables.steep).reduce((x, y) -> x + y)
+            steepGallons = steepWeight
+            timeline += '<li><span class="label label-info">steep</span> Bring ' + steepGallons.toFixed(1) + ' gallons of water to 150&deg; - 170&deg;F (~' + Math.round(steepGallons * 5) + ' minutes)<br/>Steep '
             timeline += get_items(timeline_map.fermentables.steep, [], [])
-            timeline += ' for 20 minutes in warm water (less than 150&deg;F)'
-            totalTime += 20
+            timeline += ' for 20 minutes, then remove and discard the grains. This liquid is now your wort.'
+            totalTime += Math.round(steepGallons * 5) + 20
 
-        timeline += '<li><span class="label label-info">boil</span> Bring ' + boilGallons + ' average gallons of water to a boil (~' + Math.round(boilGallons * 10) + ' minutes)</li>'
+        timeline += '<li><span class="label label-info">boil</span>'
+        if boilName is 'water'
+            timeline += 'Bring ' + boilGallons + ' average gallons of ' + boilName + ' to a rolling boil (~'
+        else
+            timeline += 'Top-up ' + boilName + ' to ' + boilGallons + ' average gallons and bring to a rolling boil (~'
+
+        timeline += Math.round(boilGallons * 10) + ' minutes).</li>'
         totalTime += parseFloat(boilGallons * 10)
 
         times = (parseInt(key) for key, value of timeline_map.times)
@@ -504,14 +518,13 @@ class Recipe
             times.push(5)
 
         for time, i in times.sort((x, y) -> y - x)
-            timeline += '<li><span class="label label-info">-' + time + ' minutes</span> Add '
-
             if i is 0
                 totalTime += time
 
+            timeline += '<li><span class="label label-info">-' + time + ' minutes</span> Add '
+
             if i is 0 and timeline_map.fermentables.boil.length
                 timeline += get_items(timeline_map.fermentables.boil, timeline_map.times[time], [])
-                totalTime += parseInt(time)
             else if time is 5 and timeline_map.fermentables.boilEnd.length
                 timeline += get_items(timeline_map.fermentables.boilEnd, timeline_map.times[time], [])
             else
@@ -521,7 +534,7 @@ class Recipe
         # Add cooling time
         totalTime += 30
 
-        timeline += '<li><span class="label label-info">0 minutes</span> Flame out; begin chilling to 100&deg;F</li>
+        timeline += '<li><span class="label label-info">0 minutes</span> Flame out; begin chilling to 70&deg; - 100&deg;F</li>
             <li><span class="label label-info">30 minutes</span> Chilling complete; top up with water to total ' + gallons + ' gallons; aerate and pitch ' + get_items([], [], timeline_map.yeast) + '</li>
             <li><span class="unknown-time">...</span>&nbsp;</li>
             <li><span class="label label-info">14 days</span> Prime and bottle about ' + bottleCount + ' bottles</li>
