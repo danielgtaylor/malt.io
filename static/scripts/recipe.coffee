@@ -457,14 +457,14 @@ class Recipe
                 if sugar[1]
                     item += sugar[1] + 'oz '
 
-                item += sugar[2] + ' (' + Math.round(sugar[3]) + ' GU)'
+                item += sugar[2] + ' (' + Math.round(sugar[3]) + ' <acronym title="Gravity Units">GU</acronym>)'
                 items.push(item)
 
             for spice in spices
                 item = spice[0] + 'oz ' + spice[1]
 
                 if spice[2]
-                    item += ' (' + spice[2].toFixed(1) + ' IBU)'
+                    item += ' (' + spice[2].toFixed(1) + ' <acronym title="International Bitterness Units">IBU</acronym>)'
 
                 items.push(item)
 
@@ -529,6 +529,13 @@ class Recipe
             <li><span class="label label-inverse">28 days</span> Relax, don\'t worry, and have a homebrew!</li>'
 
         $('#timeline ol').html(timeline)
+
+        $('#timeline ol [title]').tooltip({
+            delay: {
+                show: 500,
+                hide: 100
+            }
+        })
 
         $('#brewTime').html((totalTime / 60).toFixed(1) + ' hours')
 
