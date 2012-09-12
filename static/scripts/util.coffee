@@ -24,3 +24,33 @@ class Util
         selection = window.getSelection()
         selection.removeAllRanges()
         selection.addRange(range)
+
+    # Validate and fix input based on class names. Available validators:
+    #
+    #  * integer
+    #  * number
+    #  * positive
+    #
+    @validateInput: (event) =>
+        # Explicitly allow backspace, delete, alt/shift/ctrl, etc
+        if event.which <= 40 or event.ctrlKey or event.altKey
+            return true
+
+        valid = true
+        element = $(event.target)
+        value = String.fromCharCode(event.which)
+
+        if value
+            if element.hasClass('integer')
+                if not /[-+0-9]+/gi.test(value)
+                    valid = false
+
+            if element.hasClass('number')
+                if not /[-+0-9.]+/gi.test(value)
+                    valid = false
+
+            if element.hasClass('positive')
+                if /-/gi.test(value)
+                    valid = false
+
+        return valid

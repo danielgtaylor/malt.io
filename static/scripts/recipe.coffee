@@ -61,6 +61,9 @@ class Recipe
             @updateStats()
         )
 
+        # Setup validation delegates
+        $('#fermentables_data, #hops_data, #yeast_data, .editable').on('keypress', '.validate', Util.validateInput)
+
         # Setup row removal delegates
         $('#fermentables_data, #hops_data, #yeast_data').on('click', '.remove', (event) =>
             @removeRow(event.target.parentNode)
@@ -118,7 +121,7 @@ class Recipe
             return
 
         $('#recipeName, #recipeDescription, #batchSize, #boilSize, #bottling_temp, #bottling_pressure').attr('contentEditable', 'true')
-        $('#fermentables_data tr td:nth-child(2), #fermentables_data tr td:nth-child(3), #fermentables_data tr td:nth-child(4), #fermentables_data tr td:nth-child(5), #fermentables_data tr td:nth-child(7), #hops_data tr td:nth-child(1), #hops_data tr td:nth-child(2), #hops_data tr td:nth-child(3), #hops_data tr td:nth-child(4), #hops_data tr td:nth-child(5), #hops_data tr td:nth-child(6), #yeast_data tr td:nth-child(1), #yeast_data tr td:nth-child(2), #yeast_data tr td:nth-child(3), #yeast_data tr td:nth-child(4)').attr('contentEditable', 'true')
+        $('#fermentables_data tr td:nth-child(2), #fermentables_data tr td:nth-child(3), #fermentables_data tr td:nth-child(4), #fermentables_data tr td:nth-child(5), #fermentables_data tr td:nth-child(6), #fermentables_data tr td:nth-child(8), #hops_data tr td:nth-child(1), #hops_data tr td:nth-child(2), #hops_data tr td:nth-child(3), #hops_data tr td:nth-child(4), #hops_data tr td:nth-child(5), #hops_data tr td:nth-child(6), #yeast_data tr td:nth-child(1), #yeast_data tr td:nth-child(2), #yeast_data tr td:nth-child(3), #yeast_data tr td:nth-child(4)').attr('contentEditable', 'true')
         $('#saveMsg, .edit-show').show()
         $('.edit-hide').hide()
     
@@ -144,7 +147,7 @@ class Recipe
     # template button item.
     @addFermentableRow: (template) =>
         table = $('#fermentables_data')[0]
-        row = '<tr><td class="num percent">?</td><td class="num" contentEditable="true">1</td><td class="num" contentEditable="true">0</td><td contentEditable="true">' + template.getAttribute('data-description') + '</td><td contentEditable="true"></td><td class="num" contentEditable="true">' + template.getAttribute('data-ppg') + '</td><td class="num"><span class="srm" data-srm="' + template.getAttribute('data-srm') + '" style="background-color: ' + Util.srmToRgb(template.getAttribute('data-srm')) + '"></span> </td><td class="num" style="border-left: none;" contentEditable="true">' + template.getAttribute('data-srm') + '</td><td class="edit-show" style="display: block"><a href="#" class="remove"><i class="icon-remove"></i></a></td></tr>'
+        row = '<tr><td class="num percent">?</td><td class="num validate positive integer" contentEditable="true">1</td><td class="num validate positive integer" contentEditable="true">0</td><td contentEditable="true">' + template.getAttribute('data-description') + '</td><td contentEditable="true"></td><td class="num validate positive integer" contentEditable="true">' + template.getAttribute('data-ppg') + '</td><td class="num"><span class="srm" data-srm="' + template.getAttribute('data-srm') + '" style="background-color: ' + Util.srmToRgb(template.getAttribute('data-srm')) + '"></span> </td><td class="num validate positive integer" style="border-left: none;" contentEditable="true">' + template.getAttribute('data-srm') + '</td><td class="edit-show" style="display: block"><a href="#" class="remove"><i class="icon-remove"></i></a></td></tr>'
         table.innerHTML += row
         $('#fermentables_data tr:last td:nth-child(2)').focus()
         @updateStats()
@@ -163,7 +166,7 @@ class Recipe
             next = 5
             form = 'ground'
         
-        row = '<tr><td contentEditable="true">boil</td><td class="num" contentEditable="true">' + next + 'min</td><td class="num" contentEditable="true">1.00</td><td contentEditable="true">' + template.getAttribute('data-description') + '</td><td contentEditable="true">' + form + '</td><td class="num" contentEditable="true">' + template.getAttribute('data-aa') + '</td><td class="edit-show" style="display: block"><a href="#" class="remove"><i class="icon-remove"></i></a></td></tr>'
+        row = '<tr><td contentEditable="true">boil</td><td class="num" contentEditable="true">' + next + 'min</td><td class="num validate positive number" contentEditable="true">1.00</td><td contentEditable="true">' + template.getAttribute('data-description') + '</td><td contentEditable="true">' + form + '</td><td class="num validate positive number" contentEditable="true">' + template.getAttribute('data-aa') + '</td><td class="edit-show" style="display: block"><a href="#" class="remove"><i class="icon-remove"></i></a></td></tr>'
         table.innerHTML += row
         $('#hops_data tr:last td:nth-child(1)').focus()
         @updateStats()
@@ -172,7 +175,7 @@ class Recipe
     # template button item
     @addYeastRow: (template) =>
         table = $('#yeast_data')[0]
-        row = '<tr><td contentEditable="true">' + template.getAttribute('data-description') + '</td><td contentEditable="true">' + template.getAttribute('data-type') + '</td><td contentEditable="true">' + template.getAttribute('data-form') + '</td><td class="num" contentEditable="true">' + template.getAttribute('data-attenuation') + '</td><td class="edit-show" style="display: block"><a href="#" class="remove"><i class="icon-remove"></i></a></td></tr>'
+        row = '<tr><td contentEditable="true">' + template.getAttribute('data-description') + '</td><td contentEditable="true">' + template.getAttribute('data-type') + '</td><td contentEditable="true">' + template.getAttribute('data-form') + '</td><td class="num validate positive number" contentEditable="true">' + template.getAttribute('data-attenuation') + '</td><td class="edit-show" style="display: block"><a href="#" class="remove"><i class="icon-remove"></i></a></td></tr>'
         table.innerHTML += row
         $('#yeast_data tr:last td:nth-child(1)').focus()
         @updateStats()

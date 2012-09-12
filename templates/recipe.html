@@ -73,9 +73,9 @@
         <p style="font-size: 100%; line-height: 12pt;">
             Style: <span id="styleName" data-category="{{ recipe.category }}" data-style="{{ recipe.style }}">{{ recipe.style_display }}</span> <button class="btn btn-inverse btn-mini edit-show" data-toggle="modal" href="#styleModal" style="display: none; margin-top: -2px">Edit</button>
             <br/>
-            Batch size: <span id="batchSize">{{ recipe.batch_size }}</span> gallons
+            Batch size: <span id="batchSize" class="validate positive number">{{ recipe.batch_size }}</span> gallons
             <br/>
-            Boil size: <span id="boilSize">{{ recipe.boil_size }}</span> average gallons
+            Boil size: <span id="boilSize" class="validate positive number">{{ recipe.boil_size }}</span> average gallons
         </p>
         <div class="btn-group edit-hide" style="float: left;">
             {% if publicuser and user and user.name == publicuser.name %}
@@ -218,13 +218,13 @@
                     {% for ingredient in recipe.ingredients.fermentables %}
                         <tr>
                             <td class="num percent">0</td>
-                            <td class="num">{{ ingredient.weight|weight_whole }}</td>
-                            <td class="num">{{ ingredient.weight|weight_fractional(16) }}</td>
+                            <td class="num validate positive integer">{{ ingredient.weight|weight_whole }}</td>
+                            <td class="num validate positive integer">{{ ingredient.weight|weight_fractional(16) }}</td>
                             <td>{{ ingredient.description }}</td>
                             <td>{{ ingredient.late }}</td>
-                            <td class="num">{{ ingredient.ppg }}</td>
+                            <td class="num validate positive integer">{{ ingredient.ppg }}</td>
                             <td class="num"><span class="srm" data-srm="{{ ingredient.color }}"></span> </td>
-                            <td class="num" style="border-left: none;">{{ ingredient.color }}</td>
+                            <td class="num validate positive integer" style="border-left: none;">{{ ingredient.color }}</td>
                             <td class="edit-show"><a href="#" class="remove"><i class="icon-remove"></i></a></td>
                         </tr>
                     {% endfor %}
@@ -324,10 +324,10 @@
                         <tr>
                             <td>{{ ingredient.use }}</td>
                             <td class="num">{{ ingredient.time }}</td>
-                            <td class="num">{{ ingredient.oz }}</td>
+                            <td class="num validate positive number">{{ ingredient.oz }}</td>
                             <td>{{ ingredient.description }}</td>
                             <td>{{ ingredient.form }}</td>
-                            <td class="num">{{ ingredient.aa }}</td>
+                            <td class="num validate positive number">{{ ingredient.aa }}</td>
                             <td class="edit-show"><a href="#" class="remove"><i class="icon-remove"></i></a></td>
                         </tr>
                     {% endfor %}
@@ -427,7 +427,7 @@
                             <td>{{ ingredient.description }}</td>
                             <td>{{ ingredient.type }}</td>
                             <td>{{ ingredient.form }}</td>
-                            <td class="num">{{ ingredient.attenuation }}</td>
+                            <td class="num validate positive number">{{ ingredient.attenuation }}</td>
                             <td class="edit-show"><a href="#" class="remove"><i class="icon-remove"></i></a></td>
                         </tr>
                     {% endfor %}
@@ -493,11 +493,11 @@
         <div class="span2 editable">
             <h6>Temperature</h6>
             <p>
-                <span id="bottling_temp">{{ recipe.bottling_temp }}</span>&deg;F
+                <span id="bottling_temp" class="validate positive number">{{ recipe.bottling_temp }}</span>&deg;F
             </p>
             <h6>Volumes</h6>
             <p>
-                <span id="bottling_pressure">{{ recipe.bottling_pressure }}</span>
+                <span id="bottling_pressure" class="validate positive number">{{ recipe.bottling_pressure }}</span>
             </p>
             <h6><span title="12 oz / 0.3l">Bottles</span></h6>
             <p id="bottle_count">
