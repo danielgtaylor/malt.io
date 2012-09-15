@@ -25,6 +25,8 @@ AWARDS = {
     'created10': ['book', 'Created 10 brews']
 }
 
+template_cache = {}
+
 
 def render(handler, template, params=None):
     """
@@ -38,7 +40,15 @@ def render(handler, template, params=None):
         'logout_url': LOGOUT_URL
     })
 
-    t = JINJA_ENV.get_template(template)
+    t = template_cache.get(template, None)
+    if t is None:
+        # Get from disk
+        t = JINJA_ENV.get_template(template)
+
+        # Update the cache unless we are in developer mode
+        if not settings.DEBUG:
+            template_cache[template] = t
+
     rendered = t.render(p)
     handler.response.out.write(rendered)
     return rendered
