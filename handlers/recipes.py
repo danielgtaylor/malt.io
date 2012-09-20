@@ -64,6 +64,31 @@ class RecipesHandler(webapp2.RequestHandler):
         })
 
 
+class RecipeEmbedHandler(webapp2.RequestHandler):
+    """
+    Handle recipe embeds on other sites. This returns a javascript
+    which is used to render a small widget on another site with information
+    about the recipe and owner.
+
+        /embed/USERNAME/RECIPE-SLUG
+
+    """
+    def get(self, username, recipe):
+        publicuser = UserPrefs.all().filter('name = ', username).get()
+        recipe = Recipe.all().filter('slug =', recipe).get()
+
+        width = 260
+        try:
+            width = int(self.request.get('width'))
+        except: pass
+
+        render(self, 'recipe-embed.html', {
+            'publicuser': publicuser,
+            'recipe': recipe,
+            'width': width,
+        })
+
+
 class RecipeLikeHandler(webapp2.RequestHandler):
     """
     Recipe like request handler. Handles when a user likes a particular recipe

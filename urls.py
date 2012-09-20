@@ -3,8 +3,9 @@ from handlers.formulas import FormulasHandler
 from handlers.index import MainHandler
 from handlers.messages import MessagesHandler
 from handlers.profile import ProfileHandler
-from handlers.recipes import RecipesHandler, RecipeLikeHandler, \
-                             RecipeCloneHandler, RecipeHandler
+from handlers.recipes import RecipesHandler, RecipeEmbedHandler, \
+                             RecipeLikeHandler, RecipeCloneHandler, \
+                             RecipeHandler
 from handlers.users import UsersHandler, UserHandler, UserFollowHandler, \
                            UsernameCheckHandler
 
@@ -23,6 +24,7 @@ urls = [
     ('/messages', MessagesHandler),
     ('/profile', ProfileHandler),
     ('/new', RecipeHandler),
+    ('/embed/(.*?)/(.*?)', RecipeEmbedHandler),
     ('/homebrew-formulas', FormulasHandler),
     ('/donate', DonateHandler),
     ('/', MainHandler)

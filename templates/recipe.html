@@ -87,7 +87,8 @@
             <a class="btn" data-toggle="modal" href="#cloneModal"><i class="icon-share"></i> Clone</a>
             <a class="btn disabled"><i class="icon-fire"></i> Brew</a>
             <a class="btn disabled"><i class="icon-signal"></i> Scale</a>
-            <a class="btn disabled"><i class="icon-time"></i> View History</a>
+            <!--<a class="btn disabled"><i class="icon-time"></i> View History</a>-->
+            <a class="btn" data-toggle="modal" href="#widgetModal"><i class="icon-globe"></i> Widget</a>
         </div>
         <div class="edit-hide" style="float: left; margin-left: 1em; margin-top: 4px; position: relative;">
             <div class="g-plusone" data-size="medium" data-annotation="none"></div>&nbsp;
@@ -558,6 +559,27 @@
         <div class="modal-footer">
             <a href="#" class="btn" data-dismiss="modal">Cancel</a>
             <a id="clone-button" href="#" class="btn btn-success" data-dismiss="modal"><i class="icon-share icon-white"></i> Clone</a>
+        </div>
+    </div>
+    <div id="widgetModal" class="modal fade hide">
+        <div class="modal-header">
+            <button type="button" class="close" data-dismiss="modal">×</button>
+            <h3>Recipe Widget</h3>
+        </div>
+        <div class="modal-body">
+            <p>
+                You can share this recipe on the web by copying and pasting the code below onto your blog or website.
+            </p>
+            <div>
+                <textarea style="width: 100%;" rows="3">
+<!-- Malt.io Recipe Widget - copy and paste to your site -->
+<script src="http://www.malt.io/static/scripts/embed.js"></script>
+<div class="maltio-recipe" data-user="{{ publicuser.name }}" data-recipe="{{ recipe.slug }}"></div>
+                </textarea>
+            </div>
+        </div>
+        <div class="modal-footer">
+            <a href="#" class="btn" data-dismiss="modal">Close</a>
         </div>
     </div>
     <div id="badBrowserModal" class="modal fade hide">
