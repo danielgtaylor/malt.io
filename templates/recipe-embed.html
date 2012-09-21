@@ -19,7 +19,7 @@
     </head>
     <body class="embed">
         <div class="recipe" style="width: {{ width - 26 }}px;">
-            <span class="title ellipsize"><a href="/users/{{ recipe.owner.name }}/recipes/{{ recipe.slug }}" target="_top">{{ recipe.name }}</a></span>
+            <span class="title ellipsize"><a href="/users/{{ publicuser.name }}/recipes/{{ recipe.slug }}" target="_top">{{ recipe.name }}</a></span>
             <br/>
             <span class="ellipsize">{{ recipe.description }}</span>
             <br/>
@@ -27,8 +27,7 @@
                 <span class="srm" data-srm="{{ recipe.color }}"></span> {{ recipe.color }}&deg; SRM <span class="sep">|</span> {{ recipe.ibu }} IBU <span class="sep">|</span> {{ recipe.alcohol }}% ABV
             </div>
             <div class="btn-group">
-                <a class="btn" href="/users/{{ user.name }}/recipes/{{ recipe.slug }}" target="_top"><i class="icon-fire"></i> Brew Recipe</a>
-                <a class="btn" href="/users/{{ user.name }}/recipes/{{ recipe.slug }}/clone" target="_top"><i class="icon-share"></i> Clone Recipe</a>
+                <a class="btn" href="/users/{{ publicuser.name }}/recipes/{{ recipe.slug }}" target="_top"><i class="icon-fire"></i> Brew This Beer</a>
             </div>
             <div class="footer">
                 Powered by <a href="/" target="_top">Malt<span style="opacity: 0.6">.io</span></a>

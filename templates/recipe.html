@@ -570,12 +570,15 @@
             <p>
                 You can share this recipe on the web by copying and pasting the code below onto your blog or website.
             </p>
+            <div style="text-align: center;">
+                <iframe src="{{ base_url }}/embed/{{ publicuser.name }}/{{ recipe.slug }}" width="260" height="154" frameborder="0" scrolling="no"></iframe>
+            </div>
             <div>
-                <textarea style="width: 100%;" rows="3">
-<!-- Malt.io Recipe Widget - copy and paste to your site -->
-<script src="http://www.malt.io/static/scripts/embed.js"></script>
-<div class="maltio-recipe" data-user="{{ publicuser.name }}" data-recipe="{{ recipe.slug }}"></div>
-                </textarea>
+                <textarea style="width: 100%;" rows="5" onclick="this.select();">
+<!-- Malt.io Recipe Widget - copy and paste to your site -->{% if debug %}
+<script type="text/javascript">var maltioBaseUrl = '{{ base_url }}';</script>{% endif %}
+<script src="{{ base_url }}/static/scripts/embed.js"></script>
+<div class="maltio-recipe" data-user="{{ publicuser.name }}" data-recipe="{{ recipe.slug }}"></div></textarea>
             </div>
         </div>
         <div class="modal-footer">

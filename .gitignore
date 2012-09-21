@@ -35,3 +35,4 @@ nosetests.xml
 # Generated static files
 static/styles/main.css
 static/scripts/main.js
+static/scripts/embed.js

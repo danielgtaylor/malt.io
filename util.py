@@ -37,6 +37,7 @@ def render(handler, template, params=None):
         'debug': settings.DEBUG,
         'user': UserPrefs.get(),
         'is_admin': users.is_current_user_admin(),
+        'base_url': handler.request.host_url,
         'logout_url': LOGOUT_URL
     })
 
