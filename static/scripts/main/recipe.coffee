@@ -52,6 +52,7 @@ class Recipe
         $('#delete-button').click(@onDelete)
         $('#like-button').click(@onLiked)
         $('#clone-button').click(@onCloned)
+        $('#widget-button').click(@onWidget)
         
         # Setup editing delegates
         $('#fermentables_data, #hops_data, #yeast_data, .editable').on('keydown', '[contentEditable]', (event) =>
@@ -113,6 +114,13 @@ class Recipe
                 if data.redirect
                     window.location = data.redirect
         )
+
+    # Show widget dialog
+    @onWidget: (event) =>
+        setTimeout(->
+            frame = $('#widgetModal iframe').get(0)
+            frame.src = frame.getAttribute('data-src')
+        , 300)
 
     # Enable recipe edit mode
     @enableEdit: =>
