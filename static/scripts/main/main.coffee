@@ -13,4 +13,7 @@ $(document).ready(->
         event.preventDefault();
         window.location.href = 'http://www.google.com/search?q=' + $('#searchQuery').val() + '+site%3Awww.malt.io'
     )
+
+    # Show any dialogs based on URL
+    $(window.location.hash + 'Modal').modal('show');
 )
