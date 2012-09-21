@@ -663,22 +663,5 @@ class Recipe
             success: (data, status, xhr) =>
                 # TODO: handle errors
                 if data.redirect
-                    # If the history object exists, then disable editing nad
-                    # update the current URL without a page reload, otherwise
-                    # just do a normal redirect
-                    if window.history
-                        @disableEdit()
-                        window.history.replaceState(null, null, data.redirect)
-
-                        # Reset comments
-                        DISQUS?.reset(
-                            reload: true,
-                            config: =>
-                                this.page.identifier = undefined
-                                this.page.url = data.redirect
-                        )
-
-                        $('#disqus_thread').show()
-                    else
-                        window.location = data.redirect
+                    window.location = data.redirect
         )
