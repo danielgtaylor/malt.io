@@ -12,26 +12,6 @@
             Recipe.init();
             Recipe.updateStats();
             BeerStyles.init();
-
-            $('#gallonsSlider').noUiSlider('init', {
-                knobs: 1,
-                connect: 'lower',
-                scale: [0, 20],
-                start: {{ recipe.batch_size * 2 }},
-                change: function () {
-                    $('#gallonsValue').text(($('#gallonsSlider').noUiSlider('value')[1] / 2.0).toFixed(1));
-                }
-            });
-
-            $('#boilGallonsSlider').noUiSlider('init', {
-                knobs: 1,
-                connect: 'lower',
-                scale: [0, 20],
-                start: {{ recipe.boil_size * 2 }},
-                change: function () {
-                    $('#boilGallonsValue').text(($('#boilGallonsSlider').noUiSlider('value')[1] / 2.0).toFixed(1));
-                }
-            });
         });
 
         (function(d, s, id) {

@@ -77,6 +77,25 @@ class Recipe
             Util.selectAll(event)
         )
 
+        # Setup scaling
+        $('#gallonsSlider').noUiSlider('init',
+            knobs: 1,
+            connect: 'lower',
+            scale: [0, 20],
+            start: parseFloat($('#gallonsValue').text()) * 2,
+            change: =>
+                $('#gallonsValue').text(($('#gallonsSlider').noUiSlider('value')[1] / 2.0).toFixed(1))
+        )
+
+        $('#boilGallonsSlider').noUiSlider('init',
+            knobs: 1,
+            connect: 'lower',
+            scale: [0, 20],
+            start: parseFloat($('#boilGallonsValue').text()) * 2,
+            change: =>
+                $('#boilGallonsValue').text(($('#boilGallonsSlider').noUiSlider('value')[1] / 2.0).toFixed(1));
+        )
+
         # Was the page loaded in edit mode? If so, enable editing!
         if window.location.pathname is '/new' or window.location.hash is '#edit'
             @enableEdit()
@@ -308,6 +327,10 @@ class Recipe
 
         # Update breadcrumb name
         $('#crumbName').html($('#recipeName').html())
+
+        # Update size sliders in scale dialog
+        $('#gallonsValue').text(gallons);
+        $('#boilGallonsValue').text(boilGallons);
 
         # Are we mashing?
         mashing = @getMashingInfo()
