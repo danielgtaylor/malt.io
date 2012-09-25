@@ -12,6 +12,26 @@
             Recipe.init();
             Recipe.updateStats();
             BeerStyles.init();
+
+            $('#gallonsSlider').noUiSlider('init', {
+                knobs: 1,
+                connect: 'lower',
+                scale: [0, 20],
+                start: {{ recipe.batch_size * 2 }},
+                change: function () {
+                    $('#gallonsValue').text(($('#gallonsSlider').noUiSlider('value')[1] / 2.0).toFixed(1));
+                }
+            });
+
+            $('#boilGallonsSlider').noUiSlider('init', {
+                knobs: 1,
+                connect: 'lower',
+                scale: [0, 20],
+                start: {{ recipe.boil_size * 2 }},
+                change: function () {
+                    $('#boilGallonsValue').text(($('#boilGallonsSlider').noUiSlider('value')[1] / 2.0).toFixed(1));
+                }
+            });
         });
 
         (function(d, s, id) {
@@ -86,7 +106,7 @@
             {% endif %}
             <a class="btn" data-toggle="modal" href="#cloneModal"><i class="icon-share"></i> Clone</a>
             <a class="btn disabled"><i class="icon-fire"></i> Brew</a>
-            <a class="btn disabled"><i class="icon-signal"></i> Scale</a>
+            <a class="btn" data-toggle="modal" href="#scaleModal"><i class="icon-signal"></i> Scale</a>
             <!--<a class="btn disabled"><i class="icon-time"></i> View History</a>-->
             <a id="widget-button" class="btn" data-toggle="modal" href="#widgetModal"><i class="icon-globe"></i> Widget</a>
         </div>
@@ -558,7 +578,36 @@
         </div>
         <div class="modal-footer">
             <a href="#" class="btn" data-dismiss="modal">Cancel</a>
-            <a id="clone-button" href="#" class="btn btn-success" data-dismiss="modal"><i class="icon-share icon-white"></i> Clone</a>
+            <a id="clone-button" href="#" class="btn btn-success" data-dismiss="modal"><i class="icon-share icon-white"></i> Clone Recipe</a>
+        </div>
+    </div>
+    <div id="scaleModal" class="modal fade hide">
+        <div class="modal-header">
+            <button type="button" class="close" data-dismiss="modal">×</button>
+            <h3>Scale Recipe</h3>
+        </div>
+        <div class="modal-body">
+            <div>
+                Scaling this recipe will temporarily modify the ingredients to match new batch and boil sizes in gallons. Rounding may cause the values to change by a very small amount, but reasonable effort is taken to ensure the recipe stays true to the original pre-scaled version.<br/><br/>
+            </div>
+            <div class="row" style="position: relative;">
+                <div class="scaler">
+                    <span>Batch Size:</span>
+                    <div id="gallonsSlider" class="noUiSlider"></div>
+                    <span id="gallonsValue">{{ recipe.batch_size }}</span>
+                    <span>gallons</span>
+                </div>
+                <div class="scaler">
+                    <span>Boil Size:</span>
+                    <div id="boilGallonsSlider" class="noUiSlider"></div>
+                    <span id="boilGallonsValue">{{ recipe.boil_size }}</span>
+                    <span>gallons</span>
+                </div>
+            </div>
+        </div>
+        <div class="modal-footer">
+            <a href="#" class="btn" data-dismiss="modal">Cancel</a>
+            <a id="scale-button" href="#" class="btn btn-success" data-dismiss="modal"><i class="icon-signal icon-white"></i> Scale Recipe</a>
         </div>
     </div>
     <div id="widgetModal" class="modal fade hide">

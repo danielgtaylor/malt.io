@@ -52,6 +52,7 @@ class Recipe
         $('#delete-button').click(@onDelete)
         $('#like-button').click(@onLiked)
         $('#clone-button').click(@onCloned)
+        $('#scale-button').click(@onScaled)
         $('#widget-button').click(@onWidget)
         
         # Setup editing delegates
@@ -114,6 +115,10 @@ class Recipe
                 if data.redirect
                     window.location = data.redirect
         )
+
+    # Scale a recipe to the desired batch and boil sizes
+    @onScaled: (event) =>
+        @scale(parseFloat($('#gallonsValue').text()), parseFloat($('#boilGallonsValue').text()))
 
     # Show widget dialog
     @onWidget: (event) =>
@@ -217,6 +222,63 @@ class Recipe
                 if child is active
                     $(child).focus();
     
+    # Are we mashing? Guess based on ingredients and overrides.
+    @getMashingInfo: =>
+        $('#fermentables_data tr').each((index, element) =>
+            desc = $(element.children[3]).text()
+
+            if /mash/i.exec(desc) or not (@BOIL_FERMENTABLES.exec(desc) or @STEEP_FERMENTABLES.exec(desc))
+                return true
+        )
+
+        return false
+
+    # Get information about a fermentable table row, such as the weight, ppg
+    # gravity, addition type, etc.
+    @getFermentableInfo: (element, gallons, mashing) =>
+        lb = parseInt($(element.children[1]).text()) or 0
+        oz = parseInt($(element.children[2]).text()) or 0
+        desc = $(element.children[3]).text()
+        late = ($(element.children[4]).text() or '') in ['y', 'yes']
+        ppg = parseInt($(element.children[5]).text()) or 0
+        srm = parseInt($(element.children[7]).text()) or 0
+        
+        weight = lb + (oz / 16.0)
+        gravity = ppg * weight / gallons
+
+        forced = false
+        if /mash/i.exec(desc)
+            addition = 'mash'
+            forced = true
+        else if /steep/i.exec(desc)
+            addition = 'steep'
+            forced = true
+        else if /boil/i.exec(desc)
+            addition = 'boil'
+            forced = true
+        else if @BOIL_FERMENTABLES.exec(desc)
+            addition = 'boil'
+        else if @STEEP_FERMENTABLES.exec(desc)
+            addition = 'steep'
+        else
+            addition = 'mash'
+
+        # If this grain is normally steeped but we are mashing, then
+        # let's be sure to include this as a mashed grain unless the
+        # author forced the inclusion of a steeping step.
+        if mashing and addition is 'steep' and not forced
+            addition = 'mash'
+
+        if addition is 'steep'
+            # Steeped grains have considerably lower efficiency of 30%
+            gravity *= 0.5
+        else if addition is 'mash'
+            # Mashed grains have an average efficiency of about 75%
+            # TODO: Make this configurable later
+            gravity *= 0.75
+
+        return [lb, oz, desc, late, ppg, srm, weight, gravity, addition, forced]
+
     # Update the recipe info. This calculates color, alcohol percentage,
     # original and final gravity, bitterness, calories, priming information,
     # and more. This should be called anytime the recipe changes in some way.
@@ -248,31 +310,18 @@ class Recipe
         $('#crumbName').html($('#recipeName').html())
 
         # Are we mashing?
-        mashing = false
-        $('#fermentables_data tr').each((index, element) =>
-            desc = $(element.children[3]).text()
-
-            if /mash/i.exec(desc) or not (@BOIL_FERMENTABLES.exec(desc) or @STEEP_FERMENTABLES.exec(desc))
-                mashing = true
-        )
+        mashing = @getMashingInfo()
 
         rows = []
         $('#fermentables_data tr').each((index, element) =>
-            lb = parseInt($(element.children[1]).text()) or 0
-            oz = parseInt($(element.children[2]).text()) or 0
-            desc = $(element.children[3]).text()
-            late = ($(element.children[4]).text() or '') in ['y', 'yes']
-            ppg = parseInt($(element.children[5]).text()) or 0
-            srm = parseInt($(element.children[7]).text()) or 0
+            [lb, oz, desc, late, ppg, srm, weight, gravity, addition, forced] = @getFermentableInfo(element, gallons, mashing)
             
             # Update color
             srmspan = element.children[6].children[0]
             srmspan.setAttribute('data-srm', srm)
             srmspan.style.backgroundColor = Util.srmToRgb(srm)
             
-            weight = lb + (oz / 16.0)
             total_weight += weight;
-            gravity = ppg * weight / gallons
             mcu += srm * weight / gallons
             
             # Update approximate cost
@@ -281,44 +330,14 @@ class Recipe
                     approx_cost += weight * cost
                     break
 
-            forced = false
-            if /mash/i.exec(desc)
-                addition = 'mash'
-                forced = true
-            else if /steep/i.exec(desc)
-                addition = 'steep'
-                forced = true
-            else if /boil/i.exec(desc)
-                addition = 'boil'
-                forced = true
-            else if @BOIL_FERMENTABLES.exec(desc)
-                addition = 'boil'
-            else if @STEEP_FERMENTABLES.exec(desc)
-                addition = 'steep'
-            else
-                addition = 'mash'
-
-            # If this grain is normally steeped but we are mashing, then
-            # let's be sure to include this as a mashed grain unless the
-            # author forced the inclusion of a steeping step.
-            if mashing and addition is 'steep' and not forced
-                addition = 'mash'
-
             if addition is 'boil'
                 if not late
                     timeline_map.fermentables.boil.push([lb, oz, desc, gravity])
                 else
                     timeline_map.fermentables.boilEnd.push([lb, oz, desc, gravity])
             else if addition is 'steep'
-                # Steeped grains have considerably lower efficiency of 30%
-                gravity *= 0.5
-
                 timeline_map.fermentables.steep.push([lb, oz, desc, gravity])
             else if addition is 'mash'
-                # Mashed grains have an average efficiency of about 75%
-                # TODO: Make this configurable later
-                gravity *= 0.75
-
                 timeline_map.fermentables.mash.push([lb, oz, desc, gravity])
 
             gu += gravity
@@ -597,6 +616,67 @@ class Recipe
                 abv_element.addClass('styleError')
             else
                 abv_element.removeClass('styleError')
+
+    # Scale a recipe to a new batch and boil size, trying to keep the gravities
+    # and bitterness the same.
+    @scale: (newGallons, newBoilGallons) =>
+        earlyGu = 0.0
+
+        # Get current sizes
+        gallons = parseFloat($('#batchSize').text())
+        boilGallons = parseFloat($('#boilSize').text())
+
+        # Are we mashing?
+        mashing = @getMashingInfo()
+
+        $('#fermentables_data tr').each((index, element) =>
+            [lb, oz, desc, late, ppg, srm, weight, gravity, addition, forced] = @getFermentableInfo(element, gallons, mashing)
+            weight = lb + (oz / 16.0)
+
+            newWeight = weight / gallons * newGallons;
+            newLb = Math.floor(newWeight)
+            newOz = Math.round((newWeight - newLb) * 16.0)
+
+            if newOz is 16
+                newLb += 1
+                newOz = 0
+
+            if not late
+                earlyGu += gravity
+            
+            $(element.children[1]).text(newLb)
+            $(element.children[2]).text(newOz)
+        )
+
+        $('#hops_data tr').each((index, element) =>
+            time = parseInt($(element.children[1]).text()) or 0.0
+            oz = parseFloat($(element.children[2]).text()) or 0.0
+            form = $(element.children[4]).text() or 'pellet'
+
+            utilization_factor = 1.0
+            if form is 'pellet'
+                utilization_factor = 1.15
+
+            aa = parseFloat($(element.children[5]).text()) or 0.0
+
+            if aa
+                # This is a bittering ingredient, so scale using the bitterness formula
+                bitterness = 1.65 * Math.pow(0.000125, earlyGu - 1.0) * ((1 - Math.pow(2.718, -0.04 * time)) / 4.15) * ((aa / 100.0 * oz * 7490.0) / boilGallons) * utilization_factor
+
+                newOz = Math.round(((bitterness * newBoilGallons) / (1.65 * Math.pow(0.000125, earlyGu - 1.0) * ((1 - Math.pow(2.718, -0.04 * time)) / 4.15) * (aa / 100.0 * 7490.0) * utilization_factor)) * 100) / 100.0
+            else
+                # Non-bittering ingredient, scale linearly
+                newOz = Math.round((oz / gallons * newGallons) * 100) / 100.0
+
+            $(element.children[2]).text(newOz)
+        )
+
+        # Update sizes on page
+        $('#batchSize').text(newGallons)
+        $('#boilSize').text(newBoilGallons)
+
+        # Update calculated page info with newly scaled values
+        @updateStats()
 
     # Get a recipe object from the current page. This converts the various HTML tables
     # and other elements into an object suitable for JSON-encoding to be sent to the
