@@ -71,7 +71,7 @@
         <h1 id="recipeName">{{ recipe.name }}</h1>
         <p id="recipeDescription">{{ recipe.description }}</p>
         <p style="font-size: 100%; line-height: 12pt;">
-            Style: <span id="styleName" data-category="{{ recipe.category }}" data-style="{{ recipe.style }}">{{ recipe.style_display }}</span> <button class="btn btn-inverse btn-mini edit-show" data-toggle="modal" href="#styleModal" style="display: none; margin-top: -2px">Edit</button>
+            Style: <span id="styleName" data-category="{{ recipe.category }}" data-style="{{ recipe.style }}">{{ recipe.style_display }}</span> <a class="btn btn-inverse btn-mini edit-show" data-toggle="modal" href="#styleModal" style="display: none; margin-top: -2px">Edit</a>
             <br/>
             Batch size: <span id="batchSize" class="validate positive number">{{ recipe.batch_size }}</span> gallons
             <br/>
@@ -205,14 +205,14 @@
             <table class="table table-bordered table-striped">
                 <thead>
                     <tr>
-                        <th class="num" width="5%">%</th>
-                        <th class="num" width="5%">LB</th>
-                        <th class="num" width="5%">OZ</th>
+                        <th class="num col5">%</th>
+                        <th class="num col5">LB</th>
+                        <th class="num col5">OZ</th>
                         <th>Description</th>
-                        <th width="5%">Late</th>
-                        <th class="num" width="5%"><acronym title="Points per Pound per Gallon">PPG</acronym></th>
-                        <th class="num" width="8%" colspan="2">&deg;L</th>
-                        <th class="edit-show" width="14px"></th>
+                        <th class="col5">Late</th>
+                        <th class="num col5"><abbr title="Points per Pound per Gallon">PPG</abbr></th>
+                        <th class="num col8" colspan="2">&deg;L</th>
+                        <th class="edit-show col14p"></th>
                     </tr>
                 </thead>
                 <tbody id="fermentables_data">
@@ -243,8 +243,8 @@
             </span>
             <h6>Color</h6>
             <span>
-                <span id="recipe_color" class="srm" data-srm="1"></span> <span id="recipe_color_value" title="">1</span>&deg; <acronym title="Standard Reference Method">SRM</acronym>
-            <span>
+                <span id="recipe_color" class="srm" data-srm="1"></span> <span id="recipe_color_value" title="">1</span>&deg; <abbr title="Standard Reference Method">SRM</abbr>
+            </span>
         </div>
     </div>
     <h2>Bittering &amp; Spices</h2>
@@ -311,13 +311,13 @@
             <table class="table table-bordered table-striped">
                 <thead>
                     <tr>
-                        <th width="10%">Use</th>
-                        <th class="num" width="10%">Time</th>
-                        <th class="num" width="5%">OZ</th>
+                        <th class="col10">Use</th>
+                        <th class="num col10">Time</th>
+                        <th class="num col5">OZ</th>
                         <th>Description</th>
-                        <th width="10%">Form</th>
-                        <th class="num" width="5%"><acronym title="Alpha Acid %">AA%</acronym></th>
-                        <th class="edit-show" width="14px"></th>
+                        <th class="col10">Form</th>
+                        <th class="num col5"><abbr title="Alpha Acid %">AA%</abbr></th>
+                        <th class="edit-show col14p"></th>
                     </tr>
                 </thead>
                 <tbody id="hops_data">
@@ -338,11 +338,11 @@
         <div class="span2">
             <h6>Bitterness</h6>
             <p>
-                <span id="ibu" title="">0.0</span> <acronym title="International Bitterness Units">IBU</acronym>
+                <span id="ibu" title="">0.0</span> <abbr title="International Bitterness Units">IBU</abbr>
                 <br/>
                 <small><strong>&fnof;</strong>: Tinseth</small>
             </p>
-            <h6><acronym title="Bitterness Units to Gravity Units">BU:GU</acronym></h6>
+            <h6><abbr title="Bitterness Units to Gravity Units">BU:GU</abbr></h6>
             <p id="buToGu">
                 0.0
             </p>
@@ -416,10 +416,10 @@
                 <thead>
                     <tr>
                         <th>Strain</th>
-                        <th width="10%">Type</th>
-                        <th width="10%">Form</th>
-                        <th class="num" width="10%">Attenuation</th>
-                        <th class="edit-show" width="14px"></th>
+                        <th class="col10">Type</th>
+                        <th class="col10">Form</th>
+                        <th class="num col10">Attenuation</th>
+                        <th class="edit-show col14p"></th>
                     </tr>
                 </thead>
                 <tbody id="yeast_data">
@@ -438,7 +438,7 @@
         <div class="span2">
             <h6>Alcohol</h6>
             <p>
-                <span id="abv" title="">0.0</span>% <acronym title="Alcohol By Volume">ABV</acronym>
+                <span id="abv" title="">0.0</span>% <abbr title="Alcohol By Volume">ABV</abbr>
             </p>
             <h6>Calories</h6>
             <p>
@@ -523,7 +523,7 @@
     </div>
     <div id="disqus_thread" {% if recipe.new %}style="display: none;"{% endif %}></div>
     <div class="license">
-        Creative Commons <a rel="license" href="http://creativecommons.org/licenses/by-sa/3.0/deed.en_US"><img alt="Creative Commons License" style="border-width:0" src="http://i.creativecommons.org/l/by-sa/3.0/88x31.png" alt="This recipe is licensed under a Creative Commons Attribution-ShareAlike 3.0 Unported license." title="This recipe is licensed under a Creative Commons Attribution-ShareAlike 3.0 Unported license."/></a> Attribution ShareAlike
+        Creative Commons <a rel="license" href="http://creativecommons.org/licenses/by-sa/3.0/deed.en_US"><img style="border-width:0" src="http://i.creativecommons.org/l/by-sa/3.0/88x31.png" alt="This recipe is licensed under a Creative Commons Attribution-ShareAlike 3.0 Unported license." title="This recipe is licensed under a Creative Commons Attribution-ShareAlike 3.0 Unported license."/></a> Attribution ShareAlike
     </div>
     <div id="styleModal" class="modal fade hide">
         <div class="modal-header">

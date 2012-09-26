@@ -99,7 +99,7 @@ def render_hops_template(values):
         for i in range(3):
             rating += '<i class="icon-asterisk"'
             if i >= values[1] / 5.0:
-                rating += 'style="opacity: 0.2"'
+                rating += ' style="opacity: 0.2"'
             rating += '></i>'
 
     return '<li data-description="%(description)s" data-aa="%(aa)s" onclick="Recipe.addHopRow(this);"><a>%(rating)s %(description)s</a></li>' % {
