@@ -92,6 +92,25 @@ class RecipeEmbedHandler(webapp2.RequestHandler):
         })
 
 
+class RecipeXmlHandler(webapp2.RequestHandler):
+    """
+    Handle recipe export via BeerXML. This renders a BeerXML representation
+    of the recipe that can be imported into other beer software.
+
+        /embed/USERNAME/RECIPE-SLUG/beerxml
+
+    """
+    def get(self, username, recipe_slug):
+        publicuser = UserPrefs.all().filter('name = ', username).get()
+        recipe = Recipe.all()\
+                       .filter('owner =', publicuser)\
+                       .filter('slug =', recipe_slug)\
+                       .get()
+
+        self.response.headers['Content-Type'] = 'text/xml'
+        self.response.out.write(recipe.beerxml)
+
+
 class RecipeLikeHandler(webapp2.RequestHandler):
     """
     Recipe like request handler. Handles when a user likes a particular recipe

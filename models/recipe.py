@@ -2,6 +2,10 @@ import json
 
 from google.appengine.ext import db
 from models.userprefs import UserPrefs
+from util import time_to_min, xmlescape
+
+
+GAL_TO_LITERS = 3.78541
 
 
 class RecipeBase(db.Model):
@@ -72,6 +76,75 @@ class RecipeBase(db.Model):
             return self.category + ' - ' + self.style
 
         return 'No style'
+
+    @property
+    def beerxml(self):
+        """
+        Return a BeerXML 1.0 representation of this recipe.
+        """
+        xml = u'<?xml version="1.0" encoding="utf-8"?><RECIPES><RECIPE>'
+
+        xml += '<VERSION>1</VERSION>'
+        xml += '<NAME>' + xmlescape(self.name) + '</NAME>'
+        xml += '<TYPE>Extract</TYPE>'
+        xml += '<STYLE></STYLE>'
+        xml += '<BREWER>' + xmlescape(self.owner.name) + '</BREWER>'
+        xml += '<BATCH_SIZE>' + xmlescape(self.batch_size * GAL_TO_LITERS) + '</BATCH_SIZE>'
+        xml += '<BOIL_SIZE>' + xmlescape(self.boil_size * GAL_TO_LITERS) + '</BOIL_SIZE>'
+        xml += '<EFFICIENCY>75.0</EFFICIENCY>'
+        
+        xml += '<HOPS>'
+        for hop in [spice for spice in self.ingredients['spices'] if spice['aa'] > 0]:
+            xml += '<HOP>'
+            xml += '<VERSION>1</VERSION>'
+            xml += '<NAME>' + xmlescape(hop['description']) + '</NAME>'
+            xml += '<ALPHA>' + xmlescape(hop['aa']) + '</ALPHA>'
+            xml += '<AMOUNT>' + xmlescape(hop['oz'] / 35.275) + '</AMOUNT>'
+            xml += '<AMOUNT_IS_WEIGHT>TRUE</AMOUNT_IS_WEIGHT>'
+            xml += '<USE>' + xmlescape(hop['use'].capitalize()) + '</USE>'
+            xml += '<TIME>' + xmlescape(int(time_to_min(hop['time']))) + '</TIME>'
+            xml += '<FORM>' + xmlescape(hop['form'].capitalize()) + '</FORM>'
+            xml += '</HOP>'
+        xml += '</HOPS>'
+
+        xml += '<FERMENTABLES>'
+        for fermentable in self.ingredients['fermentables']:
+            xml += '<FERMENTABLE>'
+            xml += '<VERSION>1</VERSION>'
+            xml += '<NAME>' + xmlescape(fermentable['description']) + '</NAME>'
+            xml += '<AMOUNT>' + xmlescape(fermentable['weight'] / 2.20462) + '</AMOUNT>'
+            xml += '<YIELD>' + xmlescape(fermentable['ppg'] / 46.214 / 0.01) + '</YIELD>'
+            xml += '<COLOR>' + xmlescape(fermentable['color']) + '</COLOR>'
+            xml += '<ADD_AFTER_BOIL>' + (fermentable['late'] and 'TRUE' or 'FALSE') + '</ADD_AFTER_BOIL>'
+            xml += '</FERMENTABLE>'
+        xml += '</FERMENTABLES>'
+
+        xml += '<MISCS>'
+        for misc in [spice for spice in self.ingredients['spices'] if spice['aa'] is 0]:
+            xml += '<MISC>'
+            xml += '<VERSION>1</VERSION>'
+            xml += '<NAME>' + xmlescape(misc['description']) + '</NAME>'
+            xml += '<AMOUNT>' + xmlescape(misc['oz'] / 35.275) + '</AMOUNT>'
+            xml += '<AMOUNT_IS_WEIGHT>TRUE</AMOUNT_IS_WEIGHT>'
+            xml += '<USE>' + xmlescape(misc['use'].capitalize()) + '</USE>'
+            xml += '<TIME>' + xmlescape(int(time_to_min(misc['time']))) + '</TIME>'
+            xml += '</MISC>'
+        xml += '</MISCS>'
+
+        xml += '<YEASTS>'
+        for yeast in self.ingredients['yeast']:
+            xml += '<YEAST>'
+            xml += '<VERSION>1</VERSION>'
+            xml += '<NAME>' + xmlescape(yeast['description']) + '</NAME>'
+            xml += '<TYPE>' + xmlescape(yeast['type']).capitalize() + '</TYPE>'
+            xml += '<FORM>' + xmlescape(yeast['description']).capitalize() + '</FORM>'
+            xml += '<ATTENUATION>' + xmlescape(yeast['attenuation']) + '</ATTENUATION>'
+            xml += '</YEAST>'
+        xml += '</YEASTS>'
+
+        xml += '</RECIPE></RECIPES>'
+
+        return xml
 
 
 class Recipe(RecipeBase):

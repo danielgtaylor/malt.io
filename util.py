@@ -7,6 +7,7 @@ import settings
 from contrib.unidecode import unidecode
 from google.appengine.api import users
 from math import floor
+from xml.sax.saxutils import escape
 
 from models.userprefs import UserPrefs
 
@@ -61,6 +62,38 @@ def render_json(handler, value):
     """
     handler.response.headers['Content-Type'] = 'application/json'
     handler.response.out.write(json.dumps(value))
+
+
+def xmlescape(value):
+    """
+    Convert a value to a string and escape it for inclusion in XML
+    """
+    return escape(unicode(value))
+
+
+def time_to_min(value):
+    """
+    Convert a value into minutes. Can take in integers, floats,
+    strings of those, strings appended with 'min', 'm', 'h', etc.
+    """
+    conversions = {
+        'h': 60,
+        'hr': 60,
+        'hrs': 60,
+        'hour': 60,
+        'hours': 60,
+        'm': 1,
+        'min': 1,
+        'mins': 1
+    }
+
+    if type(value) in [str, unicode]:
+        for unit, factor in conversions.items():
+            if unit in value:
+                value = float(value.split(unit)[0]) * factor
+                break
+
+    return float(value)
 
 
 def slugify(value):

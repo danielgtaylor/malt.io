@@ -5,7 +5,7 @@ from handlers.messages import MessagesHandler
 from handlers.profile import ProfileHandler
 from handlers.recipes import RecipesHandler, RecipeEmbedHandler, \
                              RecipeLikeHandler, RecipeCloneHandler, \
-                             RecipeHandler
+                             RecipeHandler, RecipeXmlHandler
 from handlers.users import UsersHandler, UserHandler, UserFollowHandler, \
                            UsernameCheckHandler
 
@@ -14,6 +14,7 @@ from handlers.users import UsersHandler, UserHandler, UserFollowHandler, \
 urls = [
     ('/users/(.*?)/recipes/(.*?)/like', RecipeLikeHandler),
     ('/users/(.*?)/recipes/(.*?)/clone', RecipeCloneHandler),
+    ('/users/(.*?)/recipes/(.*?)/beerxml', RecipeXmlHandler),
     ('/users/(.*?)/recipes/(.*)', RecipeHandler),
     ('/users/(.*?)/recipes', RecipesHandler),
     ('/users/(.*?)/follow', UserFollowHandler),
