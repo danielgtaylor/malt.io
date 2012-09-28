@@ -73,9 +73,12 @@ class RecipeEmbedHandler(webapp2.RequestHandler):
         /embed/USERNAME/RECIPE-SLUG
 
     """
-    def get(self, username, recipe):
+    def get(self, username, recipe_slug):
         publicuser = UserPrefs.all().filter('name = ', username).get()
-        recipe = Recipe.all().filter('slug =', recipe).get()
+        recipe = Recipe.all()\
+                       .filter('owner =', publicuser)\
+                       .filter('slug =', recipe_slug)\
+                       .get()
 
         width = 260
         try:
