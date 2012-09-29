@@ -13,4 +13,12 @@ coffee -c -b -p static/scripts/embed.coffee | uglifyjs >static/scripts/embed.js
 
 # Update query string for caching
 echo 'Updating template caching...'
-sed -i "s/\?v=[0-9]*/\?v=`date +%s`/ig" templates/base.html templates/recipe-embed.html
+if [[ $OSTYPE != darwin* ]]; then
+	sed -i "s/\?v=[0-9]*/\?v=`date +%s`/ig" templates/base.html templates/recipe-embed.html
+else
+	sed "s/\?v=[0-9]*/\?v=`date +%s`/g" templates/base.html >templates/base-new.html
+	mv templates/base-new.html templates/base.html
+
+	sed "s/\?v=[0-9]*/\?v=`date +%s`/g" templates/recipe-embed.html >templates/recipe-embed-new.html
+	mv templates/recipe-embed-new.html templates/recipe-embed.html
+fi
