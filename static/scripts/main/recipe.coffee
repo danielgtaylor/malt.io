@@ -111,6 +111,8 @@ class Recipe
         else
             action = 'post'
 
+        _gaq.push(['_trackEvent', 'Recipe', 'Like', $('#recipeName').text()])
+
         $.ajax(
             url: location.href + '/like'
             type: action
@@ -126,6 +128,8 @@ class Recipe
             window.location.href = '/profile'
             return
 
+        _gaq.push(['_trackEvent', 'Recipe', 'Clone', $('#recipeName').text()])
+
         $.ajax(
             url: location.href + '/clone'
             type: 'post'
@@ -137,10 +141,12 @@ class Recipe
 
     # Scale a recipe to the desired batch and boil sizes
     @onScaled: (event) =>
+        _gaq.push(['_trackEvent', 'Recipe', 'Scale', $('#recipeName').text()])
         @scale(parseFloat($('#gallonsValue').text()), parseFloat($('#boilGallonsValue').text()))
 
     # Show widget dialog
     @onWidget: (event) =>
+        _gaq.push(['_trackEvent', 'Recipe', 'ViewWidget', $('#recipeName').text()])
         setTimeout(->
             frame = $('#widgetModal iframe').get(0)
             frame.src = frame.getAttribute('data-src')
@@ -151,6 +157,8 @@ class Recipe
         if window.brokenBrowser
             $('#badBrowserModal').modal('show')
             return
+
+        _gaq.push(['_trackEvent', 'Recipe', 'Edit', $('#recipeName').text()])
 
         $('#recipeName, #recipeDescription, #batchSize, #boilSize, #bottling_temp, #bottling_pressure').attr('contentEditable', 'true')
         $('#fermentables_data tr td:nth-child(2), #fermentables_data tr td:nth-child(3), #fermentables_data tr td:nth-child(4), #fermentables_data tr td:nth-child(5), #fermentables_data tr td:nth-child(6), #fermentables_data tr td:nth-child(8), #hops_data tr td:nth-child(1), #hops_data tr td:nth-child(2), #hops_data tr td:nth-child(3), #hops_data tr td:nth-child(4), #hops_data tr td:nth-child(5), #hops_data tr td:nth-child(6), #yeast_data tr td:nth-child(1), #yeast_data tr td:nth-child(2), #yeast_data tr td:nth-child(3), #yeast_data tr td:nth-child(4)').attr('contentEditable', 'true')
@@ -166,6 +174,7 @@ class Recipe
     
     # Handle clicks on the delete button, removing a recipe
     @onDelete: (event) =>
+        _gaq.push(['_trackEvent', 'Recipe', 'Delete', $('#recipeName').text()])
         $.ajax(
             url: location.href
             type: 'delete'
@@ -765,6 +774,7 @@ class Recipe
     # to the new recipe URL (if the name changed). If no existing recipe for
     # the current slug can be found then a new one will be created.
     @save: =>
+        _gaq.push(['_trackEvent', 'Recipe', 'Save', $('#recipeName').text()])
         # Do an AJAX call to save this recipe
         $.ajax(
             url: location.href
