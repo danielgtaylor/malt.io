@@ -137,7 +137,7 @@ class RecipeBase(db.Model):
             xml += '<VERSION>1</VERSION>'
             xml += '<NAME>' + xmlescape(yeast['description']) + '</NAME>'
             xml += '<TYPE>' + xmlescape(yeast['type']).capitalize() + '</TYPE>'
-            xml += '<FORM>' + xmlescape(yeast['description']).capitalize() + '</FORM>'
+            xml += '<FORM>' + xmlescape(yeast['form']).capitalize() + '</FORM>'
             xml += '<ATTENUATION>' + xmlescape(yeast['attenuation']) + '</ATTENUATION>'
             xml += '</YEAST>'
         xml += '</YEASTS>'
