@@ -75,21 +75,31 @@ class RecipeEmbedHandler(webapp2.RequestHandler):
     """
     def get(self, username, recipe_slug):
         publicuser = UserPrefs.all().filter('name = ', username).get()
-        recipe = Recipe.all()\
-                       .filter('owner =', publicuser)\
-                       .filter('slug =', recipe_slug)\
-                       .get()
+
+        if publicuser:
+            recipe = Recipe.all()\
+                           .filter('owner =', publicuser)\
+                           .filter('slug =', recipe_slug)\
+                           .get()
+        else:
+            recipe = None
 
         width = 260
         try:
             width = int(self.request.get('width'))
         except: pass
 
-        render(self, 'recipe-embed.html', {
-            'publicuser': publicuser,
-            'recipe': recipe,
-            'width': width,
-        })
+        if publicuser and recipe:
+            render(self, 'recipe-embed.html', {
+                'publicuser': publicuser,
+                'recipe': recipe,
+                'width': width,
+            })
+        else:
+            render(self, 'recipe-embed-404.html', {
+                'publicuser': publicuser,
+                'width': width,
+            })
 
 
 class RecipeXmlHandler(webapp2.RequestHandler):
@@ -102,10 +112,16 @@ class RecipeXmlHandler(webapp2.RequestHandler):
     """
     def get(self, username, recipe_slug):
         publicuser = UserPrefs.all().filter('name = ', username).get()
+        if not publicuser:
+            self.abort(404)
+
         recipe = Recipe.all()\
                        .filter('owner =', publicuser)\
                        .filter('slug =', recipe_slug)\
                        .get()
+
+        if not recipe:
+            self.abort(404)
 
         self.response.headers['Content-Type'] = 'text/xml'
         self.response.out.write(recipe.beerxml)

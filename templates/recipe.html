@@ -81,7 +81,7 @@
     <div class="hero-unit editable">
         {% if cloned_from %}
             <p style="opacity: 0.5;">
-                Cloned from <a href="/users/{{ recipe.cloned_from.owner.name }}">{{ cloned_from.owner.name }}</a> / <a href="/users/{{ cloned_from.owner.name }}/recipes/{{ cloned_from.slug }}">{{ recipe.name }}</a>
+                Cloned from <a href="/users/{{ cloned_from.owner.name }}">{{ cloned_from.owner.name }}</a> / <a href="/users/{{ cloned_from.owner.name }}/recipes/{{ cloned_from.slug }}">{{ cloned_from.name }}</a>
             </p>
         {% endif %}
         <div class="price-container">
