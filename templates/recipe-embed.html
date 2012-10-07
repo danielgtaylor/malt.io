@@ -1,43 +1,27 @@
-<!DOCTYPE html>
+{% extends 'base.html' %}
 
-<html>
-    <head>
-        <meta name="viewport" content="width=device-width, initial-scale=1.0">
-        <link rel="stylesheet" type="text/css" href="/static/styles/bootstrap.min.css"/>
-        <link rel="stylesheet" type="text/css" href="/static/styles/main.css?v=1348551740"/>
-        <script type="text/javascript">
-            var _gaq = _gaq || [];
-            _gaq.push(['_setAccount', 'UA-16567764-4']);
-            _gaq.push(['_trackPageview']);
+{% block scripts %}
+    <script type="text/javascript">
+        Recipe.init();
+    </script>
+{% endblock %}
 
-            (function() {
-                var ga = document.createElement('script'); ga.type = 'text/javascript'; ga.async = true;
-                ga.src = ('https:' == document.location.protocol ? 'https://ssl' : 'http://www') + '.google-analytics.com/ga.js';
-                var s = document.getElementsByTagName('script')[0]; s.parentNode.insertBefore(ga, s);
-            })();
-        </script>
-    </head>
-    <body class="embed">
-        <div class="recipe" style="width: {{ width - 26 }}px;">
-            <span class="title ellipsize"><a href="/users/{{ publicuser.name }}/recipes/{{ recipe.slug }}" target="_top">{{ recipe.name }}</a></span>
-            <br/>
-            <span class="ellipsize">{{ recipe.description }}</span>
-            <br/>
-            <div class="stats">
-                <span class="srm" data-srm="{{ recipe.color }}"></span> {{ recipe.color }}&deg; SRM <span class="sep">|</span> {{ recipe.ibu }} IBU <span class="sep">|</span> {{ recipe.alcohol }}% ABV
-            </div>
-            <div class="btn-group">
-                <a class="btn" href="/users/{{ publicuser.name }}/recipes/{{ recipe.slug }}" target="_top"><i class="icon-fire"></i> Brew This Beer</a>
-            </div>
-            <div class="footer">
-                Powered by <a href="/" target="_top">Malt<span style="opacity: 0.6">.io</span></a>
-            </div>
+{% block body_attribs %} class="embed"{% endblock %}
+
+{% block body %}
+    <div class="recipe" style="width: {{ width - 26 }}px;">
+        <span class="title ellipsize"><a href="/users/{{ publicuser.name }}/recipes/{{ recipe.slug }}" target="_top">{{ recipe.name }}</a></span>
+        <br/>
+        <span class="ellipsize">{{ recipe.description }}</span>
+        <br/>
+        <div class="stats">
+            <span class="srm" data-srm="{{ recipe.color }}"></span> {{ recipe.color }}&deg; SRM <span class="sep">|</span> {{ recipe.ibu }} IBU <span class="sep">|</span> {{ recipe.alcohol }}% ABV
         </div>
-        <script type="text/javascript" src="http://code.jquery.com/jquery-1.7.2.min.js"></script>
-        <script type="text/javascript" src="/static/scripts/bootstrap.min.js"></script>
-        <script type="text/javascript" src="/static/scripts/main.js?v=1348551740"></script>
-        <script type="text/javascript">
-            Recipe.init();
-        </script>
-    </body>
-</html>
+        <div class="btn-group">
+            <a class="btn" href="/users/{{ publicuser.name }}/recipes/{{ recipe.slug }}" target="_top"><i class="icon-fire"></i> Brew This Beer</a>
+        </div>
+        <div class="footer">
+            Powered by <a href="/" target="_top">Malt<span style="opacity: 0.6">.io</span></a>
+        </div>
+    </div>
+{% endblock %}

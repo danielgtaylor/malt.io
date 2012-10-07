@@ -1,34 +1,15 @@
-<!DOCTYPE html>
+{% extends 'base.html' %}
 
-<html>
-    <head>
-        <meta name="viewport" content="width=device-width, initial-scale=1.0">
-        <link rel="stylesheet" type="text/css" href="/static/styles/bootstrap.min.css"/>
-        <link rel="stylesheet" type="text/css" href="/static/styles/main.css?v=1348551740"/>
-        <script type="text/javascript">
-            var _gaq = _gaq || [];
-            _gaq.push(['_setAccount', 'UA-16567764-4']);
-            _gaq.push(['_trackPageview']);
+{% block body_attribs %} class="embed"{% endblock %}
 
-            (function() {
-                var ga = document.createElement('script'); ga.type = 'text/javascript'; ga.async = true;
-                ga.src = ('https:' == document.location.protocol ? 'https://ssl' : 'http://www') + '.google-analytics.com/ga.js';
-                var s = document.getElementsByTagName('script')[0]; s.parentNode.insertBefore(ga, s);
-            })();
-        </script>
-    </head>
-    <body class="embed">
-        <div class="recipe" style="width: {{ width - 26 }}px;">
-            <span class="title ellipsize">Oops, missing recipe!</span>
-            <br/>
-            <span class="missing">It appears this recipe was deleted by its {% if publicuser %}<a href="/users/{{ publicuser.name }}" target="_top">owner</a>{% else %}owner{% endif %}. Feel free to check out other recipes on <a href="/" target="_top">Malt<span style="opacity: 0.6">.io</span></a>!</span>
-            <br/>
-            <div class="footer">
-                Powered by <a href="/" target="_top">Malt<span style="opacity: 0.6">.io</span></a>
-            </div>
+{% block body %}
+    <div class="recipe" style="width: {{ width - 26 }}px;">
+        <span class="title ellipsize">Oops, missing recipe!</span>
+        <br/>
+        <span class="missing">It appears this recipe was deleted by its {% if publicuser %}<a href="/users/{{ publicuser.name }}" target="_top">owner</a>{% else %}owner{% endif %}. Feel free to check out other recipes on <a href="/" target="_top">Malt<span style="opacity: 0.6">.io</span></a>!</span>
+        <br/>
+        <div class="footer">
+            Powered by <a href="/" target="_top">Malt<span style="opacity: 0.6">.io</span></a>
         </div>
-        <script type="text/javascript" src="http://code.jquery.com/jquery-1.7.2.min.js"></script>
-        <script type="text/javascript" src="/static/scripts/bootstrap.min.js"></script>
-        <script type="text/javascript" src="/static/scripts/main.js?v=1348551740"></script>
-    </body>
-</html>
+    </div>
+{% endblock %}
