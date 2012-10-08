@@ -99,6 +99,12 @@ class Recipe
         # Was the page loaded in edit mode? If so, enable editing!
         if window.location.pathname is '/new' or window.location.hash is '#edit'
             @enableEdit()
+
+    # Initialize recipe import handling
+    @initImport: =>
+        $('#importButton').click((event) =>
+            $('#importRecipesForm').submit();
+        )
     
     # Handle clicks on the like button
     @onLiked: (event) =>

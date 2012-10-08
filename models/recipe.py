@@ -1,4 +1,6 @@
 import json
+import logging
+import xml.etree.ElementTree as et
 
 from google.appengine.ext import db
 from models.userprefs import UserPrefs
@@ -170,6 +172,103 @@ class Recipe(RecipeBase):
     # Users who have liked tihs recipe
     likes = db.StringListProperty()
     likes_count = db.IntegerProperty(default=0)
+
+    @staticmethod
+    def new_from_beerxml(data):
+        """
+        Get a list of new recipe objects from BeerXML input.
+        """
+        new_recipes = []
+        recipes = et.fromstring(data)
+
+        for recipe in recipes.iter('RECIPE'):
+            r = Recipe()
+            ingredients = r.ingredients
+
+            for recipe_member in recipe:
+                tag = recipe_member.tag.strip().lower()
+                logging.info(tag)
+                if tag == 'name':
+                    r.name = recipe_member.text.replace('\n', ' ')
+                elif tag == 'batch_size':
+                    r.batch_size = round(float(recipe_member.text) / GAL_TO_LITERS, 2)
+                elif tag == 'boil_size':
+                    r.boil_size = round(float(recipe_member.text) / GAL_TO_LITERS, 2)
+                elif tag in ['hops', 'miscs']:
+                    for hop in recipe_member:
+                        h = {
+                            'description': '',
+                            'oz': 0.0,
+                            'aa': 0.0,
+                            'use': 'boil',
+                            'time': '0',
+                            'form': 'pellet'
+                        }
+                        for hop_member in hop:
+                            tag = hop_member.tag.lower()
+                            if tag == 'name':
+                                h['description'] = hop_member.text
+                            elif tag == 'amount':
+                                h['oz'] = round(float(hop_member.text) * 2.20462 * 16, 2)
+                            elif tag == 'alpha':
+                                h['aa'] = round(float(hop_member.text), 1)
+                            elif tag == 'use':
+                                h['use'] = hop_member.text
+                            elif tag == 'time':
+                                h['time'] = hop_member.text
+                            elif tag == 'form':
+                                h['form'] = hop_member.text
+
+                        ingredients['spices'].append(h)
+
+                elif tag == 'fermentables':
+                    for fermentable in recipe_member:
+                        f = {
+                            'description': '',
+                            'weight': 0.0,
+                            'late': '',
+                            'ppg': 0.0,
+                            'color': 0
+                        }
+                        for fermentable_member in fermentable:
+                            tag = fermentable_member.tag.lower()
+                            if tag == 'name':
+                                f['description'] = fermentable_member.text
+                            elif tag == 'amount':
+                                f['weight'] = float(fermentable_member.text) * 2.20462
+                            elif tag == 'yield':
+                                f['ppg'] = round(float(fermentable_member.text) * 46.214 * 0.01)
+                            elif tag == 'color':
+                                f['color'] = float(fermentable_member.text)
+                            elif tag == 'add_after_boil':
+                                f['late'] = fermentable_member.text.lower() == 'true' and 'y' or ''
+
+                        ingredients['fermentables'].append(f)
+                elif tag is 'yeasts':
+                    for yeast in recipe_member:
+                        y = {
+                            'description': '',
+                            'type': '',
+                            'form': '',
+                            'attenuation': 75
+                        }
+                        for yeast_member in yeast:
+                            tag = yeast_member.tag.lower()
+                            if tag == 'name':
+                                y['description'] = yeast_member.text
+                            elif tag =='type':
+                                y['type'] = yeast_member.text
+                            elif tag == 'form':
+                                y['form'] = yeast_member.text
+                            elif tag == 'attenuation':
+                                y['attenuation'] = float(yeast_member.text)
+
+                        ingredients['yeast'].append(y)
+
+            r.ingredients = ingredients
+            new_recipes.append(r)
+
+        return new_recipes
 
     @property
     def owner_key(self):

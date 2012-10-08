@@ -1,11 +1,15 @@
+# content: utf-8
+
 import cgi
 import json
+import logging
 import webapp2
 
 from models.recipe import Recipe
 from models.useraction import UserAction
 from models.userprefs import UserPrefs
 from util import render, render_json, slugify
+from webapp2 import redirect
 from webapp2_extras.appengine.users import login_required
 
 
@@ -63,6 +67,26 @@ class RecipesHandler(webapp2.RequestHandler):
             'recipes': recipes
         })
 
+    def post(self):
+        """
+        Import a new recipe or list of recipes from BeerXML to the
+        currently logged in user's account.
+        """
+        user = UserPrefs.get()
+        recipesxml = self.request.POST['file'].value
+
+        for recipe in Recipe.new_from_beerxml(recipesxml):
+            recipe.owner = user
+            recipe.slug = generate_usable_slug(recipe)
+            key = recipe.put()
+
+            action = UserAction()
+            action.owner = user
+            action.object_id = key.id()
+            action.type = action.TYPE_RECIPE_CREATED
+            action.put()
+
+        return redirect('/users/' + user.name + '/recipes')
 
 class RecipeEmbedHandler(webapp2.RequestHandler):
     """

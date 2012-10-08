@@ -18,6 +18,7 @@
                             {% endif %}
                             <li><a href="/recipes">All recipes</a></li>
                             <li><a href="/homebrew-formulas">Homebrew formulas</a></li>
+                            <li><a href="#importModal" data-toggle="modal">Import recipes</a></li>
                             <li><a href="/new">Create new recipe</a></li>
                         </ul>
                     </li>
@@ -105,7 +106,29 @@
             Copyright &copy; 2012 Daniel G. Taylor
         </div>
     </div>
+    <div id="importModal" class="modal fade hide">
+        <div class="modal-header">
+            <button type="button" class="close" data-dismiss="modal">×</button>
+            <h3>Import Recipes</h3>
+        </div>
+        <div class="modal-body">
+            <p>
+                Importing recipes will blah blah...
+            </p>
+            <form id="importRecipesForm" enctype="multipart/form-data" action="/recipes" method="post">
+                <input type="file" name="file"/>
+            </form>
+        </div>
+        <div class="modal-footer">
+            <a href="#" class="btn" data-dismiss="modal">Cancel</a>
+            <a id="importButton" href="#" class="btn btn-success" data-dismiss="modal"><i class="icon-folder-open icon-white"></i> Import Recipes</a>
+        </div>
+    </div>
     <script type="text/javascript">
+        $(document).ready(function () {
+            Recipe.initImport();
+        })
+
       (function() {
         var po = document.createElement('script'); po.type = 'text/javascript'; po.async = true;
         po.src = 'https://apis.google.com/js/plusone.js';
