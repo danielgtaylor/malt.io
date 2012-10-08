@@ -111,6 +111,9 @@ class RecipeBase(db.Model):
 
         xml += '<FERMENTABLES>'
         for fermentable in self.ingredients['fermentables']:
+            if 'late' not in fermentable:
+                fermentable['late'] = False
+
             xml += '<FERMENTABLE>'
             xml += '<VERSION>1</VERSION>'
             xml += '<NAME>' + xmlescape(fermentable['description']) + '</NAME>'
