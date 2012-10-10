@@ -29,6 +29,23 @@ AWARDS = {
 template_cache = {}
 
 
+def get_template(name):
+    """
+    Get a Jinja2 template by name. This method caches templates in memory
+    and tries to fetch from memory when possible.
+    """
+    t = template_cache.get(name, None)
+    if t is None:
+        # Get from disk
+        t = JINJA_ENV.get_template(name)
+
+        # Update the cache unless we are in developer mode
+        if not settings.DEBUG:
+            template_cache[name] = t
+
+    return t
+
+
 def render(handler, template, params=None):
     """
     Render a page through Jinja2, passing in optional parameters.
@@ -42,14 +59,7 @@ def render(handler, template, params=None):
         'logout_url': LOGOUT_URL
     })
 
-    t = template_cache.get(template, None)
-    if t is None:
-        # Get from disk
-        t = JINJA_ENV.get_template(template)
-
-        # Update the cache unless we are in developer mode
-        if not settings.DEBUG:
-            template_cache[template] = t
+    t = get_template(template)
 
     rendered = t.render(p)
     handler.response.out.write(rendered)

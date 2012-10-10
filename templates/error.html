@@ -1,0 +1,10 @@
+{% extends 'page.html' %}
+
+{% block content %}
+    <div class="hero-unit" style="text-align: center;">
+        <h1 style="font-size: 800%;">Error<span style="color: #999">.{{ code }}</span></h1>
+        <span style="font-size: 150%;">{{ message }}</span>
+        <br/><br/>
+        <span>This issue has been logged. If it persists, please <a href="https://github.com/danielgtaylor/malt.io/issues">file a ticket</a>.</span>
+    </div>
+{% endblock %}
