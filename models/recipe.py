@@ -251,7 +251,7 @@ class Recipe(RecipeBase):
                                 f['late'] = fermentable_member.text.lower() == 'true' and 'y' or ''
 
                         ingredients['fermentables'].append(f)
-                elif tag is 'yeasts':
+                elif tag == 'yeasts':
                     for yeast in recipe_member:
                         y = {
                             'description': '',
