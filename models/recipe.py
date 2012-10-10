@@ -1,5 +1,6 @@
 import json
 import logging
+import re
 import xml.etree.ElementTree as et
 
 from google.appengine.ext import db
@@ -22,6 +23,9 @@ class RecipeBase(db.Model):
     This class is a common base for both the latest version of recipe
     data and hitorical versions, which are stored in a separate table.
     """
+    RE_STEEP = re.compile(r'biscuit|black|cara|chocolate|crystal|munich|roast|special ?b|toast|victory|vienna|steep')
+    RE_BOIL = re.compile(r'candi|candy|dme|dry|extract|honey|lme|liquid|sugar|syrup|turbinado|boil')
+
     # Possible recipe types, which can be useful to filter on because
     # they require different equipment.
     TYPE_EXTRACT = 0
@@ -315,6 +319,83 @@ class Recipe(RecipeBase):
             '_ingredients': self._ingredients
         })
         history.put()
+
+    def update_cache(self):
+        """
+        Update the recipe's cache of color, bitterness, alcohol, etc.
+        This is a reimplementation of static/scripts/main/recipe.coffee and 
+        should not be modified without also modifying that file!
+        """
+        mashing = False
+        for fermentable in self.ingredients['fermentables']:
+            desc = fermentable['description']
+            if 'mash' in desc or not (self.RE_STEEP.search(desc) or self.RE_BOIL.search(desc)):
+                mashing = True
+                break
+
+        gu, early_gu, mcu = 0, 0, 0
+
+        for fermentable in self.ingredients['fermentables']:
+            weight = fermentable['weight']
+            mcu += fermentable['color'] * weight / self.batch_size
+            gravity = fermentable['ppg'] * weight / self.batch_size
+
+            forced = False
+            if 'mashed' in fermentable['description']:
+                forced = True
+                addition = 'mash'
+            elif 'steep' in fermentable['description']:
+                forced = True
+                addition = 'steep'
+            elif 'boil' in fermentable['description']:
+                forced = True
+                addition = 'boil'
+            elif self.RE_BOIL.search(fermentable['description']):
+                addition = 'boil'
+            elif self.RE_STEEP.search(fermentable['description']):
+                addition = 'steep'
+            else:
+                addition = 'mash'
+
+            if mashing and addition == 'steep' and not forced:
+                addition = 'mash'
+
+            if addition == 'steep':
+                gravity *= 0.5
+            elif addition == 'mash':
+                gravity *= 0.75
+
+            if fermentable['late'] not in ['y', 'yes', 'x']:
+                early_gu += gravity
+            
+            gu += gravity
+
+        gu = 1.0 + (gu / 1000.0)
+        early_gu = 1.0 + (early_gu / 1000.0)
+        logging.info(early_gu)
+
+        attenuation = 75
+
+        fg = gu - ((gu - 1.0) * attenuation / 100.0)
+        abv = ((1.05 * (gu - fg)) / fg) / 0.79 * 100.0
+
+        ibu = 0
+        for hop in self.ingredients['spices']:
+            if not hop['aa']:
+                continue
+
+            utilization_factor = 1.0
+            if hop['form'] == 'pellet':
+                utilization_factor = 1.15
+
+            time = int(''.join([char for char in hop['time'] if char.isdigit()]))
+            b = 1.65 * pow(0.000125, early_gu - 1.0) * ((1 - pow(2.718, -0.04 * time)) / 4.15) * ((hop['aa'] / 100.0 * hop['oz'] * 7490.0) / self.boil_size) * utilization_factor
+            ibu += b
+            logging.info(b)
+
+        self.color = int(round(1.4922 * pow(mcu, 0.6859)))
+        self.ibu = round(ibu, 1)
+        self.alcohol = round(abv, 1)
 
 
 class RecipeHistory(RecipeBase):

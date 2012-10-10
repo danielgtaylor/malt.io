@@ -33,6 +33,7 @@
     <script type="text/javascript">
         user = '{% if user %}{{ user.name }}{% else %}{% endif %}';
     </script>
+    {% block body_scripts %}{% endblock %}
     {% block scripts %}{% endblock %}
 </body>
 </html>

@@ -78,6 +78,7 @@ class RecipesHandler(webapp2.RequestHandler):
         for recipe in Recipe.new_from_beerxml(recipesxml):
             recipe.owner = user
             recipe.slug = generate_usable_slug(recipe)
+            recipe.update_cache();
             key = recipe.put()
 
             action = UserAction()
