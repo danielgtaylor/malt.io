@@ -32,7 +32,11 @@
                             {% endif %}
                             <li><a href="/recipes">All recipes</a></li>
                             <li><a href="/homebrew-formulas">Homebrew formulas</a></li>
-                            <li><a href="#importModal" data-toggle="modal">Import recipes</a></li>
+                            {% if user %}
+                                <li><a href="#importModal" data-toggle="modal">Import recipes</a></li>
+                            {% else %}
+                                <li><a href="/profile">Import recipes</a></li>
+                            {% endif %}
                             <li><a href="/new">Create new recipe</a></li>
                         </ul>
                     </li>
