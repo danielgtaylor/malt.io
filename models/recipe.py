@@ -307,7 +307,7 @@ class Recipe(RecipeBase):
         """
         history = RecipeHistory(**{
             'parent_recipe': self,
-            'created': self.created,
+            'created': self.edited,
             'name': self.name,
             'description': self.description,
             'type': self.type,
