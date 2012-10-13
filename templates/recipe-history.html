@@ -1,0 +1,57 @@
+{% extends 'page.html' %}
+
+{% block scripts %}
+    <script type="text/javascript">
+        $(document).ready(function () {
+            Recipe.init();
+        });
+    </script>
+{% endblock %}
+
+{% block title %}History of {{ recipe.name }} - {{ publicuser.name }} - Malt.io{% endblock %}
+
+{% block content %}
+    <ul class="breadcrumb">
+        <li><a href="/">home</a><span class="divider">/</span></li>
+        <li><a href="/users">users</a><span class="divider">/</span></li>
+        <li><a href="/users/{{ publicuser.name }}">{{ publicuser.name }}</a><span class="divider">/</span></li>
+        <li><a href="/users/{{ publicuser.name }}/recipes">recipes</a><span class="divider">/</span></li>
+        <li><a href="{{ recipe.url }}">{{ recipe.name }}</a><span class="divider">/</span></li>
+        <li>history</li>
+    </ul>
+
+    <div id="history">
+        <div class="line"></div>
+        {% for entry in entries %}
+            <div class="entry">
+                {% if entry.recipe %}
+                    {% if not loop.first %}
+                        <div class="uparrow"></div>
+                    {% endif %}
+                    {{ entry.recipe|recipe_snippet }}
+                    {% if not loop.last %}
+                        <div class="downarrow"></div>
+                    {% endif %}
+                {% else %}
+                    <div class="node">
+                        <div class="uparrow"></div>
+                        <a href="/users/{{ recipe.owner.name }}/recipes/{{ entry.slug }}"></a>
+                        <div class="downarrow"></div>
+                    </div>
+                {% endif %}
+                <div class="offset4">
+                    <p>Edited on {{ entry.edited }}</p>
+                    {% if entry.differences %}
+                    <p>Interesting changes:</p>
+                    <ul>
+                        {% for difference in entry.differences %}
+                            <li>{{ difference }}</li>
+                        {% endfor %}
+                    </ul>
+                    {% endif %}
+                </div>
+            </div>
+        {% endfor %}
+    </div>
+    
+{% endblock %}

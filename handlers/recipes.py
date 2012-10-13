@@ -5,12 +5,13 @@ import json
 import logging
 import webapp2
 
-from models.recipe import Recipe
+from models.recipe import Recipe, RecipeHistory
 from models.useraction import UserAction
 from models.userprefs import UserPrefs
 from util import render, render_json, slugify
 from webapp2 import redirect
 from webapp2_extras.appengine.users import login_required
+from operator import itemgetter
 
 
 def generate_usable_slug(recipe):
@@ -485,3 +486,212 @@ class RecipeHandler(webapp2.RequestHandler):
                 'status': 'error',
                 'error': 'Unable to delete recipe'
             })
+
+
+class RecipeHistoryHandler(webapp2.RequestHandler):
+    """
+    Recipe history handler. This handler renders the recipe history tree for
+    a specific recipe. It is invoked via URLs like:
+
+        /users/USERNAME/recipes/RECIPE-SLUG/history
+    """
+    def get(self, username=None, recipe_slug=None):
+        """
+        Render the basic recipe history list for the given recipe.
+        """
+        if not username or not recipe_slug:
+            self.abort(404)
+
+        publicuser = UserPrefs.all().filter('name =', username).get()
+        recipe = Recipe.all()\
+                       .filter('slug = ', recipe_slug)\
+                       .filter('owner =', publicuser)\
+                       .get()
+
+        history = RecipeHistory.all()\
+                        .filter('parent_recipe =', recipe)\
+                        .order('-created')\
+                        .fetch(30)
+
+        # The list of entries we'll use to populate the template
+        entries = []
+
+        # Start with the current version versus the previous
+        entries.append({
+            'recipe': recipe,
+            'differences': self.order_differences(recipe.diff(history[0])),
+            'edited': recipe.edited,
+            'slug': recipe.slug
+        })
+
+        # Start going through the history looking at differences to decide how
+        # we plan on displaying the info to the user (using a snippet or not)
+        snippetItems = ('name', 'description', 'color', 'ibu', 'alcohol')
+        for i in range(len(history) - 1):
+            # Set some required properties for the snippet to work
+            history[i].owner = recipe.owner
+            history[i].slug = recipe.slug + '/' + str(history[i].key().id())
+
+            # Create the entry
+            entry = {}
+            differences = history[i].diff(history[i + 1])
+
+            # Check if the name, description, color, ibu, or alcohol changed
+            # and we should show a snippet
+            for snippetItem in snippetItems:
+                for diffset in differences:
+                    if snippetItem in diffset:
+                        entry['recipe'] = history[i]
+                        # Make sure the color, ibu, and alcohol were created
+                        if not hasattr(history[i], 'color'):
+                            history[i].update_cache()
+                        break
+                if 'recipe' in entry:
+                    break
+
+            entry['differences'] = self.order_differences(differences)
+            entry['edited'] = history[i].created
+            entry['slug'] = history[i].slug
+            entries.append(entry)
+
+        # Add the final entry
+        entry = history[len(history) - 1]
+        entry.owner = recipe.owner
+        entry.slug = recipe.slug + '/' + str(entry.key().id())
+        entries.append({
+            'recipe': entry,
+            'differences': None,
+            'edited': entry.created,
+            'slug': entry.slug
+        })
+
+        render(self, 'recipe-history.html', {
+            'publicuser': publicuser,
+            'recipe': recipe,
+            'entries': entries
+        })
+
+    def order_differences(self, differences):
+        """
+        Convert a set of differences into a list of "most interesting" order.
+
+        Most interesting is defined as:
+            1. Additions and deletions
+            2. Changes that affect the recipe snippet
+                a. Title, Description
+                b. Color, IBU, Alcohol (affected by ingredients and sizes)
+            3. Other
+        """
+        difflist = []
+
+        additions = differences[0]
+        deletions = differences[1]
+        modifications = differences[2]
+
+        for key in additions:
+            if key == 'ingredients':
+                for type in additions['ingredients']:
+                    for ingredient in additions['ingredients'][type]:
+                        difflist.append(self.create_add_string(str(type) + ' ingredient', ingredient))
+            else:
+                difflist.append(self.create_add_string(key, additions[key]))
+
+        for key in deletions:
+            if key == 'ingredients':
+                for type in deletions['ingredients']:
+                    for ingredient in deletions['ingredients'][type]:
+                        difflist.append(self.create_delete_string(str(type) + ' ingredient', ingredient))
+            else:
+                difflist.append(self.create_delete_string(key, deletions[key]))
+
+        # Generate a list of modifications and assign them a score
+        scoredlist = []
+        # We don't care about these being modified, since they're calculated properties
+        ignorelist = ('color', 'ibu', 'alcohol')
+        # Properties that will affect the recipe snippet, assigned a higher score
+        highimpact = ('batch_size', 'boil_size')
+        # Properties that will affect the recipe snippet, but we want to avoid
+        # showing redundant info, so these will be penalized
+        lowimpact = ('title', 'description')
+        for key in modifications:
+            if key in ignorelist:
+                continue
+            elif key == 'ingredients':
+                for type in modifications['ingredients']:
+                    for ingredient in modifications['ingredients'][type]:
+                        # Start with a high score
+                        score = 20
+                        for vals in modifications['ingredients'][type][ingredient].values():
+                            # Add a modifier for the percent change of ever modification
+                            try:
+                                score += 5 * vals[1] / vals[0]
+                            except:
+                                pass
+                        scoredlist.append((score, self.create_edit_ingredient_string(type, ingredient)))
+            else:
+                if key in highimpact:
+                    # Start with a high score
+                    score = 20
+                elif key in lowimpact:
+                    # Start with a low score
+                    score = 0
+                else:
+                    # Start with a normal score
+                    score = 10
+
+                # Add a modifier for the percent change
+                try:
+                    score += 10 * modifications[key][1] / modifications[key][0]
+                except:
+                    pass
+
+                scoredlist.append((score, self.create_edit_string(key, modifications[key][1])))
+
+        if len(scoredlist) > 0:
+            # Sort based on score
+            scoredlist.sort(key=itemgetter(0), reverse=True)
+
+            # Append the sorted items to the difflist
+            difflist.extend([diff for score, diff in scoredlist])
+
+        return difflist
+
+    def create_add_string(self, key, value):
+        """
+        Create a display string for an addition.
+        """
+        return 'Added ' + self.key_for_display(key) + ': ' + self.value_for_display(value)
+
+    def create_delete_string(self, key, value):
+        """
+        Create a display string for a deletion.
+        """
+        return 'Removed ' + self.key_for_display(key) + ': ' + self.value_for_display(value)
+
+    def create_edit_string(self, key, value):
+        """
+        Create a display string for a modification.
+        """
+        return 'Changed ' + self.key_for_display(key) + ' to ' + self.value_for_display(value)
+
+    def create_edit_ingredient_string(self, key, value):
+        """
+        Create a display string for an ingredient modification.
+        """
+        return 'Changed properties on ' + self.key_for_display(key) + ' ingredient: ' + self.value_for_display(value)
+
+    def key_for_display(self, key):
+        """
+        Convert an object key, such as batch_size, to a display value.
+        """
+        return key.replace('_', ' ')
+
+    def value_for_display(self, value):
+        """
+        Convert a user-entered value to a display value. This wraps strings
+        in quotes and converts numbers to strings.
+        """
+        if isinstance(value, (str, unicode)):
+            return '"' + value + '"'
+        else:
+            return str(value)

@@ -393,7 +393,6 @@ textarea.large {
             display: block;
             color: white;
             background-color: #333;
-            position: absolute;
             left: 40px;
             margin-left: -109px;
             padding: 1px 5px;
@@ -409,6 +408,99 @@ textarea.large {
         left: 61px;
         width: 2px;
         background-color: #333;
+    }
+}
+
+#history {
+    position: relative;
+
+    .line {
+        position: absolute;
+        z-index: -1;
+        top: 50px;
+        bottom: 50px;
+        left: 157px;
+        width: 2px;
+        background-color: #333;
+    }
+
+    .entry {
+        margin-bottom: 2em;
+        position: relative;
+
+        .recipe {
+            width: 290px;
+            background-color: #fff;
+            border: 2px solid #333;
+            margin: 0 1em 0 0;
+            box-shadow: 0 0 2px rgba(0, 0, 0, 0.5);
+            clear: both;
+        }
+
+        p {
+            padding-top: 5px;
+        }
+    }
+
+    .uparrow, .downarrow {
+        float: left;
+        clear: both;
+        margin-left: 153px;
+        width: 10px;
+        height: 6px;
+    }
+
+    .uparrow {
+        background-image: url(../img/arrow-up.png);
+    }
+
+    .downarrow {
+        background-image: url(../img/arrow.png);
+    }
+
+    .node {
+        position: absolute;
+        margin: auto;
+        width: 20px;
+        height: 25px;
+        top: 0;
+        bottom: 0;
+        left: 148px;
+
+        a {
+            float: left;
+            text-decoration: none;
+            display: block;
+            width: 20px;
+            height: 20px;
+            background-color: #333;
+            .border-radius(20px);
+            box-shadow: 0px 0px 5px rgba(0, 0, 0, 0.3);
+
+            [class^="icon-"],
+            [class*=" icon-"] {
+                position: relative;
+                left: 4px;
+            }
+
+            .icon-thumbs-up {
+                left: 3px;
+                top: 1px;
+            }
+        }
+
+        .uparrow, .downarrow {
+            margin-left: 5px;
+            margin-bottom: -2px;
+            margin-top: -2px;
+        }
+    }
+
+    .entry::after {
+        display: block;
+        visibility: hidden;
+        content: "";
+        clear: both;
     }
 }
 
