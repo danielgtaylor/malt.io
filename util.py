@@ -121,7 +121,7 @@ def render_fermentable_template(values):
     Render a fermentable template list item for the buttons which add a
     new fermentable item to the recipe.
     """
-    return '<li data-description="%(description)s" data-ppg="%(ppg)d" data-srm="%(srm)d" onclick="Recipe.addFermentableRow(this);"><a><span class="srm" data-srm="%(srm)d"></span> %(description)s</a></li>' % {
+    return '<li data-description="%(description)s" data-ppg="%(ppg)d" data-srm="%(srm)d" onclick="Recipe.addFermentableRowTemplate(this);"><a><span class="srm" data-srm="%(srm)d"></span> %(description)s</a></li>' % {
         'description': values[0],
         'ppg': values[1],
         'srm': values[2]
@@ -145,7 +145,7 @@ def render_hops_template(values):
                 rating += ' style="opacity: 0.2"'
             rating += '></i>'
 
-    return '<li data-description="%(description)s" data-aa="%(aa)s" onclick="Recipe.addHopRow(this);"><a>%(rating)s %(description)s</a></li>' % {
+    return '<li data-description="%(description)s" data-aa="%(aa)s" onclick="Recipe.addHopRowTemplate(this);"><a>%(rating)s %(description)s</a></li>' % {
         'description': values[0],
         'aa': values[1],
         'rating': rating
@@ -159,7 +159,7 @@ def render_yeast_template(values):
     Render a yeast or bug template list item for the buttons which add a
     new yeast or bug item to the recipe.
     """
-    return '<li data-description="%(description)s" data-type="%(type)s" data-form="%(form)s" data-attenuation="%(attenuation)s" onclick="Recipe.addYeastRow(this);"><a>%(description)s</a></li>' % {
+    return '<li data-description="%(description)s" data-type="%(type)s" data-form="%(form)s" data-attenuation="%(attenuation)s" onclick="Recipe.addYeastRowTemplate(this);"><a>%(description)s</a></li>' % {
         'description': values[0],
         'type': values[1],
         'form': values[2],
