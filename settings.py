@@ -5,7 +5,7 @@ from os.path import dirname, join
 # Whether or not to show stack traces on errors
 # By default this is automaticly true when running locally
 # and false when in production
-DEBUG = os.environ['HTTP_HOST'].startswith('localhost')
+DEBUG = "HTTP_HOST" in os.environ and os.environ['HTTP_HOST'].startswith('localhost') or False
 
 # The physical root directory of this project
 PROJECT_ROOT = dirname(__file__)
