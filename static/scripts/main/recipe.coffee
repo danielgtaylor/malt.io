@@ -100,6 +100,11 @@ class Recipe
         if window.location.pathname is '/new' or window.location.hash is '#edit'
             @enableEdit()
 
+        # If this is the new recipe page, then see if we have a locally saved
+        # recipe to load.
+        if window.location.pathname is '/new'
+            @loadLocal()
+
     # Initialize recipe import handling
     @initImport: =>
         $('#importButton').click((event) =>
@@ -191,19 +196,27 @@ class Recipe
         )
 
     # Add a fermentable row to the fermentables table based on a fermentable
-    # template button item.
-    @addFermentableRow: (template) =>
-        table = $('#fermentables_data')[0]
-        row = '<tr><td class="num percent">?</td><td class="num validate positive integer" contentEditable="true">1</td><td class="num validate positive integer" contentEditable="true">0</td><td contentEditable="true">' + template.getAttribute('data-description') + '</td><td contentEditable="true"></td><td class="num validate positive integer" contentEditable="true">' + template.getAttribute('data-ppg') + '</td><td class="num"><span class="srm" data-srm="' + template.getAttribute('data-srm') + '" style="background-color: ' + Util.srmToRgb(template.getAttribute('data-srm')) + '"></span> </td><td class="num validate positive integer" style="border-left: none;" contentEditable="true">' + template.getAttribute('data-srm') + '</td><td class="edit-show" style="display: block"><a href="#" class="remove"><i class="icon-remove"></i></a></td></tr>'
-        table.innerHTML += row
+    # template button item. Select the added row and update recipe stats.
+    @addFermentableRowTemplate: (template) =>
+        @addFermentableRow(1.0,
+                           template.getAttribute('data-description'),
+                           '',
+                           template.getAttribute('data-ppg'),
+                           template.getAttribute('data-srm'))
         $('#fermentables_data tr:last td:nth-child(2)').focus()
         @updateStats()
+
+    # Add a fermentable row to the fermentables table.
+    @addFermentableRow: (weight, description, late, ppg, srm) =>
+        table = $('#fermentables_data')[0]
+        lb = Math.floor(weight)
+        oz = Math.round((weight - lb) * 16)
+        row = '<tr><td class="num percent">?</td><td class="num validate positive integer" contentEditable="true">' + lb + '</td><td class="num validate positive integer" contentEditable="true">' + oz + '</td><td contentEditable="true">' + description + '</td><td contentEditable="true">' + late + '</td><td class="num validate positive integer" contentEditable="true">' + ppg + '</td><td class="num"><span class="srm" data-srm="' + srm + '" style="background-color: ' + Util.srmToRgb(srm) + '"></span> </td><td class="num validate positive integer" style="border-left: none;" contentEditable="true">' + srm + '</td><td class="edit-show" style="display: block"><a href="#" class="remove"><i class="icon-remove"></i></a></td></tr>'
+        table.innerHTML += row
     
     # Add a hop/spice row to the hops and spices table based on a hop
     # template button item
-    @addHopRow: (template) =>
-        table = $('#hops_data')[0]
-        
+    @addHopRowTemplate: (template) =>
         # Try to guess a reasonable time for the next addition
         if parseFloat(template.getAttribute('data-aa'))
             latest = parseInt($('#hops_data tr:last td:nth-child(2)').html?()) || 90
@@ -212,20 +225,35 @@ class Recipe
         else
             next = 5
             form = 'ground'
-        
-        row = '<tr><td contentEditable="true">boil</td><td class="num" contentEditable="true">' + next + 'min</td><td class="num validate positive number" contentEditable="true">1.00</td><td contentEditable="true">' + template.getAttribute('data-description') + '</td><td contentEditable="true">' + form + '</td><td class="num validate positive number" contentEditable="true">' + template.getAttribute('data-aa') + '</td><td class="edit-show" style="display: block"><a href="#" class="remove"><i class="icon-remove"></i></a></td></tr>'
-        table.innerHTML += row
+
+        @addHopRow('boil', next, 1.0, template.getAttribute('data-description'),
+                   template.getAttribute('data-aa'), form)
+
         $('#hops_data tr:last td:nth-child(1)').focus()
         @updateStats()
+
+    # Add a hop row to the spices table
+    @addHopRow: (use, time, weight, description, aa, form) =>
+        table = $('#hops_data')[0]
+
+        row = '<tr><td contentEditable="true">' + use + '</td><td class="num" contentEditable="true">' + time + '</td><td class="num validate positive number" contentEditable="true">' + weight + '</td><td contentEditable="true">' + description + '</td><td contentEditable="true">' + form + '</td><td class="num validate positive number" contentEditable="true">' + aa + '</td><td class="edit-show" style="display: block"><a href="#" class="remove"><i class="icon-remove"></i></a></td></tr>'
+        table.innerHTML += row
     
     # Add a yeast/bug row to the yeast and other bugs table based on a yeast
     # template button item
-    @addYeastRow: (template) =>
-        table = $('#yeast_data')[0]
-        row = '<tr><td contentEditable="true">' + template.getAttribute('data-description') + '</td><td contentEditable="true">' + template.getAttribute('data-type') + '</td><td contentEditable="true">' + template.getAttribute('data-form') + '</td><td class="num validate positive number" contentEditable="true">' + template.getAttribute('data-attenuation') + '</td><td class="edit-show" style="display: block"><a href="#" class="remove"><i class="icon-remove"></i></a></td></tr>'
-        table.innerHTML += row
+    @addYeastRowTemplate: (template) =>
+        @addYeastRow(template.getAttribute('data-description'),
+                     template.getAttribute('data-type'),
+                     template.getAttribute('data-form')
+                     template.getAttribute('data-attenuation'))
         $('#yeast_data tr:last td:nth-child(1)').focus()
         @updateStats()
+
+    # Add a yeast/bug to the yeast and other bugs table
+    @addYeastRow: (description, type, form, attenuation) =>
+        table = $('#yeast_data')[0]
+        row = '<tr><td contentEditable="true">' + description + '</td><td contentEditable="true">' + type + '</td><td contentEditable="true">' + form + '</td><td class="num validate positive number" contentEditable="true">' + attenuation + '</td><td class="edit-show" style="display: block"><a href="#" class="remove"><i class="icon-remove"></i></a></td></tr>'
+        table.innerHTML += row
     
     # Remove a row from the table in which it currently resides and update
     # the recipe info
@@ -655,6 +683,10 @@ class Recipe
             else
                 abv_element.removeClass('styleError')
 
+        # Save recipe to local storage if this is a new recipe being created
+        if window.location.pathname is '/new'
+            @saveLocal()
+
     # Scale a recipe to a new batch and boil size, trying to keep the gravities
     # and bitterness the same.
     @scale: (newGallons, newBoilGallons) =>
@@ -789,6 +821,52 @@ class Recipe
                 recipe: JSON.stringify(@getFromPage())
             success: (data, status, xhr) =>
                 # TODO: handle errors
+
+                # Delete the new recipe local cache as we have now saved the
+                # new recipe successfully.
+                if window.location.pathname is '/new'
+                    @clearLocal()
+
                 if data.redirect
                     window.location = data.redirect
         )
+
+    # Save the current recipe to local storage so that it can be loaded again
+    # later when the user comes back to this page.
+    @saveLocal: =>
+        localStorage['currentRecipe'] = JSON.stringify(@getFromPage())
+
+    # Clear the current recipe saved in local storage
+    @clearLocal: =>
+        localStorage.removeItem('currentRecipe')
+
+    # Load a recipe from local storage
+    @loadLocal: =>
+        # No recipe saved? Just return silently
+        return if not localStorage['currentRecipe']
+
+        recipe = JSON.parse(localStorage['currentRecipe'])
+
+        # Load basic recipe information
+        $('#recipeName').text(recipe.name)
+        $('#recipeDescription').text(recipe.description)
+        $('#styleName').attr(
+            'data-category': recipe.category
+            'data-style': recipe.style
+        ).text(recipe.category + ' - ' + recipe.style)
+        $('#batchSize').text(recipe.batchSize)
+        $('#boilSize').text(recipe.boilSize)
+        $('#bottling_temp').text(recipe.bottlingTemp)
+        $('#bottling_pressure').text(recipe.bottlingPressure)
+
+        # Load fermentables, spices, yeast
+        for fermentable in recipe.ingredients.fermentables
+            @addFermentableRow(fermentable.weight, fermentable.description, fermentable.late, fermentable.color, fermentable.ppg)
+
+        for spice in recipe.ingredients.spices
+            @addHopRow(spice.use, spice.time, spice.oz, spice.description, spice.aa, spice.form)
+
+        for yeast in recipe.ingredients.yeast
+            @addYeastRow(yeast.description, yeast.type, yeast.form, yeast.attenuation)
+
+        @updateStats()

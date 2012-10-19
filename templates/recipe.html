@@ -64,9 +64,9 @@
 {% block content %}
     <div id="saveMsg" class="alert alert-info" style="position: fixed; z-index: 999; width: 889px; top: 43px; opacity: 0.9; display: none;">
         {% if user %}
-            You are currently editing this recipe. Your changes have not yet been saved. <div class="pull-right"><a class="btn btn-mini" href=""><i class="icon-remove"></i> Cancel</a> <a class="btn btn-info btn-mini" onclick="Recipe.save();"><i class="icon-book icon-white"></i> Save recipe</a></div>
+            You are currently editing this recipe. Your changes have not yet been saved. <div class="pull-right"><a class="btn btn-mini" href=""><i class="icon-remove"></i> Cancel</a>{% if recipe.new %} <a class="btn btn-warning btn-mini" href="" onclick="Recipe.clearLocal();"><i class="icon-exclamation-sign icon-white"></i> Clear recipe</a>{% endif %} <a class="btn btn-info btn-mini" onclick="Recipe.save();"><i class="icon-book icon-white"></i> Save recipe</a></div>
         {% else %}
-            You are currently editing this recipe. Your changes have not been saved. <a href="/profile">Log in</a> to save recipes.
+            You are currently editing this recipe. Your changes have not been saved. {% if recipe.new %}<a class="btn btn-warning btn-mini" href="" onclick="Recipe.clearLocal();"><i class="icon-exclamation-sign icon-white"></i> Clear recipe</a> {% endif %}<a href="/profile">Log in</a> to save recipes.
         {% endif %}
     </div>
     {% if publicuser %}
@@ -131,7 +131,7 @@
     </h2>
     <div class="btn-toolbar edit-show" style="display: none;">
         <div class="btn-group">
-            <a class="btn" data-description="New ingredient" data-ppg="32" data-srm="2" onclick="Recipe.addFermentableRow(this);"><i class="icon-plus-sign"></i></a>
+            <a class="btn" data-description="New ingredient" data-ppg="32" data-srm="2" onclick="Recipe.addFermentableRowTemplate(this);"><i class="icon-plus-sign"></i></a>
         </div>
         <div class="btn-group">
             <a class="btn dropdown-toggle" data-toggle="dropdown" href="#">
