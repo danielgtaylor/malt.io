@@ -20,13 +20,13 @@
                         else
                             element.css({'position': 'absolute',
                                          'margin-left': '5px'});
-                        var adjust = '+=' + (element.height() - lineheight + 3)
+                        var adjust = element.height() - lineheight + 3;
                         if (element.next().length > 0)
-                            element.next().css('margin-top', adjust);
+                            element.next().css('margin-top', '+=' + adjust);
                         else if (element.parent().next().length > 0)
-                            element.parent().next().css('margin-top', adjust);
+                            element.parent().next().css('margin-top', '+=' + adjust);
                         else
-                            element.parent().parent().css('padding-bottom', adjust);
+                            element.parent().parent().css('padding-bottom', '+=' + (adjust - 7));
                     }
                 });
             }
@@ -61,8 +61,9 @@
                 highlighter.children().toggleClass('highlight');
                 return e.preventDefault();
             });
+            $('.entry .tags').after('<span>Edited</span> ').next().toggle();
             $('#tagsbtn').on('click', function(e) {
-                if ($('.entry .tags').toggle().is(':visible'))
+                if ($('.entry .tags').toggle().next().toggle().end().is(':visible'))
                     $(this).text('Hide Tags');
                 else
                     $(this).text('Show Tags');
@@ -111,7 +112,7 @@
     <div id="history">
         <div class="line"></div>
         {% for entry in entries %}
-            <div class="entry">
+            <div class="entry clearfix">
                 {% if entry.recipe %}
                     {% if not loop.first %}
                         <div class="uparrow"></div>
@@ -129,35 +130,30 @@
                 {% endif %}
                 <div class="offset4">
                     <p>
-                    {% if entry.edited %}
-                        Edited {{ entry.edited|timesince }}
-                    {% else %}
-                        Created {{ entry.created|timesince }}
-                    {% endif %}
-                         ago
                         <span class="tags">
                     {% if entry.customtag is defined %}
                             <span class="label label-warning">{{ entry.customtag }}</span>
                     {% endif %}
                     {% if entry.differences %}
                         {% if entry.differences[0]|count > 0 %}
-                            <span class="label label-success">Add</span>
+                            <span class="label label-success">Added</span>
                         {% endif %}
                         {% if entry.differences[1]|count > 0 %}
-                            <span class="label label-important">Delete</span>
+                            <span class="label label-important">Deleted</span>
                         {% endif %}
                         {% if entry.differences[2]|count > 0 %}
-                            <span class="label label-info">Modify</span>
+                            <span class="label label-info">Modified</span>
                         {% endif %}
                     {% endif %}
                         </span>
+                        {{ entry.edited|timesince }} ago
                      </p>
-                    {% if entry.differences %}
+                    {% if entry.differences is defined %}
                         {{ entry.differences|render_history_diff }}
                     {% elif entry.first is defined %}
                         <p>Original version, of course there aren't any changes!</p>
                     {% else %}
-                        <p>Nothing's changed!</p>
+                        <p>Nothing's changed, why am I here!?</p>
                     {% endif %}
                 </div>
             </div>

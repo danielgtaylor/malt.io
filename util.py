@@ -309,6 +309,9 @@ def render_history_diff(value):
     deletions = value[1]
     modifications = value[2]
 
+    if len(additions) == len(deletions) == len(modifications) == 0:
+        return '<p>Nothing\'s changed, why am I here!?</p>'
+
     for key in additions:
         if key == 'ingredients':
             for type in additions['ingredients']:

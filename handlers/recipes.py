@@ -531,7 +531,7 @@ class RecipeHistoryHandler(webapp2.RequestHandler):
             'differences': differences,
             'edited': recipe.edited,
             'slug': recipe.slug,
-            'customtag': 'Current'
+            'customtag': 'Most Recent'
         })
 
         # Start going through the history looking at differences to decide how
@@ -570,7 +570,6 @@ class RecipeHistoryHandler(webapp2.RequestHandler):
             entry.slug = recipe.slug + '/' + str(entry.key().id())
             entries.append({
                 'recipe': entry,
-                'differences': None,
                 'edited': entry.created,
                 'slug': entry.slug,
                 'customtag': 'Original',
