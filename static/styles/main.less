@@ -424,22 +424,30 @@ textarea.large {
         background-color: #333;
     }
 
+    .recipe {
+        width: 290px;
+        background-color: #fff;
+        border: 2px solid #333;
+        margin: 0 1em 0 0;
+        box-shadow: 0 0 2px rgba(0, 0, 0, 0.5);
+        clear: both;
+    }
+
     .entry {
-        margin-bottom: 2em;
+        margin-bottom: 3em;
         position: relative;
 
-        .recipe {
-            width: 290px;
-            background-color: #fff;
-            border: 2px solid #333;
-            margin: 0 1em 0 0;
-            box-shadow: 0 0 2px rgba(0, 0, 0, 0.5);
+        &::after {
+            display: block;
+            visibility: hidden;
+            content: "";
             clear: both;
         }
+    }
 
-        p {
-            padding-top: 5px;
-        }
+    p {
+        padding-top: 5px;
+        margin-bottom: 5px;
     }
 
     .uparrow, .downarrow {
@@ -496,11 +504,21 @@ textarea.large {
         }
     }
 
-    .entry::after {
-        display: block;
-        visibility: hidden;
-        content: "";
-        clear: both;
+    ul {
+        margin-left: 20px;
+        list-style: decimal;
+    }
+
+    li {
+        padding: 2px 0px;
+    }
+
+    ul ul {
+        list-style: lower-alpha;
+    }
+
+    .tags {
+        margin-left: 10px;
     }
 }
 
@@ -570,4 +588,12 @@ textarea.large {
 .footer:hover {
     opacity: 1.0;
     .transition(all 0.2s);
+}
+
+.text-subtle {
+    color: #a27035;
+}
+
+.highlight {
+    background-color: #ffa;
 }

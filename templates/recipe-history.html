@@ -4,6 +4,77 @@
     <script type="text/javascript">
         $(document).ready(function () {
             Recipe.init();
+
+            var spans = $('.entry span.text-subtle, .entry code')
+            if (spans.length > 0) {
+                var lineheight = parseInt(spans.css('line-height'));
+                spans.each(function (index, element) {
+                    element = $(element)
+                    if (element.height() > lineheight) {
+                        if (element.prop('tagName').toLowerCase() == 'code') {
+                            element.css({'position': 'absolute',
+                                         'margin-left': '5px',
+                                         'margin-top': '-2px'});
+                            element.parent().css('margin-top', '+=2px')
+                        }
+                        else
+                            element.css({'position': 'absolute',
+                                         'margin-left': '5px'});
+                        var adjust = '+=' + (element.height() - lineheight + 3)
+                        if (element.next().length > 0)
+                            element.next().css('margin-top', adjust);
+                        else if (element.parent().next().length > 0)
+                            element.parent().next().css('margin-top', adjust);
+                        else
+                            element.parent().parent().css('padding-bottom', adjust);
+                    }
+                });
+            }
+            highlighter = $();
+            var titles = $('div.recipe > .title');
+            var descriptions = titles.siblings('span');
+            var buttongroups = $('div.recipe > .btn-group');
+            $.each([titles, descriptions], function (i, e) {
+                e.each(function (j, el) {
+                    if (j+1==e.length)
+                        return;
+                    var $el = $(el);
+                    if ($.trim($el.text()) != $.trim($(e[j+1]).text()))
+                        highlighter = highlighter.add($el);
+                });
+            });
+            buttongroups.each(function (i, el) {
+                if (i+1==buttongroups.length)
+                    return;
+                var btns = $(el).children();
+                var siblingbtns = $(buttongroups[i+1]).children()
+                btns.each(function (j, btn) {
+                    var $btn = $(btn);
+                    if ($.trim($btn.text()) != $.trim($(siblingbtns[j]).text()))
+                        highlighter = highlighter.add($btn);
+                });
+            });
+            highlighter.each(function (i, e) {
+                $(e).wrapInner('<span></span>');
+            })
+            $('#highlightbtn').on('click', function(e) {
+                highlighter.children().toggleClass('highlight');
+                return e.preventDefault();
+            });
+            $('#tagsbtn').on('click', function(e) {
+                if ($('.entry .tags').toggle().is(':visible'))
+                    $(this).text('Hide Tags');
+                else
+                    $(this).text('Show Tags');
+                return e.preventDefault();
+            });
+            $('#detailsbtn').on('click', function(e) {
+                if ($('.entry li ul').toggle().is(':visible'))
+                    $(this).text('Hide Details');
+                else
+                    $(this).text('Show Details');
+                return e.preventDefault();
+            });
         });
     </script>
 {% endblock %}
@@ -19,6 +90,23 @@
         <li><a href="{{ recipe.url }}">{{ recipe.name }}</a><span class="divider">/</span></li>
         <li>history</li>
     </ul>
+
+    <div class="row" style="margin-bottom: 25px">
+        <h1 class="span8">Recipe History</h1>
+        <div class="span4">
+            <div class="btn-group pull-right" style="margin-top:5px">
+                <button class="btn dropdown-toggle" data-toggle="dropdown">
+                    Options
+                    <span class="caret"></span>
+                </button>
+                <ul class="dropdown-menu">
+                    <li><a id="highlightbtn" href="#">Highlight Differences</a></li>
+                    <li><a id="tagsbtn" href="#">Hide Tags</a></li>
+                    <li><a id="detailsbtn" href="#">Hide Details</a></li>
+                </ul>
+            </div>
+        </div>
+    </div>
 
     <div id="history">
         <div class="line"></div>
@@ -40,18 +128,41 @@
                     </div>
                 {% endif %}
                 <div class="offset4">
-                    <p>Edited on {{ entry.edited }}</p>
+                    <p>
+                    {% if entry.edited %}
+                        Edited {{ entry.edited|timesince }}
+                    {% else %}
+                        Created {{ entry.created|timesince }}
+                    {% endif %}
+                         ago
+                        <span class="tags">
+                    {% if entry.customtag is defined %}
+                            <span class="label label-warning">{{ entry.customtag }}</span>
+                    {% endif %}
                     {% if entry.differences %}
-                    <p>Interesting changes:</p>
-                    <ul>
-                        {% for difference in entry.differences %}
-                            <li>{{ difference }}</li>
-                        {% endfor %}
-                    </ul>
+                        {% if entry.differences[0]|count > 0 %}
+                            <span class="label label-success">Add</span>
+                        {% endif %}
+                        {% if entry.differences[1]|count > 0 %}
+                            <span class="label label-important">Delete</span>
+                        {% endif %}
+                        {% if entry.differences[2]|count > 0 %}
+                            <span class="label label-info">Modify</span>
+                        {% endif %}
+                    {% endif %}
+                        </span>
+                     </p>
+                    {% if entry.differences %}
+                        {{ entry.differences|render_history_diff }}
+                    {% elif entry.first is defined %}
+                        <p>Original version, of course there aren't any changes!</p>
+                    {% else %}
+                        <p>Nothing's changed!</p>
                     {% endif %}
                 </div>
             </div>
         {% endfor %}
     </div>
+    <a class="pull-right" href="#top" style="margin-top:-3em;margin-bottom:1em">Back to Top</a>
     
 {% endblock %}
