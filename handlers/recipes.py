@@ -506,75 +506,84 @@ class RecipeHistoryHandler(webapp2.RequestHandler):
             self.abort(404)
 
         publicuser = UserPrefs.all().filter('name =', username).get()
+        if not publicuser:
+            self.abort(404)
+
         recipe = Recipe.all()\
                        .filter('slug = ', recipe_slug)\
                        .filter('owner =', publicuser)\
                        .get()
+        if not recipe:
+            self.abort(404)
 
         history = RecipeHistory.all()\
                         .filter('parent_recipe =', recipe)\
                         .order('-created')\
-                        .fetch(30)
+                        .fetch(20)
 
-        # The list of entries we'll use to populate the template
-        entries = []
-
-        # Check if there is any history to diff with
-        if len(history) > 0:
-            differences = self.delete_ignored_keys(recipe.diff(history[0]))
-        else:
-            differences = None
-
-        # Start with the current version versus the previous
-        entries.append({
+        # The list of entries we'll use to populate the template along with
+        # the current recipe as the first entry
+        entries = [{
             'recipe': recipe,
-            'differences': differences,
             'edited': recipe.edited,
             'slug': recipe.slug,
             'customtag': 'Most Recent'
-        })
+        }]
+
+        # Check if there is any history to diff with
+        if len(history) > 0:
+            entries[0]['differences'] = self.delete_ignored_keys(recipe.diff(history[0]))
+        else:
+            entries[0]['first'] = True
+
+        # Get a list of differences in the history. Use reduce with a function
+        # that returns the right operand to simply find pairwise differences.
+        differences = []
+        def diff(left, right):
+            differences.append(left.diff(right))
+            return right
+        reduce(diff, history)
 
         # Start going through the history looking at differences to decide how
         # we plan on displaying the info to the user (using a snippet or not)
-        for i in range(len(history) - 1):
+        for i in range(len(differences)):
             # Set some required properties for the snippet to work
             history[i].owner = recipe.owner
             history[i].slug = recipe.slug + '/' + str(history[i].key().id())
 
             # Create the entry
             entry = {}
-            differences = history[i].diff(history[i + 1])
 
             # Check if the name, description, color, ibu, or alcohol changed
             # and we should show a snippet
             for snippetItem in RecipeHistoryHandler.SNIPPET_ITEMS:
-                for diffset in differences:
-                    if snippetItem in diffset:
-                        entry['recipe'] = history[i]
-                        # Make sure the color, ibu, and alcohol were created
-                        if not hasattr(history[i], 'color'):
-                            history[i].update_cache()
-                        break
-                if 'recipe' in entry:
+                if snippetItem in differences[i][2]:
+                    entry['recipe'] = history[i]
+                    # Make sure the color, ibu, and alcohol were created
+                    if not hasattr(history[i], 'color'):
+                        history[i].update_cache()
                     break
 
-            entry['differences'] = self.delete_ignored_keys(differences)
+            # Set the required properties
+            entry['differences'] = self.delete_ignored_keys(differences[i])
             entry['edited'] = history[i].created
             entry['slug'] = history[i].slug
             entries.append(entry)
 
-        # Add the final entry
+        # Add the final entry only if it's the original recipe, otherwise it
+        # will be a version that should have diffs but we didn't generate any.
         if len(history) > 0:
-            entry = history[len(history) - 1]
-            entry.owner = recipe.owner
-            entry.slug = recipe.slug + '/' + str(entry.key().id())
-            entries.append({
-                'recipe': entry,
-                'edited': entry.created,
-                'slug': entry.slug,
-                'customtag': 'Original',
-                'first': True
-            })
+            last = history[-1]
+            if recipe.created == last.created:
+                last.owner = recipe.owner
+                last.slug = recipe.slug + '/' + str(last.key().id())
+                entries.append({
+                    'recipe': last,
+                    'edited': last.created,
+                    'slug': last.slug,
+                    'customtag': 'Original',
+                    'first': True
+                })
 
         render(self, 'recipe-history.html', {
             'publicuser': publicuser,

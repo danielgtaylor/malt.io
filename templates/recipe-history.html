@@ -60,26 +60,26 @@
                 <div class="offset4">
                     <p>
                         <span class="tags">
-                    {% if entry.customtag is defined %}
-                            <span class="label label-warning">{{ entry.customtag }}</span>
-                    {% endif %}
-                    {% if entry.differences %}
-                        {% if entry.differences[0]|count > 0 %}
-                            <span class="label label-success">Added</span>
+                        {% if entry.customtag %}
+                                <span class="label label-warning">{{ entry.customtag }}</span>
                         {% endif %}
-                        {% if entry.differences[1]|count > 0 %}
-                            <span class="label label-important">Deleted</span>
+                        {% if entry.differences %}
+                            {% if entry.differences[0]|count > 0 %}
+                                <span class="label label-success">Added</span>
+                            {% endif %}
+                            {% if entry.differences[1]|count > 0 %}
+                                <span class="label label-important">Deleted</span>
+                            {% endif %}
+                            {% if entry.differences[2]|count > 0 %}
+                                <span class="label label-info">Modified</span>
+                            {% endif %}
                         {% endif %}
-                        {% if entry.differences[2]|count > 0 %}
-                            <span class="label label-info">Modified</span>
-                        {% endif %}
-                    {% endif %}
                         </span>
                         {{ entry.edited|timesince }} ago
                      </p>
-                    {% if entry.differences is defined %}
+                    {% if entry.differences %}
                         {{ entry.differences|render_history_diff }}
-                    {% elif entry.first is defined %}
+                    {% elif entry.first %}
                         <p>Original version, of course there aren't any changes!</p>
                     {% else %}
                         <p>Nothing's changed, why am I here!?</p>
