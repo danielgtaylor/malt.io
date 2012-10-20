@@ -4,78 +4,7 @@
     <script type="text/javascript">
         $(document).ready(function () {
             Recipe.init();
-
-            var spans = $('.entry span.text-subtle, .entry code')
-            if (spans.length > 0) {
-                var lineheight = parseInt(spans.css('line-height'));
-                spans.each(function (index, element) {
-                    element = $(element)
-                    if (element.height() > lineheight) {
-                        if (element.prop('tagName').toLowerCase() == 'code') {
-                            element.css({'position': 'absolute',
-                                         'margin-left': '5px',
-                                         'margin-top': '-2px'});
-                            element.parent().css('margin-top', '+=2px')
-                        }
-                        else
-                            element.css({'position': 'absolute',
-                                         'margin-left': '5px'});
-                        var adjust = element.height() - lineheight + 3;
-                        if (element.next().length > 0)
-                            element.next().css('margin-top', '+=' + adjust);
-                        else if (element.parent().next().length > 0)
-                            element.parent().next().css('margin-top', '+=' + adjust);
-                        else
-                            element.parent().parent().css('padding-bottom', '+=' + (adjust - 7));
-                    }
-                });
-            }
-            highlighter = $();
-            var titles = $('div.recipe > .title');
-            var descriptions = titles.siblings('span');
-            var buttongroups = $('div.recipe > .btn-group');
-            $.each([titles, descriptions], function (i, e) {
-                e.each(function (j, el) {
-                    if (j+1==e.length)
-                        return;
-                    var $el = $(el);
-                    if ($.trim($el.text()) != $.trim($(e[j+1]).text()))
-                        highlighter = highlighter.add($el);
-                });
-            });
-            buttongroups.each(function (i, el) {
-                if (i+1==buttongroups.length)
-                    return;
-                var btns = $(el).children();
-                var siblingbtns = $(buttongroups[i+1]).children()
-                btns.each(function (j, btn) {
-                    var $btn = $(btn);
-                    if ($.trim($btn.text()) != $.trim($(siblingbtns[j]).text()))
-                        highlighter = highlighter.add($btn);
-                });
-            });
-            highlighter.each(function (i, e) {
-                $(e).wrapInner('<span></span>');
-            })
-            $('#highlightbtn').on('click', function(e) {
-                highlighter.children().toggleClass('highlight');
-                return e.preventDefault();
-            });
-            $('.entry .tags').after('<span>Edited</span> ').next().toggle();
-            $('#tagsbtn').on('click', function(e) {
-                if ($('.entry .tags').toggle().next().toggle().end().is(':visible'))
-                    $(this).text('Hide Tags');
-                else
-                    $(this).text('Show Tags');
-                return e.preventDefault();
-            });
-            $('#detailsbtn').on('click', function(e) {
-                if ($('.entry li ul').toggle().is(':visible'))
-                    $(this).text('Hide Details');
-                else
-                    $(this).text('Show Details');
-                return e.preventDefault();
-            });
+            RecipeHistory.init();
         });
     </script>
 {% endblock %}
@@ -95,7 +24,7 @@
     <div class="row" style="margin-bottom: 25px">
         <h1 class="span8">Recipe History</h1>
         <div class="span4">
-            <div class="btn-group pull-right" style="margin-top:5px">
+            <div id="options" class="btn-group pull-right" style="margin-top:5px;display:none;">
                 <button class="btn dropdown-toggle" data-toggle="dropdown">
                     Options
                     <span class="caret"></span>

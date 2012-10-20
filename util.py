@@ -408,7 +408,7 @@ def render_history_ingredient_mod(key, name, value):
     Render an ingredient modification in the history diff. This provides more
     info than a regular modification.
     """
-    return 'Changed properties on %(key)s ingredient <span class="text-subtle">%(value)s</span><ul>' % {
+    return 'Changed properties on %(key)s ingredient <strong>%(value)s</strong><ul>' % {
         'key': key_for_display(key),
         'value': name
     } + \
