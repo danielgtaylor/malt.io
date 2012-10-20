@@ -1,6 +1,6 @@
 class BeerStyles
     @init: =>
-        html = ''
+        html = '<ul class="unstyled"><li><a href="#" data-dismiss="modal">No style</a></li></ul>'
 
         for own category, styles of BeerStyles.categories
             html += '<h6>' + category + '</h6>'
@@ -15,10 +15,17 @@ class BeerStyles
 
         $('#styleModal').on('click', 'li > a', (event) =>
             target = event.currentTarget
+            category = target.getAttribute('data-category')
+            style = target.getAttribute('data-style')
             styleName = $('#styleName').get(0)
-            styleName.innerHTML = target.dataset.category + ' - ' + target.dataset.style
-            styleName.dataset.category = target.dataset.category
-            styleName.dataset.style = target.dataset.style
+
+            if category and style
+                styleName.innerHTML = category + ' - ' + style
+            else
+                styleName.innerHTML = 'No style'
+
+            styleName.setAttribute('data-category', category)
+            styleName.setAttribute('data-style', style)
             Recipe.updateStats()
         )
 

@@ -682,6 +682,22 @@ class Recipe
                 abv_element.addClass('styleError')
             else
                 abv_element.removeClass('styleError')
+        else
+            # Clear all styling info
+            og_element.attr('data-original-title', '')
+            og_element.removeClass('styleError')
+
+            fg_element.attr('data-original-title', '')
+            fg_element.removeClass('styleError')
+
+            color_element.attr('data-original-title', '')
+            color_element.removeClass('styleError')
+
+            ibu_element.attr('data-original-title', '')
+            ibu_element.removeClass('styleError')
+
+            abv_element.attr('data-original-title', '')
+            abv_element.removeClass('styleError')
 
         # Save recipe to local storage if this is a new recipe being created
         if window.location.pathname is '/new'
@@ -850,10 +866,16 @@ class Recipe
         # Load basic recipe information
         $('#recipeName').text(recipe.name)
         $('#recipeDescription').text(recipe.description)
+
+        if recipe.category and recipe.category isnt 'null'
+            style = recipe.category + ' - ' + recipe.style
+        else
+            style = 'No style'
+
         $('#styleName').attr(
             'data-category': recipe.category
             'data-style': recipe.style
-        ).text(recipe.category + ' - ' + recipe.style)
+        ).text(style)
         $('#batchSize').text(recipe.batchSize)
         $('#boilSize').text(recipe.boilSize)
         $('#bottling_temp').text(recipe.bottlingTemp)
