@@ -65,7 +65,7 @@ def recipe_to_response(recipe):
             'description': fermentable['description'],
             'late': fermentable['late'] and True or False,
             'color': float(fermentable['color']),
-            'yield_ratio': fermentable['ppg'] / 46.214 / 0.01
+            'yield_ratio': fermentable['ppg'] / 46.214
         }))
 
     return apimessages.RecipeGetResponse(**{
