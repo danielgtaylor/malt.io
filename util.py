@@ -11,6 +11,9 @@ from xml.sax.saxutils import escape
 
 from models.userprefs import UserPrefs
 
+GAL_TO_LITERS = 3.78541
+LB_TO_KG = 2.20462
+
 # Setup the Jinja2 template environment
 JINJA_ENV = jinja2.Environment(**{
     'loader': jinja2.FileSystemLoader(settings.TEMPLATE_PATH)

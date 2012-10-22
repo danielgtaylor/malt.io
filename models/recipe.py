@@ -5,10 +5,7 @@ import xml.etree.ElementTree as et
 
 from google.appengine.ext import db
 from models.userprefs import UserPrefs
-from util import time_to_min, xmlescape
-
-
-GAL_TO_LITERS = 3.78541
+from util import time_to_min, xmlescape, GAL_TO_LITERS, LB_TO_KG
 
 
 class RecipeBase(db.Model):
@@ -121,7 +118,7 @@ class RecipeBase(db.Model):
             xml += '<FERMENTABLE>'
             xml += '<VERSION>1</VERSION>'
             xml += '<NAME>' + xmlescape(fermentable['description']) + '</NAME>'
-            xml += '<AMOUNT>' + xmlescape(fermentable['weight'] / 2.20462) + '</AMOUNT>'
+            xml += '<AMOUNT>' + xmlescape(fermentable['weight'] / LB_TO_KG) + '</AMOUNT>'
             xml += '<YIELD>' + xmlescape(fermentable['ppg'] / 46.214 / 0.01) + '</YIELD>'
             xml += '<COLOR>' + xmlescape(fermentable['color']) + '</COLOR>'
             xml += '<ADD_AFTER_BOIL>' + (fermentable['late'] and 'TRUE' or 'FALSE') + '</ADD_AFTER_BOIL>'

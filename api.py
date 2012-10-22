@@ -3,6 +3,7 @@ from google.appengine.api import oauth
 from protorpc import remote
 
 import apimessages
+import util
 
 from models.recipe import Recipe
 from models.userprefs import UserPrefs
@@ -41,7 +42,6 @@ def user_to_response(user):
     Get a user object as a ProtoRPC message response.
     """
     return apimessages.UserGetResponse(**{
-        'user_id': user.user_id,
         'user_name': user.name,
         'joined_date': str(user.joined),
         'awards': user.awards,
@@ -54,9 +54,27 @@ def recipe_to_response(recipe):
     """
     Get a recipe object as a ProtoRPC message response.
     """
+    fermentables = []
+
+    for fermentable in recipe.ingredients['fermentables']:
+        if 'late' not in fermentable:
+            fermentable['late'] = False
+
+        fermentables.append(apimessages.FermentableResponse(**{
+            'weight_kg': fermentable['weight'] * util.LB_TO_KG,
+            'description': fermentable['description'],
+            'late': fermentable['late'] and True or False,
+            'color': float(fermentable['color']),
+            'yield_ratio': fermentable['ppg'] / 46.214 / 0.01
+        }))
+
     return apimessages.RecipeGetResponse(**{
         'name': recipe.name,
-        'description': recipe.description
+        'slug': recipe.slug,
+        'description': recipe.description,
+        'batch_liters': recipe.batch_size * util.GAL_TO_LITERS,
+        'boil_liters': recipe.boil_size * util.GAL_TO_LITERS,
+        'fermentables': fermentables
     })
 
 
@@ -104,9 +122,38 @@ class MaltioApi(remote.Service):
 
         return user_to_response(publicuser)
 
+    @endpoints.method(apimessages.RecipeListRequest,
+                      apimessages.RecipeListResponse,
+                      path='recipes/{user_name}',
+                      http_method='GET',
+                      name='users.recipes.list')
+    def get_recipes(self, request):
+        """
+        Get a list of recipes for a user name. Specify 'all' as the user name to get a list of recipes from all users.
+        """
+        if request.user_name != 'all':
+            publicuser = UserPrefs.all().filter('name =', request.user_name).get()
+
+            if not publicuser:
+                raise endpoints.NotFoundException(USER_NOT_FOUND)
+
+            recipes = Recipe.all()\
+                            .filter('owner =', publicuser)
+        else:
+            recipes = Recipe.all()
+
+        items = []
+        for recipe in recipes:
+            items.append(recipe_to_response(recipe))
+
+        return apimessages.RecipeListResponse(**{
+            'items': items
+        })
+
+
     @endpoints.method(apimessages.RecipeGetRequest,
                       apimessages.RecipeGetResponse,
-                      path='users/{user_name}/recipes/{slug}',
+                      path='recipes/{user_name}/{slug}',
                       http_method='GET',
                       name='users.recipes.get')
     def get_recipe(self, request):
