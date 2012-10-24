@@ -492,6 +492,10 @@ class ApiConfigGenerator(object):
         else:
           descriptor['default'] = field.default
 
+      description = message_parser.get_field_description(message_type, field)
+      if description:
+        descriptor['description'] = description
+
       params[field.name] = descriptor
 
     return params, param_order

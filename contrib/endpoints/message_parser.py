@@ -29,8 +29,36 @@ import google
 
 from protorpc import messages
 
-__all__ = ['MessageTypeToJsonSchema']
+__all__ = ['get_field_description', 'MessageTypeToJsonSchema']
 
+
+def get_field_description(message_type, field):
+  """Get a description for a field based on its parent class' docstring.
+
+  This searches the parent class' docstring for the occurence of the field
+  name followed by a colon or minus sign and a description. The description
+  is pulled out and returned if possible.
+
+  Args:
+    message_type: protorpc.messages.Message class
+    field: protorpc.messages.MessageField class to get description for
+
+  Returns:
+    A description string or the empty string
+  """
+  docs = message_type.__doc__
+
+  desc = ''
+  if docs is not None:
+    matches = re.search(field.name + r' *[:-] *(.*)', docs)
+
+    if matches:
+      desc = matches.group(1)
+
+  if field.default is not None:
+    desc += ' [' + str(field.default) + ']'
+
+  return desc
 
 class MessageTypeToJsonSchema(object):
   """Describe ProtoRPC messages in JSON Schema.
@@ -137,32 +165,6 @@ class MessageTypeToJsonSchema(object):
 
     return normalized
 
-  def __get_field_description(self, message_type, field):
-    """Get a description for a field based on its parent class' docstring.
-
-    This searches the parent class' docstring for the occurence of the field
-    name followed by a colon or minus sign and a description. The description
-    is pulled out and returned if possible.
-
-    Args:
-      message_type: protorpc.messages.Message class
-      field: protorpc.messages.MessageField class to get description for
-
-    Returns:
-      A description string or the empty string
-    """
-    docs = message_type.__doc__
-
-    if docs is None:
-      return ''
-
-    matches = re.search(field.name + r' *[:-] *(.*)', docs)
-
-    if matches:
-      return matches.group(1)
-    else:
-      return ''
-
   def __message_to_schema(self, message_type):
     """Parse a single message into JSON Schema.
 
@@ -187,7 +189,7 @@ class MessageTypeToJsonSchema(object):
       descriptor = {}
 
       # Attempt to set the description from the class's docstring
-      description = self.__get_field_description(message_type, field)
+      description = get_field_description(message_type, field)
       if description:
         descriptor['description'] = description
 
@@ -208,9 +210,6 @@ class MessageTypeToJsonSchema(object):
           descriptor['default'] = str(field.default)
         else:
           descriptor['default'] = field.default
-
-        if 'description' in descriptor:
-          descriptor['description'] += ' [' + descriptor['default'] + ']'
 
       if field.repeated:
         if '$ref' in descriptor:
