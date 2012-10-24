@@ -1,3 +1,5 @@
+import logging
+
 from contrib import endpoints
 from google.appengine.api import oauth
 from protorpc import remote
@@ -37,6 +39,26 @@ def oauth_required(func):
     return decorated
 
 
+def get_limits(request):
+    """
+    Check and get the starting offset and limit for a request that returns
+    many items in a list.
+    """
+    offset = request.offset
+
+    if offset < 0:
+        msg = 'Invalid start offset number %d, should be greater or equal to zero' % offset
+        raise endpoints.BadRequestException(msg)
+
+    limit = request.limit
+
+    if limit < 1 or limit > 100:
+        msg = 'Invalid limit %d, should be between 1 and 100 inclusive' % limit
+        raise endpoints.BadRequestException(msg)
+
+    return [offset, limit]
+
+
 def user_to_response(user):
     """
     Get a user object as a ProtoRPC message response.
@@ -69,16 +91,21 @@ def recipe_to_response(recipe):
         }))
 
     return apimessages.RecipeGetResponse(**{
+        'owner': recipe.owner.name,
         'name': recipe.name,
         'slug': recipe.slug,
         'description': recipe.description,
         'batch_liters': recipe.batch_size * util.GAL_TO_LITERS,
         'boil_liters': recipe.boil_size * util.GAL_TO_LITERS,
+        'color': recipe.color,
+        'ibu': recipe.ibu,
+        'abv': recipe.alcohol,
         'fermentables': fermentables
     })
 
 
-@endpoints.api(name='maltio', version='v1', description='Malt.io API')
+@endpoints.api(name='maltio', version='v1',
+               description='Malt.io Public API - users, recipes, brews, etc')
 class MaltioApi(remote.Service):
     """
     Malt.io Public API
@@ -95,12 +122,21 @@ class MaltioApi(remote.Service):
                       name="users.list")
     def get_users(self, request):
         """
-        Get a list of all users.
+        Get a list of users.
         """
-        users = UserPrefs.all()
+        offset, limit = get_limits(request)
+
+        query = UserPrefs.all()
+
+        if request.order == apimessages.UserOrder.NAME:
+            query = query.order('name')
+        elif request.order == apimessages.UserOrder.JOINED:
+            query = query.order('-joined')
+
+        users = query.fetch(limit, offset=offset)
 
         items = []
-        for user in UserPrefs.all():
+        for user in users:
             items.append(user_to_response(user))
 
         return apimessages.UserListResponse(**{
@@ -124,23 +160,36 @@ class MaltioApi(remote.Service):
 
     @endpoints.method(apimessages.RecipeListRequest,
                       apimessages.RecipeListResponse,
-                      path='recipes/{user_name}',
+                      path='recipes',
                       http_method='GET',
-                      name='users.recipes.list')
+                      name='recipes.list')
     def get_recipes(self, request):
         """
-        Get a list of recipes for a user name. Specify 'all' as the user name to get a list of recipes from all users.
+        Get a list of recipes, optionally filtered by user name.
         """
-        if request.user_name != 'all':
+        offset, limit = get_limits(request)
+
+        if request.user_name:
             publicuser = UserPrefs.all().filter('name =', request.user_name).get()
 
             if not publicuser:
                 raise endpoints.NotFoundException(USER_NOT_FOUND)
 
-            recipes = Recipe.all()\
+            query = Recipe.all()\
                             .filter('owner =', publicuser)
         else:
-            recipes = Recipe.all()
+            query = Recipe.all()
+
+        if request.order == apimessages.RecipeOrder.NAME:
+            query = query.order('name')
+        elif request.order == apimessages.RecipeOrder.CREATED:
+            query = query.order('-created')
+        elif request.order == apimessages.RecipeOrder.EDITED:
+            query = query.order('-edited')
+        elif request.order == apimessages.RecipeOrder.LIKES:
+            query = query.order('-likes_count')
+
+        recipes = query.fetch(limit, offset=offset)
 
         items = []
         for recipe in recipes:
@@ -155,7 +204,7 @@ class MaltioApi(remote.Service):
                       apimessages.RecipeGetResponse,
                       path='recipes/{user_name}/{slug}',
                       http_method='GET',
-                      name='users.recipes.get')
+                      name='recipes.get')
     def get_recipe(self, request):
         """
         Get a recipe by user name and recipe slug.

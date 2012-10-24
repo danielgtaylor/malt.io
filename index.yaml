@@ -19,6 +19,12 @@ indexes:
 - kind: Recipe
   properties:
   - name: owner
+  - name: created
+    direction: desc
+
+- kind: Recipe
+  properties:
+  - name: owner
   - name: edited
     direction: desc
 

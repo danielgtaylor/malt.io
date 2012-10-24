@@ -137,6 +137,32 @@ class MessageTypeToJsonSchema(object):
 
     return normalized
 
+  def __get_field_description(self, message_type, field):
+    """Get a description for a field based on its parent class' docstring.
+
+    This searches the parent class' docstring for the occurence of the field
+    name followed by a colon or minus sign and a description. The description
+    is pulled out and returned if possible.
+
+    Args:
+      message_type: protorpc.messages.Message class
+      field: protorpc.messages.MessageField class to get description for
+
+    Returns:
+      A description string or the empty string
+    """
+    docs = message_type.__doc__
+
+    if docs is None:
+      return ''
+
+    matches = re.search(field.name + r' *[:-] *(.*)', docs)
+
+    if matches:
+      return matches.group(1)
+    else:
+      return ''
+
   def __message_to_schema(self, message_type):
     """Parse a single message into JSON Schema.
 
@@ -160,14 +186,20 @@ class MessageTypeToJsonSchema(object):
     for field in message_type.all_fields():
       descriptor = {}
 
+      # Attempt to set the description from the class's docstring
+      description = self.__get_field_description(message_type, field)
+      if description:
+        descriptor['description'] = description
+
       if type(field) == messages.MessageField:
         field_type = field.type().__class__
         descriptor['$ref'] = self.add_message(field_type)
-        if field_type.__doc__:
+        if 'description' not in descriptor and field_type.__doc__:
           descriptor['description'] = field_type.__doc__
       else:
         descriptor['type'] = self.__FIELD_TO_SCHEMA_TYPE_MAP.get(
             type(field), self.__DEFAULT_SCHEMA_TYPE)
+        
       if field.required:
         descriptor['required'] = True
 
@@ -176,6 +208,9 @@ class MessageTypeToJsonSchema(object):
           descriptor['default'] = str(field.default)
         else:
           descriptor['default'] = field.default
+
+        if 'description' in descriptor:
+          descriptor['description'] += ' [' + descriptor['default'] + ']'
 
       if field.repeated:
         if '$ref' in descriptor:
