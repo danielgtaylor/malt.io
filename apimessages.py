@@ -38,12 +38,14 @@ class UserGetResponse(messages.Message):
     awards: A list of strings representing awards the user has earned
     avatar_small: A small avatar image URL
     avatar: A large avatar image URL
+    url: The URL to this user's page
     """
     user_name = messages.StringField(1)
     joined_date = messages.StringField(2)
     awards = messages.StringField(3, repeated=True)
     avatar_small = messages.StringField(4)
     avatar = messages.StringField(5)
+    url = messages.StringField(6)
 
 
 class UserListRequest(messages.Message):
@@ -96,6 +98,40 @@ class FermentableResponse(messages.Message):
     yield_ratio = messages.FloatField(5)
 
 
+class SpiceResponse(messages.Message):
+    """
+    A spice ingredient (hops, herbs, spices, etc).
+
+    use: When to use the item (mash, boil, primary, etc)
+    time: When to add the item in seconds
+    weight_kg: Weight in kilograms
+    description: Item description
+    form: The form of the item (pellet, whole, ground, etc)
+    aa: The alpha acid ratio for bitterness calculation
+    """
+    use = messages.StringField(1)
+    time = messages.IntegerField(2)
+    weight_kg = messages.FloatField(3)
+    description = messages.StringField(4)
+    form = messages.StringField(5)
+    aa_ratio = messages.FloatField(6)
+
+
+class YeastResponse(messages.Message):
+    """
+    A yeast ingredient or other bug.
+
+    description: Item description
+    type: Yeast type (ale, lager, etc)
+    form: Yeast form (liquid, dry)
+    attenuation_ratio: Fermentable conversion potential
+    """
+    description = messages.StringField(1)
+    type = messages.StringField(2)
+    form = messages.StringField(3)
+    attenuation_ratio = messages.FloatField(4)
+
+
 class RecipeGetResponse(messages.Message):
     """
     A recipe.
@@ -109,6 +145,15 @@ class RecipeGetResponse(messages.Message):
     ibu: Bitterness units
     abv: Alcohol content by volume
     fermentables: List of fermentables
+    spices: List of spices (hops, herbs, spices)
+    yeast: List of yeast and bugs
+    bottling_temp: Temperature in C at bottling time
+    bottling_pressure: Desired volumes of CO2 pressure
+    likes: The number of likes this recipe has
+    url: The URL to this recipe
+    parent_owner: The owner of the parent recipe if this is a cloned recipe
+    parent_slug: The slug of the parent recipe if this is a cloned recipe
+    parent_url: The URL to the parent recipe if this is a cloned recipe
     """
     owner = messages.StringField(1)
     name = messages.StringField(2)
@@ -120,6 +165,15 @@ class RecipeGetResponse(messages.Message):
     ibu = messages.FloatField(8)
     abv = messages.FloatField(9)
     fermentables = messages.MessageField(FermentableResponse, 10, repeated=True)
+    spices = messages.MessageField(SpiceResponse, 11, repeated=True)
+    yeast = messages.MessageField(YeastResponse, 12, repeated=True)
+    bottling_temp = messages.FloatField(13)
+    bottling_pressure = messages.FloatField(14)
+    likes = messages.IntegerField(15)
+    url = messages.StringField(16)
+    parent_owner = messages.StringField(17)
+    parent_slug = messages.StringField(18)
+    parent_url = messages.StringField(19)
 
 
 class RecipeListRequest(messages.Message):

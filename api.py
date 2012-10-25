@@ -68,7 +68,8 @@ def user_to_response(user):
         'joined_date': str(user.joined),
         'awards': user.awards,
         'avatar_small': user.gravatar_tiny,
-        'avatar': user.gravatar_small
+        'avatar': user.gravatar_small,
+        'url': 'http://www.malt.io/users/%s' % user.name
     })
 
 
@@ -77,6 +78,8 @@ def recipe_to_response(recipe):
     Get a recipe object as a ProtoRPC message response.
     """
     fermentables = []
+    spices = []
+    yeasts = []
 
     for fermentable in recipe.ingredients['fermentables']:
         if 'late' not in fermentable:
@@ -90,8 +93,30 @@ def recipe_to_response(recipe):
             'yield_ratio': fermentable['ppg'] / 46.214
         }))
 
+    for spice in recipe.ingredients['spices']:
+        spices.append(apimessages.SpiceResponse(**{
+            'use': spice['use'],
+            'time': int(util.time_to_min(spice['time']) * 60),
+            'weight_kg': float(spice['oz'] * util.OZ_TO_KG),
+            'description': spice['description'],
+            'form': spice['form'],
+            'aa_ratio':  spice['aa'] / 100.0
+        }))
+
+    for yeast in recipe.ingredients['yeast']:
+        yeasts.append(apimessages.YeastResponse(**{
+            'description': yeast['description'],
+            'form': yeast['form'],
+            'type': yeast['type'],
+            'attenuation_ratio': yeast['attenuation'] / 100.0
+        }))
+
+    owner = recipe.owner
+    parent = recipe.cloned_from
+    parent_owner = parent and parent.owner or None
+
     return apimessages.RecipeGetResponse(**{
-        'owner': recipe.owner.name,
+        'owner': owner.name,
         'name': recipe.name,
         'slug': recipe.slug,
         'description': recipe.description,
@@ -100,7 +125,16 @@ def recipe_to_response(recipe):
         'color': recipe.color,
         'ibu': recipe.ibu,
         'abv': recipe.alcohol,
-        'fermentables': fermentables
+        'fermentables': fermentables,
+        'spices': spices,
+        'yeast': yeasts,
+        'bottling_temp': (recipe.bottling_temp - 32) * 5.0 / 9.0,
+        'bottling_pressure': recipe.bottling_pressure,
+        'likes': recipe.likes_count,
+        'url': 'http://www.malt.io/users/%s/recipes/%s' % (owner.name, recipe.slug),
+        'parent_owner': parent_owner and parent_owner.name or '',
+        'parent_slug': parent and parent.slug or '',
+        'parent_url': parent and 'http://www.malt.io/users/%s/recipes/%s' % (parent_owner.name, parent.slug) or ''
     })
 
 
