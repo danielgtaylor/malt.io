@@ -61,9 +61,14 @@ class RecipesHandler(webapp2.RequestHandler):
             publicuser = UserPrefs.all().filter('name =', username).get()
             recipes = Recipe.all()\
                             .filter('owner =', publicuser)
+            def setowner(recipe):
+                recipe.owner = publicuser
+                return recipe
+            recipes = map(setowner, recipes)
         else:
             publicuser = None
             recipes = Recipe.all()
+            recipes = [r for r in recipes]
 
         render(self, 'recipes.html', {
             'publicuser': publicuser,
