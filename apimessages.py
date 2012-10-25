@@ -54,7 +54,7 @@ class UserListRequest(messages.Message):
 
     offset: The starting offset of the query (0 or higher)
     limit: The maximum number of results to return (1 - 100)
-    order: The order of returned items (1: name, 2: joined)
+    order: The order of returned items (NAME, JOINED)
     """
     offset = messages.IntegerField(1, default=0)
     limit = messages.IntegerField(2, default=25)
@@ -183,7 +183,7 @@ class RecipeListRequest(messages.Message):
     user_name: The user's unique name
     offset: The starting offset of the query (0 or higher)
     limit: The maximum number of results to return (1 - 100)
-    order: The order of returned items (1: name, 2: created, 3: edited, 4: likes)
+    order: The order of returned items (NAME, CREATED, EDITED, LIKES)
     """
     user_name = messages.StringField(1)
     offset = messages.IntegerField(2, default=0)
