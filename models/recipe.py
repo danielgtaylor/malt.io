@@ -563,8 +563,7 @@ class Recipe(RecipeBase):
         of this recipe are copied to the RecipeHistory store with a link back
         to this recipe.
         """
-        history = RecipeHistory(**{
-            'parent_recipe': self,
+        history = RecipeHistory(self, **{
             'created': self.edited,
             'name': self.name,
             'description': self.description,
@@ -582,6 +581,6 @@ class Recipe(RecipeBase):
 
 class RecipeHistory(RecipeBase):
     # The parent recipe that this is a historic version of
-    parent_recipe = db.ReferenceProperty(Recipe)
+    #parent_recipe = db.ReferenceProperty(Recipe)
 
     created = db.DateTimeProperty()

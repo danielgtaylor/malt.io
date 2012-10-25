@@ -17,6 +17,7 @@ urls = [
     ('/users/(.*?)/recipes/(.*?)/clone', RecipeCloneHandler),
     ('/users/(.*?)/recipes/(.*?)/beerxml', RecipeXmlHandler),
     ('/users/(.*?)/recipes/(.*?)/history', RecipeHistoryHandler),
+    ('/users/(.*?)/recipes/(.*?)/history/(.*)', RecipeHandler),
     ('/users/(.*?)/recipes/(.*)', RecipeHandler),
     ('/users/(.*?)/recipes', RecipesHandler),
     ('/users/(.*?)/follow', UserFollowHandler),

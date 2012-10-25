@@ -11,7 +11,9 @@ from models.userprefs import UserPrefs
 from util import render, render_json, slugify
 from webapp2 import redirect
 from webapp2_extras.appengine.users import login_required
+from google.appengine.ext import db
 from operator import itemgetter
+from datetime import timedelta
 
 
 def generate_usable_slug(recipe):
@@ -314,9 +316,10 @@ class RecipeHandler(webapp2.RequestHandler):
 
         /new
         /users/USERNAME/recipes/RECIPE-SLUG
+        /users/USERNAME/recipes/RECIPE-SLUG/VERSION
 
     """
-    def get(self, username=None, recipe_slug=None):
+    def get(self, username=None, recipe_slug=None, version=None):
         """
         Render the recipe view. If no slug is given then create a new recipe
         and render it in edit mode.
@@ -340,6 +343,29 @@ class RecipeHandler(webapp2.RequestHandler):
 
             if not recipe:
                 self.abort(404)
+
+            if version:
+                try:
+                    version = int(version)
+                except:
+                    self.abort(404)
+
+                history = RecipeHistory.get_by_id(version, recipe)
+
+                if not history:
+                    self.abort(404)
+
+                recipe.old = True
+                recipe.oldname = history.name
+                recipe.description = history.description
+                recipe.type = history.type
+                recipe.category = history.category
+                recipe.style = history.style
+                recipe.batch_size = history.batch_size
+                recipe.boil_size = history.boil_size
+                recipe.bottling_temp = history.bottling_temp
+                recipe.bottling_pressure = history.bottling_pressure
+                recipe._ingredients = history._ingredients
 
         cloned_from = None
         try:
@@ -517,7 +543,7 @@ class RecipeHistoryHandler(webapp2.RequestHandler):
             self.abort(404)
 
         history = RecipeHistory.all()\
-                        .filter('parent_recipe =', recipe)\
+                        .ancestor(recipe)\
                         .order('-created')\
                         .fetch(20)
 
@@ -542,14 +568,15 @@ class RecipeHistoryHandler(webapp2.RequestHandler):
         def diff(left, right):
             differences.append(left.diff(right))
             return right
-        reduce(diff, history)
+        # Make sure reduce isn't called with no history (throws exception)
+        reduce(diff, history) if len(history) > 0 else None
 
         # Start going through the history looking at differences to decide how
         # we plan on displaying the info to the user (using a snippet or not)
         for i in range(len(differences)):
             # Set some required properties for the snippet to work
-            history[i].owner = recipe.owner
-            history[i].slug = recipe.slug + '/' + str(history[i].key().id())
+            history[i].owner = publicuser
+            history[i].slug = recipe.slug + '/history/' + str(history[i].key().id())
 
             # Create the entry
             entry = {}
@@ -574,9 +601,10 @@ class RecipeHistoryHandler(webapp2.RequestHandler):
         # will be a version that should have diffs but we didn't generate any.
         if len(history) > 0:
             last = history[-1]
-            if recipe.created == last.created:
+            delta = timedelta(seconds=1)
+            if recipe.created - delta < last.created < recipe.created + delta:
                 last.owner = recipe.owner
-                last.slug = recipe.slug + '/' + str(last.key().id())
+                last.slug = recipe.slug + '/history/' + str(last.key().id())
                 entries.append({
                     'recipe': last,
                     'edited': last.created,
@@ -584,6 +612,10 @@ class RecipeHistoryHandler(webapp2.RequestHandler):
                     'customtag': 'Original',
                     'first': True
                 })
+
+        # Stop the template from performing another query for the username
+        # when it tries to render the recipe
+        recipe.owner = publicuser
 
         render(self, 'recipe-history.html', {
             'publicuser': publicuser,

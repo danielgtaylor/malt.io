@@ -8,6 +8,10 @@
 
 {% block scripts %}
     <script type="text/javascript">
+        {% if recipe.old %}
+            Recipe.oldVersion = true;
+        {% endif %}
+
         $(document).ready(function () {
             Recipe.init();
             Recipe.updateStats();
@@ -66,7 +70,7 @@
         {% if user %}
             You are currently editing this recipe. Your changes have not yet been saved. <div class="pull-right"><a class="btn btn-mini" href=""><i class="icon-remove"></i> Cancel</a>{% if recipe.new %} <a class="btn btn-warning btn-mini" href="" onclick="Recipe.clearLocal();"><i class="icon-exclamation-sign icon-white"></i> Clear recipe</a>{% endif %} <a class="btn btn-info btn-mini" onclick="Recipe.save();"><i class="icon-book icon-white"></i> Save recipe</a></div>
         {% else %}
-            You are currently editing this recipe. Your changes have not been saved. {% if recipe.new %}<a class="btn btn-warning btn-mini" href="" onclick="Recipe.clearLocal();"><i class="icon-exclamation-sign icon-white"></i> Clear recipe</a> {% endif %}<a href="/profile">Log in</a> to save recipes.
+            You are currently editing this recipe. Your changes have not been saved. <a href="/profile">Log in</a> to save recipes.{% if recipe.new %}<a class="btn btn-warning btn-mini pull-right" href="" onclick="Recipe.clearLocal();"><i class="icon-exclamation-sign icon-white"></i> Clear recipe</a> {% endif %}
         {% endif %}
     </div>
     {% if publicuser %}
@@ -77,6 +81,12 @@
             <li><a href="/users/{{ publicuser.name }}/recipes">recipes</a><span class="divider">/</span></li>
             <li id="crumbName">{{ recipe.name }}</li>
         </ul>
+    {% endif %}
+    {% if recipe.old %}
+        <div class="alert">
+            <strong>Heads up!</strong>
+            This is an old version of a recipe that has been updated. The latest version of this recipe can be found <a href="/users/{{ publicuser.name }}/recipes/{{ recipe.slug }}">here</a>.
+        </div>
     {% endif %}
     <div class="hero-unit editable">
         {% if cloned_from %}
@@ -91,7 +101,7 @@
                 <span class="small"><span id="bottle_cost">0</span>&#162; / <span title="12 oz / 0.3l">bottle</span></span>
             </div>
         </div>
-        <h1 id="recipeName">{{ recipe.name }}</h1>
+        <h1 id="recipeName">{% if recipe.old %}{{ recipe.oldname }}{% else %}{{ recipe.name }}{% endif %}</h1>
         <p id="recipeDescription">{{ recipe.description }}</p>
         <p style="font-size: 100%; line-height: 12pt;">
             Style: <span id="styleName" data-category="{{ recipe.category }}" data-style="{{ recipe.style }}">{{ recipe.style_display }}</span> <a class="btn btn-inverse btn-mini edit-show" data-toggle="modal" href="#styleModal" style="display: none; margin-top: -2px">Edit</a>
@@ -101,30 +111,43 @@
             Boil size: <span id="boilSize" class="validate positive number">{{ recipe.boil_size }}</span> average gallons
         </p>
         <div class="btn-group edit-hide" style="float: left;">
+            {% if not recipe.old %}
             {% if publicuser and user and user.name == publicuser.name %}
-                <a id="edit-button" class="btn"><i class="icon-pencil"></i> Edit</a>
-                <a class="btn" data-toggle="modal" href="#deleteModal"><i class="icon-remove"></i> Delete</a>
+                <a id="edit-button" class="btn{% if recipe.old %} disabled{% endif %}"><i class="icon-pencil"></i> Edit</a>
+                <a class="btn{% if recipe.old %} disabled{% endif %}"{% if not recipe.old %} data-toggle="modal" href="#deleteModal"{% endif %}><i class="icon-remove"></i> Delete</a>
             {% else %}
                 <a id="like-button" class="btn{% if user and user.user_id in recipe.likes %} active{% endif %}" data-toggle="button"><i class="icon-thumbs-up"></i> Like</a>
             {% endif %}
-            <a class="btn" data-toggle="modal" href="#cloneModal"><i class="icon-share"></i> Clone</a>
+            {% endif %}
+            {% if recipe.old %}
+                <a class="btn disabled"><i class="icon-share"></i> Clone</a>
+            {% else %}
+                <a class="btn" data-toggle="modal" href="#cloneModal"><i class="icon-share"></i> Clone</a>
+            {% endif %}
             <a class="btn disabled"><i class="icon-fire"></i> Brew</a>
             <a class="btn" data-toggle="modal" href="#scaleModal"><i class="icon-signal"></i> Scale</a>
-            <!--<a class="btn disabled"><i class="icon-time"></i> View History</a>-->
-            <a id="widget-button" class="btn" data-toggle="modal" href="#widgetModal"><i class="icon-globe"></i> Widget</a>
-            <a class="btn" href="/users/{{ publicuser.name }}/recipes/{{ recipe.slug }}/beerxml"><i class="icon-download-alt"></i> Export</a>
+            <a class="btn" href="/users/{{ publicuser.name }}/recipes/{{ recipe.slug }}/history"><i class="icon-time"></i> View History</a>
+            {% if not recipe.old %}
+                <a id="widget-button" class="btn" data-toggle="modal" href="#widgetModal"><i class="icon-globe"></i> Widget</a>
+                <a class="btn" href="/users/{{ publicuser.name }}/recipes/{{ recipe.slug }}/beerxml"><i class="icon-download-alt"></i> Export</a>
+            {% else %}
+                <a class="btn" href="/users/{{ publicuser.name }}/recipes/{{ recipe.slug }}"><i class="icon-arrow-up"></i> View Latest</a>
+                <a class="btn disabled"><i class="icon-download-alt"></i> Export</a>
+            {% endif %}
         </div>
         <div class="edit-hide" style="float: left; margin-left: 1em; margin-top: 4px; position: relative;">
             <div class="g-plusone" data-size="medium" data-annotation="none"></div>&nbsp;
             <div class="g-plus" data-action="share" data-annotation="bubble"></div>&nbsp;
             <div class="fb-like" data-layout="button_count" data-width="90" data-show-faces="false" style="top: -3px;"></div>
         </div>
+        {% if not recipe.old %}
         <div class="clear"></div>
         <div class="likes-container edit-hide">
             <div class="likes-tag">
                 {{ recipe.likes|length }} like{% if recipe.likes != 1 %}s{% endif %}
             </div>
         </div>
+        {% endif %}
     </div>
     <h2>
         Fermentable Sugars
@@ -545,7 +568,7 @@
             <p id="brewTime">2.5 hours</p>
         </div>
     </div>
-    <div id="disqus_thread" {% if recipe.new %}style="display: none;"{% endif %}></div>
+    <div id="disqus_thread" {% if recipe.new or recipe.old %}style="display: none;"{% endif %}></div>
     <div class="license">
         Creative Commons <a rel="license" href="http://creativecommons.org/licenses/by-sa/3.0/deed.en_US"><img style="border-width:0" src="http://i.creativecommons.org/l/by-sa/3.0/88x31.png" alt="This recipe is licensed under a Creative Commons Attribution-ShareAlike 3.0 Unported license." title="This recipe is licensed under a Creative Commons Attribution-ShareAlike 3.0 Unported license."/></a> Attribution ShareAlike
     </div>

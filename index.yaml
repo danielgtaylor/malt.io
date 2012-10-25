@@ -44,6 +44,12 @@ indexes:
   - name: created
     direction: desc
 
+- kind: RecipeHistory
+  ancestor: yes
+  properties:
+  - name: created
+    direction: desc
+
 - kind: UserAction
   properties:
   - name: owner

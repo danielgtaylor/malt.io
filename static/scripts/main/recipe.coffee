@@ -48,8 +48,9 @@ class Recipe
         )
 
         # Setup action buttons
-        $('#edit-button').click(@enableEdit)
-        $('#delete-button').click(@onDelete)
+        if not @oldVersion
+            $('#edit-button').click(@enableEdit)
+            $('#delete-button').click(@onDelete)
         $('#like-button').click(@onLiked)
         $('#clone-button').click(@onCloned)
         $('#scale-button').click(@onScaled)
@@ -369,7 +370,8 @@ class Recipe
             yeast: []
 
         # Update breadcrumb name
-        $('#crumbName').html($('#recipeName').html())
+        if $('#crumbName').attr('contentEditable')
+            $('#crumbName').html($('#recipeName').html())
 
         # Update size sliders in scale dialog
         $('#gallonsValue').text(gallons);
