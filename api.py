@@ -86,7 +86,7 @@ def recipe_to_response(recipe):
             fermentable['late'] = False
 
         fermentables.append(apimessages.FermentableResponse(**{
-            'weight_kg': fermentable['weight'] * util.LB_TO_KG,
+            'weight_kg': fermentable['weight'] * util.LB_PER_KG,
             'description': fermentable['description'],
             'late': fermentable['late'] and True or False,
             'color': float(fermentable['color']),
@@ -97,7 +97,7 @@ def recipe_to_response(recipe):
         spices.append(apimessages.SpiceResponse(**{
             'use': spice['use'],
             'time': int(util.time_to_min(spice['time']) * 60),
-            'weight_kg': float(spice['oz'] * util.OZ_TO_KG),
+            'weight_kg': float(spice['oz'] * util.OZ_PER_KG),
             'description': spice['description'],
             'form': spice['form'],
             'aa_ratio':  spice['aa'] / 100.0

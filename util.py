@@ -12,8 +12,8 @@ from xml.sax.saxutils import escape
 from models.userprefs import UserPrefs
 
 GAL_TO_LITERS = 3.78541
-LB_TO_KG = 2.20462
-OZ_TO_KG = LB_TO_KG / 16.0
+LB_PER_KG = 0.45359
+OZ_PER_KG = LB_PER_KG / 16.0
 
 # Setup the Jinja2 template environment
 JINJA_ENV = jinja2.Environment(**{
