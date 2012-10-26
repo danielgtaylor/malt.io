@@ -197,7 +197,7 @@ class RecipeBase(db.Model):
             elif addition == 'mash':
                 gravity *= 0.75
 
-            if fermentable['late'] not in ['y', 'yes', 'x']:
+            if 'late' in fermentable and fermentable['late'] not in ['y', 'yes', 'x']:
                 early_gu += gravity
 
             gu += gravity
@@ -305,6 +305,8 @@ class RecipeBase(db.Model):
                 if full:
                     # Compare all values of the ingredients, yay another loop!
                     for prop in newIngredients[ingredient]:
+                        if prop not in oldIngredients[ingredient]:
+                            oldIngredients[ingredient][prop] = ''
                         if newIngredients[ingredient][prop] != oldIngredients[ingredient][prop]:
                             # Make the dictionary chain if necessary
                             if not 'ingredients' in modifications:
