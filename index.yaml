@@ -45,12 +45,6 @@ indexes:
   - name: name
 
 - kind: RecipeHistory
-  properties:
-  - name: parent_recipe
-  - name: created
-    direction: desc
-
-- kind: RecipeHistory
   ancestor: yes
   properties:
   - name: created
