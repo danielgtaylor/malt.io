@@ -152,6 +152,264 @@ class RecipeBase(db.Model):
 
         return xml
 
+    def update_cache(self):
+        """
+        Update the recipe's cache of color, bitterness, alcohol, etc.
+        This is a reimplementation of static/scripts/main/recipe.coffee and
+        should not be modified without also modifying that file!
+        """
+        mashing = False
+        for fermentable in self.ingredients['fermentables']:
+            desc = fermentable['description']
+            if 'mash' in desc or not (self.RE_STEEP.search(desc) or self.RE_BOIL.search(desc)):
+                mashing = True
+                break
+
+        gu, early_gu, mcu = 0, 0, 0
+
+        for fermentable in self.ingredients['fermentables']:
+            weight = fermentable['weight']
+            mcu += fermentable['color'] * weight / self.batch_size
+            gravity = fermentable['ppg'] * weight / self.batch_size
+
+            forced = False
+            if 'mashed' in fermentable['description']:
+                forced = True
+                addition = 'mash'
+            elif 'steep' in fermentable['description']:
+                forced = True
+                addition = 'steep'
+            elif 'boil' in fermentable['description']:
+                forced = True
+                addition = 'boil'
+            elif self.RE_BOIL.search(fermentable['description']):
+                addition = 'boil'
+            elif self.RE_STEEP.search(fermentable['description']):
+                addition = 'steep'
+            else:
+                addition = 'mash'
+
+            if mashing and addition == 'steep' and not forced:
+                addition = 'mash'
+
+            if addition == 'steep':
+                gravity *= 0.5
+            elif addition == 'mash':
+                gravity *= 0.75
+
+            if fermentable['late'] not in ['y', 'yes', 'x']:
+                early_gu += gravity
+
+            gu += gravity
+
+        gu = 1.0 + (gu / 1000.0)
+        early_gu = 1.0 + (early_gu / 1000.0)
+        logging.info(early_gu)
+
+        attenuation = 75
+
+        fg = gu - ((gu - 1.0) * attenuation / 100.0)
+        abv = ((1.05 * (gu - fg)) / fg) / 0.79 * 100.0
+
+        ibu = 0
+        for hop in self.ingredients['spices']:
+            if not hop['aa']:
+                continue
+
+            utilization_factor = 1.0
+            if hop['form'] == 'pellet':
+                utilization_factor = 1.15
+
+            time = int(''.join([char for char in hop['time'] if char.isdigit()]))
+            b = 1.65 * pow(0.000125, early_gu - 1.0) * ((1 - pow(2.718, -0.04 * time)) / 4.15) * ((hop['aa'] / 100.0 * hop['oz'] * 7490.0) / self.boil_size) * utilization_factor
+            ibu += b
+            logging.info(b)
+
+        self.color = int(round(1.4922 * pow(mcu, 0.6859)))
+        self.ibu = round(ibu, 1)
+        self.alcohol = round(abv, 1)
+
+    def diff(self, other, full=True):
+        """
+        Return the differences between this version of a recipe and another.
+        The other recipe will be considered the older version for the purpose
+        of reporting additions and deletions. Three dictionaries will be
+        returned: additions, deletions, and modifications. Each dictionary key
+        corresponds to a field name, and the value depends on the type of
+        field. For the modifications dictionary, all values are tuples of
+        (from, to) pairs.
+
+        An example return value is as follows:
+
+        additions: {
+            ingredients: {
+                fermentables: ['Flaked wheat', 'Acidulated malt'],
+                spices: ['Orange peel']
+            }
+        },
+
+        deletions: {
+            ingredients: {
+                spices: ['Coriander']
+            }
+        },
+
+        modifications: {
+            ingredients: {
+                yeast: {
+                    'Wyeast 3944 - Belgian Witbier\u2122': {'attenuation': (70, 74)}
+                }
+            },
+            name: ('Biere Blanche a l'Orange', 'Biere Blanche a l'Oranges'),
+            batch_size: (3.0, 3.5)
+        }
+        """
+        additions = {}
+        deletions  = {}
+        modifications = {}
+
+        # First check the overall properties
+        properties = ('name', 'description', 'type', 'category', 'style', 'batch_size',
+                      'boil_size', 'bottling_temp', 'bottling_pressure')
+        for p in properties:
+            oldVal = getattr(other, p, None)
+            newVal = getattr(self, p, None)
+            if oldVal != newVal:
+                if oldVal is None:
+                    additions[p] = newVal
+                elif newVal is None:
+                    deletions[p] = oldVal
+                else:
+                   modifications[p] = (oldVal, newVal)
+
+        # Now that the easy checks are over, time to check the ingredients
+        newIngredientSet = set(key for key in self.ingredients)
+        oldIngredientSet = set(key for key in other.ingredients)
+
+        # Ingredient types found in both recipes (e.g. fermentables)
+        for type in newIngredientSet.intersection(oldIngredientSet):
+            # Create dictionaries using the ingredient description as the key
+            # for easier processing later
+            newIngredients = {ingredient['description']: ingredient for ingredient in self.ingredients[type]}
+            oldIngredients = {ingredient['description']: ingredient for ingredient in other.ingredients[type]}
+
+            # Create new and old sets to find what changed
+            newSet = set(newIngredients.keys())
+            oldSet = set(oldIngredients.keys())
+
+            # Ingredients found in both recipes
+            for ingredient in newSet.intersection(oldSet):
+                # If we're doing a full compare, find exactly which ingredients
+                # were modified. Otherwise, just return the ingredient
+                # description, since that's all that matters.
+                if full:
+                    # Compare all values of the ingredients, yay another loop!
+                    for prop in newIngredients[ingredient]:
+                        if newIngredients[ingredient][prop] != oldIngredients[ingredient][prop]:
+                            # Make the dictionary chain if necessary
+                            if not 'ingredients' in modifications:
+                                modifications['ingredients'] = {}
+
+                            if not type in modifications['ingredients']:
+                                modifications['ingredients'][type] = {}
+
+                            if not ingredient in modifications['ingredients'][type]:
+                                modifications['ingredients'][type][ingredient] = {}
+
+                            # Finally set the value
+                            modifications['ingredients'][type][ingredient][prop] = (
+                                oldIngredients[ingredient][prop],
+                                newIngredients[ingredient][prop]
+                            )
+                else:
+                    # Make the dictionary chain if necessary
+                    if not 'ingredients' in modifications:
+                        modifications['ingredients'] = {}
+
+                    if not type in modifications['ingredients']:
+                        modifications['ingredients'][type] = []
+
+                    modifications['ingredients'][type].append(ingredient)
+
+            # Ingredients found only in the new recipe
+            for ingredient in newSet.difference(oldSet):
+                # Make the dictionary chain if necessary
+                if not 'ingredients' in additions:
+                    additions['ingredients'] = {}
+
+                if not type in additions['ingredients']:
+                    additions['ingredients'][type] = []
+
+                # Finally set the value
+                additions['ingredients'][type].append(ingredient)
+
+            # Ingredients found only in the old recipe
+            for ingredient in oldSet.difference(newSet):
+                # Make the dictionary chain if necessary
+                if not 'ingredients' in deletions:
+                    deletions['ingredients'] = {}
+
+                if not type in deletions['ingredients']:
+                    deletions['ingredients'][type] = []
+
+                # Finally set the value
+                deletions['ingredients'][type].append(ingredient)
+
+        # Ingredient sets found only in the new recipe
+        for type in newIngredientSet.difference(oldIngredientSet):
+            # Make the dictionary chain if necessary
+            if not 'ingredients' in additions:
+                additions['ingredients'] = {}
+
+            if not type in additions['ingredients']:
+                additions['ingredients'][type] = []
+
+            for ingredient in self.ingredients[type]:
+                # Finally set the value
+                additions['ingredients'][type].append(ingredient['description'])
+
+        # Ingredient sets found only in the old recipe
+        for type in oldIngredientSet.difference(newIngredientSet):
+            # Make the dictionary chain if necessary
+            if not 'ingredients' in deletions:
+                deletions['ingredients'] = {}
+
+            if not type in deletions['ingredients']:
+                deletions['ingredients'][type] = []
+
+            for ingredient in self.ingredients[type]:
+                # Finally set the value
+                deletions['ingredients'][type].append(ingredient['description'])
+
+        # Only compare color, ibu, and alcohol if we suspect they might be
+        # different. They are affected by batch_size, boil_size, and ingedients.
+        if 'batch_size' in additions or \
+           'boil_size' in additions or \
+           'ingredients' in additions or \
+           'batch_size' in deletions or \
+           'boil_size' in deletions or \
+           'ingredients' in deletions or \
+           'batch_size' in modifications or \
+           'boil_size' in modifications or \
+           'ingredients' in modifications:
+
+            # Update the caches if needed
+            if not hasattr(self, 'color'):
+                self.update_cache()
+            if not hasattr(other, 'color'):
+                other.update_cache()
+
+            # Compare color, ibu, and alcohol
+            properties = ('color', 'ibu', 'alcohol')
+            for p in properties:
+                oldVal = getattr(other, p, None)
+                newVal = getattr(self, p, None)
+                if oldVal != newVal:
+                    modifications[p] = (oldVal, newVal)
+
+
+        return additions, deletions, modifications
+
 
 class Recipe(RecipeBase):
     # URL-friendly name by which this recipe can be referenced
@@ -302,12 +560,12 @@ class Recipe(RecipeBase):
         of this recipe are copied to the RecipeHistory store with a link back
         to this recipe.
         """
-        history = RecipeHistory(**{
-            'parent_recipe': self,
+        history = RecipeHistory(self, **{
             'created': self.edited,
             'name': self.name,
             'description': self.description,
             'type': self.type,
+            'category': self.category,
             'style': self.style,
             'batch_size': self.batch_size,
             'boil_size': self.boil_size,
@@ -317,86 +575,9 @@ class Recipe(RecipeBase):
         })
         history.put()
 
-    def update_cache(self):
-        """
-        Update the recipe's cache of color, bitterness, alcohol, etc.
-        This is a reimplementation of static/scripts/main/recipe.coffee and 
-        should not be modified without also modifying that file!
-        """
-        mashing = False
-        for fermentable in self.ingredients['fermentables']:
-            desc = fermentable['description']
-            if 'mash' in desc or not (self.RE_STEEP.search(desc) or self.RE_BOIL.search(desc)):
-                mashing = True
-                break
-
-        gu, early_gu, mcu = 0, 0, 0
-
-        for fermentable in self.ingredients['fermentables']:
-            weight = fermentable['weight']
-            mcu += fermentable['color'] * weight / self.batch_size
-            gravity = fermentable['ppg'] * weight / self.batch_size
-
-            forced = False
-            if 'mashed' in fermentable['description']:
-                forced = True
-                addition = 'mash'
-            elif 'steep' in fermentable['description']:
-                forced = True
-                addition = 'steep'
-            elif 'boil' in fermentable['description']:
-                forced = True
-                addition = 'boil'
-            elif self.RE_BOIL.search(fermentable['description']):
-                addition = 'boil'
-            elif self.RE_STEEP.search(fermentable['description']):
-                addition = 'steep'
-            else:
-                addition = 'mash'
-
-            if mashing and addition == 'steep' and not forced:
-                addition = 'mash'
-
-            if addition == 'steep':
-                gravity *= 0.5
-            elif addition == 'mash':
-                gravity *= 0.75
-
-            if fermentable['late'] not in ['y', 'yes', 'x']:
-                early_gu += gravity
-            
-            gu += gravity
-
-        gu = 1.0 + (gu / 1000.0)
-        early_gu = 1.0 + (early_gu / 1000.0)
-        logging.info(early_gu)
-
-        attenuation = 75
-
-        fg = gu - ((gu - 1.0) * attenuation / 100.0)
-        abv = ((1.05 * (gu - fg)) / fg) / 0.79 * 100.0
-
-        ibu = 0
-        for hop in self.ingredients['spices']:
-            if not hop['aa']:
-                continue
-
-            utilization_factor = 1.0
-            if hop['form'] == 'pellet':
-                utilization_factor = 1.15
-
-            time = int(''.join([char for char in hop['time'] if char.isdigit()]))
-            b = 1.65 * pow(0.000125, early_gu - 1.0) * ((1 - pow(2.718, -0.04 * time)) / 4.15) * ((hop['aa'] / 100.0 * hop['oz'] * 7490.0) / self.boil_size) * utilization_factor
-            ibu += b
-            logging.info(b)
-
-        self.color = int(round(1.4922 * pow(mcu, 0.6859)))
-        self.ibu = round(ibu, 1)
-        self.alcohol = round(abv, 1)
-
 
 class RecipeHistory(RecipeBase):
     # The parent recipe that this is a historic version of
-    parent_recipe = db.ReferenceProperty(Recipe)
+    #parent_recipe = db.ReferenceProperty(Recipe)
 
     created = db.DateTimeProperty()

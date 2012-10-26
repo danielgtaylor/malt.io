@@ -5,12 +5,15 @@ import json
 import logging
 import webapp2
 
-from models.recipe import Recipe
+from models.recipe import Recipe, RecipeHistory
 from models.useraction import UserAction
 from models.userprefs import UserPrefs
 from util import render, render_json, slugify
 from webapp2 import redirect
 from webapp2_extras.appengine.users import login_required
+from google.appengine.ext import db
+from operator import itemgetter
+from datetime import timedelta
 
 
 def generate_usable_slug(recipe):
@@ -58,9 +61,14 @@ class RecipesHandler(webapp2.RequestHandler):
             publicuser = UserPrefs.all().filter('name =', username).get()
             recipes = Recipe.all()\
                             .filter('owner =', publicuser)
+            def setowner(recipe):
+                recipe.owner = publicuser
+                return recipe
+            recipes = map(setowner, recipes)
         else:
             publicuser = None
             recipes = Recipe.all()
+            recipes = [r for r in recipes]
 
         render(self, 'recipes.html', {
             'publicuser': publicuser,
@@ -313,9 +321,10 @@ class RecipeHandler(webapp2.RequestHandler):
 
         /new
         /users/USERNAME/recipes/RECIPE-SLUG
+        /users/USERNAME/recipes/RECIPE-SLUG/VERSION
 
     """
-    def get(self, username=None, recipe_slug=None):
+    def get(self, username=None, recipe_slug=None, version=None):
         """
         Render the recipe view. If no slug is given then create a new recipe
         and render it in edit mode.
@@ -339,6 +348,29 @@ class RecipeHandler(webapp2.RequestHandler):
 
             if not recipe:
                 self.abort(404)
+
+            if version:
+                try:
+                    version = int(version)
+                except:
+                    self.abort(404)
+
+                history = RecipeHistory.get_by_id(version, recipe)
+
+                if not history:
+                    self.abort(404)
+
+                recipe.old = True
+                recipe.oldname = history.name
+                recipe.description = history.description
+                recipe.type = history.type
+                recipe.category = history.category
+                recipe.style = history.style
+                recipe.batch_size = history.batch_size
+                recipe.boil_size = history.boil_size
+                recipe.bottling_temp = history.bottling_temp
+                recipe.bottling_pressure = history.bottling_pressure
+                recipe._ingredients = history._ingredients
 
         cloned_from = None
         try:
@@ -485,3 +517,125 @@ class RecipeHandler(webapp2.RequestHandler):
                 'status': 'error',
                 'error': 'Unable to delete recipe'
             })
+
+
+class RecipeHistoryHandler(webapp2.RequestHandler):
+    """
+    Recipe history handler. This handler renders the recipe history tree for
+    a specific recipe. It is invoked via URLs like:
+
+        /users/USERNAME/recipes/RECIPE-SLUG/history
+    """
+    IGNORED_KEYS = ('color', 'ibu', 'alcohol')
+    SNIPPET_ITEMS = IGNORED_KEYS + ('name', 'description')
+
+    def get(self, username=None, recipe_slug=None):
+        """
+        Render the basic recipe history list for the given recipe.
+        """
+        if not username or not recipe_slug:
+            self.abort(404)
+
+        publicuser = UserPrefs.all().filter('name =', username).get()
+        if not publicuser:
+            self.abort(404)
+
+        recipe = Recipe.all()\
+                       .filter('slug = ', recipe_slug)\
+                       .filter('owner =', publicuser)\
+                       .get()
+        if not recipe:
+            self.abort(404)
+
+        history = RecipeHistory.all()\
+                        .ancestor(recipe)\
+                        .order('-created')\
+                        .fetch(20)
+
+        # The list of entries we'll use to populate the template along with
+        # the current recipe as the first entry
+        entries = [{
+            'recipe': recipe,
+            'edited': recipe.edited,
+            'slug': recipe.slug,
+            'customtag': 'Most Recent'
+        }]
+
+        # Check if there is any history to diff with
+        if len(history) > 0:
+            entries[0]['differences'] = self.delete_ignored_keys(recipe.diff(history[0]))
+        else:
+            entries[0]['first'] = True
+
+        # Get a list of differences in the history. Use reduce with a function
+        # that returns the right operand to simply find pairwise differences.
+        differences = []
+        def diff(left, right):
+            differences.append(left.diff(right))
+            return right
+        # Make sure reduce isn't called with no history (throws exception)
+        reduce(diff, history) if len(history) > 0 else None
+
+        # Start going through the history looking at differences to decide how
+        # we plan on displaying the info to the user (using a snippet or not)
+        for i in range(len(differences)):
+            # Set some required properties for the snippet to work
+            history[i].owner = publicuser
+            history[i].slug = recipe.slug + '/history/' + str(history[i].key().id())
+
+            # Create the entry
+            entry = {}
+
+            # Check if the name, description, color, ibu, or alcohol changed
+            # and we should show a snippet
+            for snippetItem in RecipeHistoryHandler.SNIPPET_ITEMS:
+                if snippetItem in differences[i][2]:
+                    entry['recipe'] = history[i]
+                    # Make sure the color, ibu, and alcohol were created
+                    if not hasattr(history[i], 'color'):
+                        history[i].update_cache()
+                    break
+
+            # Set the required properties
+            entry['differences'] = self.delete_ignored_keys(differences[i])
+            entry['edited'] = history[i].created
+            entry['slug'] = history[i].slug
+            entries.append(entry)
+
+        # Add the final entry only if it's the original recipe, otherwise it
+        # will be a version that should have diffs but we didn't generate any.
+        if len(history) > 0:
+            last = history[-1]
+            delta = timedelta(seconds=1)
+            if recipe.created - delta < last.created < recipe.created + delta:
+                last.owner = recipe.owner
+                last.slug = recipe.slug + '/history/' + str(last.key().id())
+                entries.append({
+                    'recipe': last,
+                    'edited': last.created,
+                    'slug': last.slug,
+                    'customtag': 'Original',
+                    'first': True
+                })
+
+        # Stop the template from performing another query for the username
+        # when it tries to render the recipe
+        recipe.owner = publicuser
+
+        render(self, 'recipe-history.html', {
+            'publicuser': publicuser,
+            'recipe': recipe,
+            'entries': entries
+        })
+
+
+    def delete_ignored_keys(self, differences):
+        """
+        Delete keys from the difference list we don't want passed to the
+        templating system.
+        """
+        for key in RecipeHistoryHandler.IGNORED_KEYS:
+            if key in differences[2]:
+                del differences[2][key]
+
+        return differences

@@ -8,6 +8,7 @@ from contrib.unidecode import unidecode
 from google.appengine.api import users
 from math import floor
 from xml.sax.saxutils import escape
+from operator import itemgetter
 
 from models.userprefs import UserPrefs
 
@@ -290,3 +291,147 @@ def recipe_snippet(value):
     })
 
 JINJA_ENV.filters['recipe_snippet'] = recipe_snippet
+
+
+def render_history_diff(value):
+    """
+    Render a history diff. This will produce a formatted list of changes found
+    in value, which must be formatted like the output by
+    models.recipe.RecipeBase.
+
+    This function attempts to order the history in a 'most interesting' order,
+    defined as follows:
+        1. Additions and deletions
+        2. Changes that affect the recipe snippet
+            a. Title, Description
+            b. Color, IBU, Alcohol (affected by ingredients and sizes)
+        3. Other
+    """
+    difflist = []
+
+    additions = value[0]
+    deletions = value[1]
+    modifications = value[2]
+
+    if len(additions) == len(deletions) == len(modifications) == 0:
+        return '<p>Nothing\'s changed, why am I here!?</p>'
+
+    for key in additions:
+        if key == 'ingredients':
+            for type in additions['ingredients']:
+                for ingredient in additions['ingredients'][type]:
+                    difflist.append('<li>' + render_history_addition(type, ingredient, True) + '</li>')
+        else:
+            difflist.append('<li>' + render_history_addition(key, additions[key]) + '</li>')
+
+    for key in deletions:
+        if key == 'ingredients':
+            for type in deletions['ingredients']:
+                for ingredient in deletions['ingredients'][type]:
+                    difflist.append('<li>' + render_history_deletion(type, ingredient, True) + '</li>')
+        else:
+            difflist.append('<li>' + render_history_deletion(key, deletions[key]) + '</li>')
+
+    # Generate a list of modifications and assign them a score
+    scoredlist = []
+    # We don't care about these being modified, since they're calculated properties
+    ignorelist = ('color', 'ibu', 'alcohol')
+    # Properties that will affect the recipe snippet, assigned a higher score
+    highimpact = ('batch_size', 'boil_size')
+    # Properties that will affect the recipe snippet, but we want to avoid
+    # showing redundant info, so these will be penalized
+    lowimpact = ('title', 'description')
+    for key in modifications:
+        if key in ignorelist:
+            continue
+        elif key == 'ingredients':
+            for type in modifications['ingredients']:
+                for ingredient in modifications['ingredients'][type]:
+                    # Start with a high score
+                    score = 30
+                    scoredlist.append((score, '<li>' + render_history_ingredient_mod(type,
+                        ingredient,
+                        modifications['ingredients'][type][ingredient]) + '</li>'))
+        else:
+            if key in highimpact:
+                # Start with a high score
+                score = 20
+            elif key in lowimpact:
+                # Start with a low score
+                score = 0
+            else:
+                # Start with a normal score
+                score = 10
+            scoredlist.append((score, '<li>' + render_history_modification(key, modifications[key][1]) + '</li>'))
+
+    if len(scoredlist) > 0:
+        # Sort based on score
+        scoredlist.sort(key=itemgetter(0), reverse=True)
+
+        # Append the sorted items to the difflist
+        difflist.extend([diff for score, diff in scoredlist])
+
+    return '<ul>' + ''.join(difflist) + '</ul>'
+
+JINJA_ENV.filters['render_history_diff'] = render_history_diff
+
+def render_history_addition(key, value, ingredient=False):
+    """
+    Render an addition in the history diff.
+    """
+    return 'Added %(key)s%(extra)s <code>%(value)s</code>' % {
+        'key': key_for_display(key),
+        'extra': ingredient and ' ingredient' or '',
+        'value': value
+    }
+
+
+def render_history_deletion(key, value, ingredient=False):
+    """
+    Render a deletion in the history diff.
+    """
+    return 'Removed %(key)s%(extra)s <code>%(value)s</code>' % {
+        'key': key_for_display(key),
+        'extra': ingredient and ' ingredient' or '',
+        'value': value
+    }
+
+
+def render_history_modification(key, value):
+    """
+    Render a modification in the history diff.
+    """
+    return 'Changed %(key)s to <code>%(value)s</code>' % {
+        'key': key_for_display(key),
+        'value': value
+    }
+
+
+def render_history_ingredient_mod(key, name, value):
+    """
+    Render an ingredient modification in the history diff. This provides more
+    info than a regular modification.
+    """
+    return 'Changed properties on %(key)s ingredient <strong>%(value)s</strong><ul>' % {
+        'key': key_for_display(key),
+        'value': name
+    } + \
+    ''.join(['<li>Changed %(key)s from <code>%(from)s</code> to <code>%(to)s</code></li>' % {
+        'key': key_for_display(subkey),
+        'from': value[subkey][0],
+        'to': value[subkey][1]
+    } for subkey in value]) + '</ul>'
+
+
+def key_for_display(key):
+    """
+    Return a human-friendly version of a given key string.
+    """
+    if key == 'aa':
+        return 'AA%'
+    elif key == 'ppg':
+        return 'PPG'
+    elif key == 'color':
+        return '&deg;L'
+    else:
+        return key.replace('_', ' ')

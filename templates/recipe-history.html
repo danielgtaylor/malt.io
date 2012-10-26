@@ -1,0 +1,93 @@
+{% extends 'page.html' %}
+
+{% block scripts %}
+    <script type="text/javascript">
+        $(document).ready(function () {
+            Recipe.init();
+            RecipeHistory.init();
+        });
+    </script>
+{% endblock %}
+
+{% block title %}History of {{ recipe.name }} - {{ publicuser.name }} - Malt.io{% endblock %}
+
+{% block content %}
+    <ul class="breadcrumb">
+        <li><a href="/">home</a><span class="divider">/</span></li>
+        <li><a href="/users">users</a><span class="divider">/</span></li>
+        <li><a href="/users/{{ publicuser.name }}">{{ publicuser.name }}</a><span class="divider">/</span></li>
+        <li><a href="/users/{{ publicuser.name }}/recipes">recipes</a><span class="divider">/</span></li>
+        <li><a href="{{ recipe.url }}">{{ recipe.name }}</a><span class="divider">/</span></li>
+        <li>history</li>
+    </ul>
+
+    <div class="row" style="margin-bottom: 25px">
+        <h1 class="span8">Recipe History</h1>
+        <div class="span4">
+            <div id="options" class="btn-group pull-right" style="margin-top:5px;display:none;">
+                <button class="btn dropdown-toggle" data-toggle="dropdown">
+                    Options
+                    <span class="caret"></span>
+                </button>
+                <ul class="dropdown-menu">
+                    <li><a id="highlightbtn" href="#">Highlight Differences</a></li>
+                    <li><a id="tagsbtn" href="#">Hide Tags</a></li>
+                    <li><a id="detailsbtn" href="#">Hide Details</a></li>
+                </ul>
+            </div>
+        </div>
+    </div>
+
+    <div id="history">
+        <div class="line"></div>
+        {% for entry in entries %}
+            <div class="entry clearfix">
+                {% if entry.recipe %}
+                    {% if not loop.first %}
+                        <div class="uparrow"></div>
+                    {% endif %}
+                    {{ entry.recipe|recipe_snippet }}
+                    {% if not loop.last %}
+                        <div class="downarrow"></div>
+                    {% endif %}
+                {% else %}
+                    <div class="node">
+                        <div class="uparrow"></div>
+                        <a href="/users/{{ recipe.owner.name }}/recipes/{{ entry.slug }}"></a>
+                        <div class="downarrow"></div>
+                    </div>
+                {% endif %}
+                <div class="offset4">
+                    <p>
+                        <span class="tags">
+                        {% if entry.customtag %}
+                                <span class="label label-warning">{{ entry.customtag }}</span>
+                        {% endif %}
+                        {% if entry.differences %}
+                            {% if entry.differences[0]|count > 0 %}
+                                <span class="label label-success">Added</span>
+                            {% endif %}
+                            {% if entry.differences[1]|count > 0 %}
+                                <span class="label label-important">Deleted</span>
+                            {% endif %}
+                            {% if entry.differences[2]|count > 0 %}
+                                <span class="label label-info">Modified</span>
+                            {% endif %}
+                        {% endif %}
+                        </span>
+                        {{ entry.edited|timesince }} ago
+                     </p>
+                    {% if entry.differences %}
+                        {{ entry.differences|render_history_diff }}
+                    {% elif entry.first %}
+                        <p>Original version, of course there aren't any changes!</p>
+                    {% else %}
+                        <p>Nothing's changed, why am I here!?</p>
+                    {% endif %}
+                </div>
+            </div>
+        {% endfor %}
+    </div>
+    <a class="pull-right" href="#top" style="margin-top:-3em;margin-bottom:1em">Back to Top</a>
+    
+{% endblock %}
