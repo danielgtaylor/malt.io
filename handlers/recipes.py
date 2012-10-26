@@ -608,7 +608,7 @@ class RecipeHistoryHandler(webapp2.RequestHandler):
             last = history[-1]
             delta = timedelta(seconds=1)
             if recipe.created - delta < last.created < recipe.created + delta:
-                last.owner = recipe.owner
+                last.owner = publicuser
                 last.slug = recipe.slug + '/history/' + str(last.key().id())
                 entries.append({
                     'recipe': last,
