@@ -54,3 +54,5 @@ class Util
                     valid = false
 
         return valid
+
+exports.Util = Util if exports?

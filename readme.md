@@ -7,7 +7,7 @@ Technology
 The following technologies are used for Malt.io:
 
  * [Git](https://help.github.com/)
- * [Google AppEngine](https://developers.google.com/appengine/)
+ * [Google App Engine](https://developers.google.com/appengine/)
  * [Python](http://www.python.org/)
  * [Webapp2](http://webapp-improved.appspot.com/)
  * [Jinja2](http://jinja.pocoo.org/docs/)
@@ -16,6 +16,7 @@ The following technologies are used for Malt.io:
  * [Less](http://www.lesscss.org/)
  * [Gravatar](http://en.gravatar.com/)
  * [Stripe](https://stripe.com/)
+ * [Nose](https://nose.readthedocs.org/en/latest/) and [Jasmine](http://pivotal.github.com/jasmine/)
 
 Getting Started
 ---------------
@@ -31,8 +32,8 @@ wget http://googleappengine.googlecode.com/files/google_appengine_1.7.1.zip
 unzip google_appengine_1.7.1.zip
 
 # Get other dependencies
-pip install pycco
-npm install --global coffee-script less uglify-js
+pip install pycco nose NoseGAE nose-exclude
+npm install --global coffee-script less uglify-js jasmine-node
 
 # Get Malt.io codebase
 git clone https://github.com/danielgtaylor/malt.io.git
@@ -64,8 +65,8 @@ You should now be able to access the site at [http://localhost:8080/](http://loc
 
  	```bash
 	# Install other dependencies
-	easy_install pycco
-	npm install --global coffee-script less uglify-js
+	easy_install pycco nose NoseGAE nose-exclude
+	npm install --global coffee-script less uglify-js jasmine-node
 
 	# Run the development server
 	cd malt.io
@@ -100,6 +101,19 @@ cd malt.io
 ```
 
 You will see a bunch of new HTML files in the `docs` directory. There is one documentation file per file of source code.
+
+Unit Testing
+------------
+Unit tests are built into the project in the form of doctests and UnitTest subclasses for Python, and Jasmine tests for CoffeeScript. You can run the entire test suite with the following:
+
+```bash
+cd malt.io
+./runTests.sh
+```
+
+This will test all the server-side Python excluding the *contrib* folder, and all the client-side CoffeeScript.
+
+**Unit tests should be run before doing a commit**. This helps to ensure that nothing breaks on the live site. Unit tests **will** be run before any pull request is accepted, so please make sure your changes do not break existing code!
 
 Code Overview
 -------------

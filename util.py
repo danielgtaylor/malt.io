@@ -22,7 +22,10 @@ JINJA_ENV = jinja2.Environment(**{
 })
 
 # The logout url, if a user is currently logged in
-LOGOUT_URL = users.create_logout_url('/')
+try:
+    LOGOUT_URL = users.create_logout_url('/')
+except:
+    LOGOUT_URL = '/'
 
 # A mapping of award names to icon, description pairs
 AWARDS = {
@@ -90,6 +93,12 @@ def time_to_min(value):
     """
     Convert a value into minutes. Can take in integers, floats,
     strings of those, strings appended with 'min', 'm', 'h', etc.
+
+        >>> time_to_min('5min')
+        5.0
+        >>> time_to_min('2hr')
+        120.0
+
     """
     conversions = {
         'h': 60,
@@ -115,6 +124,12 @@ def slugify(value):
     """
     Return a slugified version of a string, removing strange
     unicode characters and replacing whitespace with dashes.
+
+        >>> slugify('This is a test')
+        'this-is-a-test'
+        >>> slugify('aB   xY   Zw')
+        'ab-xy-zw'
+
     """
     return re.sub(r'\W+', '-', unidecode(value).lower())
 
@@ -178,6 +193,14 @@ def weight_whole(value):
     """
     Get the whole part of a weight. E.g. for a weight of 8.6, this would
     return 8.
+
+        >>> weight_whole(1.0)
+        1
+        >>> weight_whole(1.1)
+        1
+        >>> weight_whole(1.9)
+        1
+
     """
     return int(floor(value))
 
@@ -188,6 +211,14 @@ def weight_fractional(value, parts):
     """
     Get the fractional part of a weight, given a number of parts. E.g. for
     8.6 and 16 parts, this would return 10.
+
+        >>> weight_fractional(8.0, 10)
+        0
+        >>> weight_fractional(8.6, 10)
+        6
+        >>> weight_fractional(8.6, 16)
+        10
+
     """
     return int(round((value - floor(value)) * parts))
 
