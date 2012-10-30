@@ -20,8 +20,8 @@ class RecipeBase(db.Model):
     This class is a common base for both the latest version of recipe
     data and hitorical versions, which are stored in a separate table.
     """
-    RE_STEEP = re.compile(r'biscuit|black|cara|chocolate|crystal|munich|roast|special ?b|toast|victory|vienna|steep')
-    RE_BOIL = re.compile(r'candi|candy|dme|dry|extract|honey|lme|liquid|sugar|syrup|turbinado|boil')
+    RE_STEEP = re.compile(r'biscuit|black|cara|chocolate|crystal|munich|roast|special ?b|toast|victory|vienna|steep', re.I)
+    RE_BOIL = re.compile(r'candi|candy|dme|dry|extract|honey|lme|liquid|sugar|syrup|turbinado|boil', re.I)
 
     # Possible recipe types, which can be useful to filter on because
     # they require different equipment.
@@ -157,11 +157,24 @@ class RecipeBase(db.Model):
         Update the recipe's cache of color, bitterness, alcohol, etc.
         This is a reimplementation of static/scripts/main/recipe.coffee and
         should not be modified without also modifying that file!
+
+            >>> r = Recipe()
+            >>> r.ingredients['fermentables'] += [{'weight': 6.0, 'description': 'Extra pale liquid extract', 'late': '', 'ppg': 37, 'color': 2}, {'weight': 0.5, 'description': 'Caramel 40L', 'late': '', 'ppg': 34, 'color': 40}]
+            >>> r.ingredients['spices'] += [{'use': 'boil', 'time': '60', 'oz': 1.0, 'description': '', 'form': 'pellet', 'aa': 4.0}, {'use': 'boil', 'time': '15', 'oz': 0.5, 'description': '', 'form': 'pellet', 'aa': 3.5}]
+            >>> r.ingredients['yeast'].append({'description': '', 'form': 'pellet', 'attenuation': 80})
+            >>> r.update_cache()
+            >>> r.alcohol
+            4.9
+            >>> r.ibu
+            18.2
+            >>> r.color
+            5
+
         """
         mashing = False
         for fermentable in self.ingredients['fermentables']:
             desc = fermentable['description']
-            if 'mash' in desc or not (self.RE_STEEP.search(desc) or self.RE_BOIL.search(desc)):
+            if 'mash' in desc or not ((self.RE_STEEP.search(desc) or self.RE_BOIL.search(desc))):
                 mashing = True
                 break
 
@@ -197,16 +210,21 @@ class RecipeBase(db.Model):
             elif addition == 'mash':
                 gravity *= 0.75
 
-            if 'late' in fermentable and fermentable['late'] not in ['y', 'yes', 'x']:
+            if 'late' not in fermentable or fermentable['late'] not in ['y', 'yes', 'x']:
                 early_gu += gravity
 
             gu += gravity
 
         gu = 1.0 + (gu / 1000.0)
         early_gu = 1.0 + (early_gu / 1000.0)
-        logging.info(early_gu)
 
-        attenuation = 75
+        attenuation = 0
+        for yeast in self.ingredients['yeast']:
+            if yeast['attenuation'] > attenuation:
+                attenuation = yeast['attenuation']
+
+        if not attenuation:
+            attenuation = 75
 
         fg = gu - ((gu - 1.0) * attenuation / 100.0)
         abv = ((1.05 * (gu - fg)) / fg) / 0.79 * 100.0
@@ -221,9 +239,8 @@ class RecipeBase(db.Model):
                 utilization_factor = 1.15
 
             time = int(''.join([char for char in hop['time'] if char.isdigit()]))
-            b = 1.65 * pow(0.000125, early_gu - 1.0) * ((1 - pow(2.718, -0.04 * time)) / 4.15) * ((hop['aa'] / 100.0 * hop['oz'] * 7490.0) / self.boil_size) * utilization_factor
+            b = 1.65 * pow(0.000125, early_gu - 1.0) * ((1.0 - pow(2.718, -0.04 * time)) / 4.15) * ((hop['aa'] / 100.0 * hop['oz'] * 7490.0) / self.boil_size) * utilization_factor
             ibu += b
-            logging.info(b)
 
         self.color = int(round(1.4922 * pow(mcu, 0.6859)))
         self.ibu = round(ibu, 1)

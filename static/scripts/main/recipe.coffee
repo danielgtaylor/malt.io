@@ -487,8 +487,12 @@ class Recipe
             if form is 'pellet'
                 utilization_factor = 1.15
             aa = parseFloat($(element.children[5]).text()) or 0.0
-            bitterness = 1.65 * Math.pow(0.000125, earlyGu - 1.0) * ((1 - Math.pow(2.718, -0.04 * time)) / 4.15) * ((aa / 100.0 * oz * 7490.0) / boilGallons) * utilization_factor
-            ibu += bitterness
+
+            if aa
+                bitterness = 1.65 * Math.pow(0.000125, earlyGu - 1.0) * ((1 - Math.pow(2.718, -0.04 * time)) / 4.15) * ((aa / 100.0 * oz * 7490.0) / boilGallons) * utilization_factor
+                ibu += bitterness
+            else
+                bitterness = 0
 
             # Update cost
             for [regex, cost] in @HOP_PRICES
@@ -885,7 +889,7 @@ class Recipe
 
         # Load fermentables, spices, yeast
         for fermentable in recipe.ingredients.fermentables
-            @addFermentableRow(fermentable.weight, fermentable.description, fermentable.late, fermentable.color, fermentable.ppg)
+            @addFermentableRow(fermentable.weight, fermentable.description, fermentable.late, fermentable.ppg, fermentable.color)
 
         for spice in recipe.ingredients.spices
             @addHopRow(spice.use, spice.time, spice.oz, spice.description, spice.aa, spice.form)
