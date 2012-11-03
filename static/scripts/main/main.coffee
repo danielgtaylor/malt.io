@@ -16,4 +16,17 @@ $(document).ready(->
 
     # Show any dialogs based on URL
     $(window.location.hash + 'Modal').modal('show');
+
+    # Keyboard shortcuts
+    Mousetrap.bindGlobal 'ctrl+m u', =>
+        window.location.href = '/users'
+
+    Mousetrap.bindGlobal 'ctrl+m r', =>
+        window.location.href = '/recipes'
+
+    Mousetrap.bindGlobal 'ctrl+m n', =>
+        window.location.href = '/new'
+
+    Mousetrap.bindGlobal 'ctrl+m p', =>
+        window.location.href = '/users/' + user
 )
