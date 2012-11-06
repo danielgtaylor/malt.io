@@ -18,19 +18,22 @@ $(document).ready(->
     $(window.location.hash + 'Modal').modal('show');
 
     # Keyboard shortcuts
-    Mousetrap.bind '?', =>
+    Mousetrap.bind ['/', '?'], =>
         $('#shortcutsModal').modal('show')
 
-    Mousetrap.bindGlobal 'ctrl+m u', =>
+    Mousetrap.bindGlobal ['ctrl+m h', 'command+m h'], =>
+        window.location.href = '/'
+
+    Mousetrap.bindGlobal ['ctrl+m u', 'command+m u'], =>
         window.location.href = '/users'
 
-    Mousetrap.bindGlobal 'ctrl+m r', =>
+    Mousetrap.bindGlobal ['ctrl+m r', 'command+m r'], =>
         window.location.href = '/recipes'
 
-    Mousetrap.bindGlobal 'ctrl+m n', =>
+    Mousetrap.bindGlobal ['ctrl+m n', 'command+m n'], =>
         window.location.href = '/new'
 
     if user
-        Mousetrap.bindGlobal 'ctrl+m p', =>
+        Mousetrap.bindGlobal ['ctrl+m p', 'command+m p'], =>
             window.location.href = '/users/' + user
 )

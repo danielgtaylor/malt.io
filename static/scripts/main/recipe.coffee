@@ -97,67 +97,6 @@ class Recipe
                 $('#boilGallonsValue').text(($('#boilGallonsSlider').noUiSlider('value')[1] / 2.0).toFixed(1));
         )
 
-        # Keyboard shortcuts
-        Mousetrap.bind ['f', 's', 'y'], (event, combo) =>
-            if combo is 'f'
-                $('#newFermentable').click()
-            else if combo is 's'
-                $('#newSpice').click()
-            else
-                $('#newYeast').click()
-            off
-
-        Mousetrap.bindGlobal 'enter', =>
-            # If we are currently in one of the tables, move to next row if it exists
-            [inTable, tbody, row, trIndex, tdIndex] = @currentFocusInfo()
-            if inTable
-                if tbody.children().length > trIndex + 1
-                    # Select the next row
-                    $($(tbody.children()[trIndex + 1]).children()[tdIndex]).focus()
-                else
-                    # Move to the next table, creating a row if none exists
-                    id = tbody.attr 'id'
-                    if id is 'fermentables_data'
-                        if $('#hops_data').children().length
-                            $('#hops_data tr:first td:nth-child(4)').focus()
-                        else
-                            $('#newSpice').click()
-                    else if id is 'hops_data'
-                        if $('#yeast_data').children().length
-                            $('#yeast_data tr:first td:nth-child(1)').focus()
-                        else
-                            $('#newYeast').click()
-
-        Mousetrap.bindGlobal 'shift+enter', =>
-            # If we are currently in one of the tables, move to previous row if it exists
-            [inTable, tbody, row, trIndex, tdIndex] = @currentFocusInfo()
-            if inTable
-                if trIndex > 0
-                    # Select the previous row
-                    $($(tbody.children()[trIndex - 1]).children()[tdIndex]).focus()
-                else
-                    # Move up to the previous table if possible
-                    id = tbody.attr 'id'
-                    if id is 'hops_data'
-                        $('#fermentables_data tr:last td:nth-child(4)').focus()
-                    else if id is 'yeast_data'
-                        $('#hops_data tr:last td:nth-child(4)').focus()
-
-        Mousetrap.bindGlobal 'ctrl+enter', =>
-            # Add a new row to the current table and select it
-            if $('#hops_data').has(document.activeElement).length
-                $('#newSpice').click()
-            else if $('#yeast_data').has(document.activeElement).length
-                $('#newYeast').click()
-            else
-                # Either fermentable item is selected or no item is selected
-                $('#newFermentable').click()
-            off
-
-        Mousetrap.bindGlobal 'ctrl+s', =>
-            # Save the current recipe, overriding saving the HTML page
-            @save()
-
         # Was the page loaded in edit mode? If so, enable editing!
         if window.location.pathname is '/new' or window.location.hash is '#edit'
             @enableEdit()
@@ -260,6 +199,67 @@ class Recipe
         $('#fermentables_data tr td:nth-child(2), #fermentables_data tr td:nth-child(3), #fermentables_data tr td:nth-child(4), #fermentables_data tr td:nth-child(5), #fermentables_data tr td:nth-child(6), #fermentables_data tr td:nth-child(8), #hops_data tr td:nth-child(1), #hops_data tr td:nth-child(2), #hops_data tr td:nth-child(3), #hops_data tr td:nth-child(4), #hops_data tr td:nth-child(5), #hops_data tr td:nth-child(6), #yeast_data tr td:nth-child(1), #yeast_data tr td:nth-child(2), #yeast_data tr td:nth-child(3), #yeast_data tr td:nth-child(4)').attr('contentEditable', 'true')
         $('#saveMsg, .edit-show').show()
         $('.edit-hide').hide()
+
+        # Keyboard shortcuts
+        Mousetrap.bind ['f', 's', 'y'], (event, combo) =>
+            if combo is 'f'
+                $('#newFermentable').click()
+            else if combo is 's'
+                $('#newSpice').click()
+            else
+                $('#newYeast').click()
+            off
+
+        Mousetrap.bindGlobal 'enter', =>
+            # If we are currently in one of the tables, move to next row if it exists
+            [inTable, tbody, row, trIndex, tdIndex] = @currentFocusInfo()
+            if inTable
+                if tbody.children().length > trIndex + 1
+                    # Select the next row
+                    $($(tbody.children()[trIndex + 1]).children()[tdIndex]).focus()
+                else
+                    # Move to the next table, creating a row if none exists
+                    id = tbody.attr 'id'
+                    if id is 'fermentables_data'
+                        if $('#hops_data').children().length
+                            $('#hops_data tr:first td:nth-child(4)').focus()
+                        else
+                            $('#newSpice').click()
+                    else if id is 'hops_data'
+                        if $('#yeast_data').children().length
+                            $('#yeast_data tr:first td:nth-child(1)').focus()
+                        else
+                            $('#newYeast').click()
+
+        Mousetrap.bindGlobal 'shift+enter', =>
+            # If we are currently in one of the tables, move to previous row if it exists
+            [inTable, tbody, row, trIndex, tdIndex] = @currentFocusInfo()
+            if inTable
+                if trIndex > 0
+                    # Select the previous row
+                    $($(tbody.children()[trIndex - 1]).children()[tdIndex]).focus()
+                else
+                    # Move up to the previous table if possible
+                    id = tbody.attr 'id'
+                    if id is 'hops_data'
+                        $('#fermentables_data tr:last td:nth-child(4)').focus()
+                    else if id is 'yeast_data'
+                        $('#hops_data tr:last td:nth-child(4)').focus()
+
+        Mousetrap.bindGlobal ['ctrl+enter', 'command+enter'], =>
+            # Add a new row to the current table and select it
+            if $('#hops_data').has(document.activeElement).length
+                $('#newSpice').click()
+            else if $('#yeast_data').has(document.activeElement).length
+                $('#newYeast').click()
+            else
+                # Either fermentable item is selected or no item is selected
+                $('#newFermentable').click()
+            off
+
+        Mousetrap.bindGlobal ['ctrl+s', 'command+s'], =>
+            # Save the current recipe, overriding saving the HTML page
+            @save()
     
     # Disable recipe edit mode, e.g. after a save
     @disableEdit: =>
@@ -267,6 +267,13 @@ class Recipe
         $('#fermentables_data tr td:nth-child(2), #fermentables_data tr td:nth-child(3), #fermentables_data tr td:nth-child(4), #fermentables_data tr td:nth-child(5), #fermentables_data tr td:nth-child(7), #hops_data tr td:nth-child(1), #hops_data tr td:nth-child(2), #hops_data tr td:nth-child(3), #hops_data tr td:nth-child(4), #hops_data tr td:nth-child(5), #hops_data tr td:nth-child(6), #yeast_data tr td:nth-child(1), #yeast_data tr td:nth-child(2), #yeast_data tr td:nth-child(3), #yeast_data tr td:nth-child(4)').removeAttr('contentEditable')
         $('#saveMsg, .edit-show').hide()
         $('.edit-hide').show()
+
+        # Remove editing shortcuts
+        Mousetrap.unbind ['f', 's', 'y']
+        Mousetrap.unbind 'enter'
+        Mousetrap.unbind 'shift+enter'
+        Mousetrap.unbind ['ctrl+enter', 'command+enter']
+        Mousetrap.unbind ['ctrl+s', 'command+s']
     
     # Handle clicks on the delete button, removing a recipe
     @onDelete: (event) =>
