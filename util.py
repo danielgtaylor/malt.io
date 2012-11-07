@@ -98,6 +98,8 @@ def time_to_min(value):
         5.0
         >>> time_to_min('2hr')
         120.0
+        >>> time_to_min('5sec')
+        0.08333333333333333
 
     """
     conversions = {
@@ -108,7 +110,10 @@ def time_to_min(value):
         'hours': 60,
         'm': 1,
         'min': 1,
-        'mins': 1
+        'mins': 1,
+        's': 1 / 60.0,
+        'sec': 1 / 60.0,
+        'seconds': 1 / 60.0
     }
 
     if type(value) in [str, unicode]:
