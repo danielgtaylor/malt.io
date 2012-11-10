@@ -38,8 +38,7 @@
                 <div class="control-group">
                     <label class="control-label">Avatar</label>
                     <div class="controls">
-                        <a href="http://www.gravatar.com/" class="avatar-large" style="background-image: url({{ user.avatar_large }});">
-                            <span class="fade">Edit</span>
+                        <a class="avatar-large" style="background-image: url({{ user.avatar_large }});">
                         </a>
                     </div>
                 </div>
@@ -61,14 +60,6 @@
                     <div class="controls">
                         <input name="email" type="email" class="span3" value="{{ user.email }}"/>
                         <p class="help-block">Never shown to other users</p>
-                    </div>
-                </div>
-            </fieldset>
-            <fieldset>
-                <div class="control-group">
-                    <label class="control-label">Password</label>
-                    <div class="controls">
-                        <a style="display: inline-block; margin-top: 5px;" href="https://www.google.com/settings/security">Edit your Google account password settings</a>
                     </div>
                 </div>
             </fieldset>

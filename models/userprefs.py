@@ -156,6 +156,10 @@ class UserPrefs(db.Model):
             return 'http://www.gravatar.com/avatar/%(hash)s?s=%(size)d&d=identicon' % locals()
 
     @property
+    def avatar_large(self):
+        return self.avatar_size(80)
+
+    @property
     def avatar_small(self):
         return self.avatar_size(40)
 
