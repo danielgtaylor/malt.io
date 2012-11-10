@@ -29,7 +29,7 @@
         <li><a href="/profile"><i class="icon-cog"></i> User settings</a></li>
         <li class="nav-header">Following</li>
         {% for u in following %}
-            <li><a href="/users/{{ u.name }}"><div class="avatar-tiny" style="background-image: url({{ u.gravatar_tiny }});"></div> {{ u.name }}</a></li>
+            <li><a href="/users/{{ u.name }}"><div class="avatar-tiny" style="background-image: url({{ u.avatar_tiny }});"></div> {{ u.name }}</a></li>
         {% endfor %}
     </ul>
     <div class="span7">
