@@ -149,7 +149,11 @@ class UserPrefs(db.Model):
         return 'admin' in self.awards
 
     def avatar_size(self, size):
-        return self.avatar.format(size)
+        if self.avatar:
+            return self.avatar.format(size)
+        else:
+            hash = hashlib.md5(self.email.strip().lower()).hexdigest()
+            return 'http://www.gravatar.com/avatar/%(hash)s?s=%(size)d&d=identicon' % locals()
 
     @property
     def avatar_small(self):
