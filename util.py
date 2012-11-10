@@ -28,6 +28,7 @@ except:
 
 # A mapping of award names to icon, description pairs
 AWARDS = {
+    'admin': ['cog', 'Administrator'],
     'donated': ['gift', 'Donated'],
     'liked15': ['heart', 'Liked 15 brews'],
     'created10': ['book', 'Created 10 brews']
