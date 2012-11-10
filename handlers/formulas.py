@@ -1,9 +1,7 @@
-import webapp2
-
-from util import render
+from handlers.base import BaseHandler
 
 
-class FormulasHandler(webapp2.RequestHandler):
+class FormulasHandler(BaseHandler):
     """
     Handle requests to the formulas page, accessible via the URLs:
 
@@ -15,4 +13,4 @@ class FormulasHandler(webapp2.RequestHandler):
         Render the formulas page. This describes various homebrewing
         formulas that are used by Malt.io
         """
-        render(self, 'formulas.html')
+        self.render('formulas.html')

@@ -1,15 +1,13 @@
-import webapp2
-
 from google.appengine.api import memcache
 from google.appengine.ext import db
 from google.appengine.ext.db import Key
+from handlers.base import BaseHandler
 from models.recipe import Recipe
 from models.useraction import UserAction
 from models.userprefs import UserPrefs
-from util import render
 
 
-class MainHandler(webapp2.RequestHandler):
+class MainHandler(BaseHandler):
     """
     Handle requests to the index page, i.e. http://www.malt.io/
     """
@@ -19,7 +17,7 @@ class MainHandler(webapp2.RequestHandler):
         Render the index page. Currently this renders a 'Coming soon' landing
         page that will eventually be replaced with a proper home page.
         """
-        user = UserPrefs.get()
+        user = self.user
 
         if user:
             # Try to get rendered output from memcache
@@ -75,7 +73,7 @@ class MainHandler(webapp2.RequestHandler):
                 recipe_map[r.key().id()] = r
 
             # Render and cache for 1 minute
-            memcache.set('dashboard-' + user.user_id, render(self, 'dashboard.html', {
+            memcache.set('dashboard-' + user.user_id, self.render('dashboard.html', {
                 'following': following,
                 'user_map': user_map,
                 'recipe_map': recipe_map,
@@ -93,6 +91,6 @@ class MainHandler(webapp2.RequestHandler):
                             .run(limit=15)
 
             # Render and cache for 15 minutes
-            memcache.set('index', render(self, 'index.html', {
+            memcache.set('index', self.render('index.html', {
                 'recipes': recipes
             }), 900)

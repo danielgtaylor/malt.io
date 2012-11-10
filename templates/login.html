@@ -1,0 +1,45 @@
+{% extends 'page.html' %}
+
+{% block title %}Login - Malt.io{% endblock %}
+
+{% block content %}
+    <ul class="breadcrumb">
+        <li><a href="/">home</a><span class="divider">/</span></li>
+        <li>login</li>
+    </ul>
+    <div class="well">
+        <div class="span5">
+            <h2>Sign in Now!</h2>
+            <br>
+            {% if debug %}
+                <a class="zocial guest" href="/auth/dummy">Dummy developer sign in</a>
+                <br/><br/>
+            {% endif %}
+            <a class="zocial googleplus" href="/auth/google">Sign in with Google</a>
+            <br/><br/>
+            <a class="zocial facebook" href="/auth/facebook">Sign in with Facebook</a>
+            <br/><br/>
+            <a class="zocial windows" href="/auth/windows_live">Sign in with Windows Live</a>
+        </div>
+        <div class="span6 pull-right">
+            <h2>More Features</h2>
+            <p>
+                Signing in to Malt.io will give you more features!
+            </p>
+            <ul>
+                <li>Create and save recipes</li>
+                <li>Edit recipes and track your history</li>
+                <li>Log whenever you brew</li>
+                <li>Review other's brews</li>
+                <li>Clone recipes from other brewers</li>
+                <li>Follow other brewers</li>
+                <li>Like other's recipes</li>
+                <li>And more!</li>
+            </ul>
+        </div>
+        <div class="clear"></div>
+    </div>
+    <div>
+        Why do we use third party sign in? It means that Malt.io <strong>never</strong> sees your password, only your unique user identifier, name and email address. This means you have fewer passwords to worry about and everyone has fewer security concerns. We also promise to never sell, exchange, or otherwise share your email or other personal information with third parties.
+    </div>
+{% endblock %}

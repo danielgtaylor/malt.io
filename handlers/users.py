@@ -1,14 +1,16 @@
 import cgi
+import logging
 import settings
 import webapp2
 
+from handlers.base import BaseHandler
 from models.recipe import Recipe
 from models.useraction import UserAction
 from models.userprefs import UserPrefs
 from util import render, render_json
 
 
-class UsersHandler(webapp2.RequestHandler):
+class UsersHandler(BaseHandler):
     """
     Public user list handler. This handler renders the list of public
     users via the URLs:
@@ -20,12 +22,12 @@ class UsersHandler(webapp2.RequestHandler):
         """
         Render the public users list.
         """
-        render(self, 'users.html', {
+        self.render('users.html', {
             'users': UserPrefs.all()
         })
 
 
-class UserHandler(webapp2.RequestHandler):
+class UserHandler(BaseHandler):
     """
     Public user profile page handler. This handler renders information
     about a single user via the URLs:
@@ -74,7 +76,7 @@ class UserHandler(webapp2.RequestHandler):
         for recipe in Recipe.get_by_id(object_ids['recipes']):
             recipe_map[recipe.key().id()] = recipe
 
-        render(self, 'user.html', {
+        self.render('user.html', {
             'publicuser': publicuser,
             'recipes': recipes,
             'actions': actions,
@@ -83,7 +85,7 @@ class UserHandler(webapp2.RequestHandler):
         })
 
 
-class UserFollowHandler(webapp2.RequestHandler):
+class UserFollowHandler(BaseHandler):
     """
     Follow another user to see when they create or like recipes, etc via
     the following URLs:
@@ -105,14 +107,14 @@ class UserFollowHandler(webapp2.RequestHandler):
         publicuser = UserPrefs.all().filter('name =', username).get()
 
         if not user or not publicuser:
-            return render_json(self, {
+            return self.render_json({
                 'status': 'error',
                 'error': 'User not found'
             })
 
         if action == 'post':
             if publicuser.user_id in user.following:
-                return render_json(self, {
+                return self.render_json({
                     'status': 'error',
                     'error': 'Already following user'
                 })
@@ -133,7 +135,7 @@ class UserFollowHandler(webapp2.RequestHandler):
                 user_action.put()
         else:
             if publicuser.user_id not in user.following:
-                return render_json(self, {
+                return self.render_json({
                     'status': 'error',
                     'error': 'User not being followed'
                 })
@@ -152,12 +154,12 @@ class UserFollowHandler(webapp2.RequestHandler):
         # Save updated following list
         user.put()
 
-        render_json(self, {
+        self.render_json({
             'status': 'ok'
         })
 
 
-class UsernameCheckHandler(webapp2.RequestHandler):
+class UsernameCheckHandler(BaseHandler):
     """
     This handler checks a proposed username and returns information on
     whether it is valid or not. A valid username has the following rules:
@@ -198,7 +200,7 @@ class UsernameCheckHandler(webapp2.RequestHandler):
                 or username in settings.RESERVED_USERNAMES:
             count = 1
 
-        render_json(self, {
+        self.render_json({
             'username': username,
             'available': count == 0
         })

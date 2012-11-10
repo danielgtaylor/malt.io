@@ -36,3 +36,6 @@ nosetests.xml
 static/styles/main.css
 static/scripts/main.js
 static/scripts/embed.js
+
+# Secret account keys
+secrets.py

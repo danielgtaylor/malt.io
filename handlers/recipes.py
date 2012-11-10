@@ -5,6 +5,7 @@ import json
 import logging
 import webapp2
 
+from handlers.base import BaseHandler
 from models.recipe import Recipe, RecipeHistory
 from models.useraction import UserAction
 from models.userprefs import UserPrefs
@@ -44,7 +45,7 @@ def generate_usable_slug(recipe):
     return slug
 
 
-class RecipesHandler(webapp2.RequestHandler):
+class RecipesHandler(BaseHandler):
     """
     Recipe list view handler. This handler renders the public recipe list for
     a specific user and for all users. It is invoked via URLs like:
@@ -70,7 +71,7 @@ class RecipesHandler(webapp2.RequestHandler):
             recipes = Recipe.all()
             recipes = [r for r in recipes]
 
-        render(self, 'recipes.html', {
+        self.render('recipes.html', {
             'publicuser': publicuser,
             'recipes': recipes
         })
@@ -95,9 +96,9 @@ class RecipesHandler(webapp2.RequestHandler):
             action.type = action.TYPE_RECIPE_CREATED
             action.put()
 
-        return redirect('/users/' + user.name + '/recipes')
+        self.redirect('/users/' + user.name + '/recipes')
 
-class RecipeEmbedHandler(webapp2.RequestHandler):
+class RecipeEmbedHandler(BaseHandler):
     """
     Handle recipe embeds on other sites. This returns a javascript
     which is used to render a small widget on another site with information
@@ -123,19 +124,19 @@ class RecipeEmbedHandler(webapp2.RequestHandler):
         except: pass
 
         if publicuser and recipe:
-            render(self, 'recipe-embed.html', {
+            self.render('recipe-embed.html', {
                 'publicuser': publicuser,
                 'recipe': recipe,
                 'width': width,
             })
         else:
-            render(self, 'recipe-embed-404.html', {
+            self.render('recipe-embed-404.html', {
                 'publicuser': publicuser,
                 'width': width,
             })
 
 
-class RecipeXmlHandler(webapp2.RequestHandler):
+class RecipeXmlHandler(BaseHandler):
     """
     Handle recipe export via BeerXML. This renders a BeerXML representation
     of the recipe that can be imported into other beer software.
@@ -156,11 +157,10 @@ class RecipeXmlHandler(webapp2.RequestHandler):
         if not recipe:
             self.abort(404)
 
-        self.response.headers['Content-Type'] = 'text/xml'
-        self.response.out.write(recipe.beerxml)
+        self.render_xml(recipe.beerxml)
 
 
-class RecipeLikeHandler(webapp2.RequestHandler):
+class RecipeLikeHandler(BaseHandler):
     """
     Recipe like request handler. Handles when a user likes a particular recipe
     by adding this user's id to the list of likes. This handler supports two
@@ -192,7 +192,7 @@ class RecipeLikeHandler(webapp2.RequestHandler):
                               .get()
 
         if not publicuser:
-            render_json(self, {
+            self.render_json({
                 'status': 'error',
                 'error': 'User not found'
             })
@@ -204,7 +204,7 @@ class RecipeLikeHandler(webapp2.RequestHandler):
                        .get()
 
         if not recipe:
-            render_json(self, {
+            self.render_json({
                 'status': 'error',
                 'error': 'Recipe not found'
             })
@@ -242,13 +242,13 @@ class RecipeLikeHandler(webapp2.RequestHandler):
                 if existing:
                     existing.delete()
 
-        return render_json(self, {
+        return self.render_json({
             'status': 'ok',
             'likes': len(recipe.likes)
         })
 
 
-class RecipeCloneHandler(webapp2.RequestHandler):
+class RecipeCloneHandler(BaseHandler):
     """
     Recipe clone handler. This handler is responsible for cloning a recipe
     to a user's account, by creating a new recipe and copying over all
@@ -263,7 +263,7 @@ class RecipeCloneHandler(webapp2.RequestHandler):
                               .get()
 
         if not publicuser:
-            render_json(self, {
+            self.render_json({
                 'status': 'error',
                 'error': 'User not found'
             })
@@ -275,7 +275,7 @@ class RecipeCloneHandler(webapp2.RequestHandler):
                        .get()
 
         if not recipe:
-            render_json(self, {
+            self.render_json({
                 'status': 'error',
                 'error': 'Recipe not found'
             })
@@ -307,13 +307,13 @@ class RecipeCloneHandler(webapp2.RequestHandler):
         action.object_id = new_recipe.key().id()
         action.put()
 
-        return render_json(self, {
+        return self.render_json({
             'status': 'ok',
             'redirect': new_recipe.url
         })
 
 
-class RecipeHandler(webapp2.RequestHandler):
+class RecipeHandler(BaseHandler):
     """
     Recipe view handler. This handler renders a recipe and handles updating
     recipe data when a user saves a recipe in edit mode. It is invoked via
@@ -331,7 +331,7 @@ class RecipeHandler(webapp2.RequestHandler):
         """
         # Create a new recipe if we have no slug, otherwise query
         if not recipe_slug:
-            publicuser = UserPrefs.get()
+            publicuser = self.user
             recipe = Recipe()
             recipe.owner = publicuser
             recipe.new = True
@@ -378,7 +378,7 @@ class RecipeHandler(webapp2.RequestHandler):
         except Exception, e:
             pass
 
-        render(self, 'recipe.html', {
+        self.render('recipe.html', {
             'publicuser': publicuser,
             'recipe': recipe,
             'cloned_from': cloned_from
@@ -391,14 +391,14 @@ class RecipeHandler(webapp2.RequestHandler):
         if the current user does not have the proper rights to modify the
         recipe.
         """
-        user = UserPrefs.get()
+        user = self.user
         recipe_json = cgi.escape(self.request.get('recipe'))
 
         # Parse the JSON into Python objects
         try:
             recipe_data = json.loads(recipe_json)
         except Exception, e:
-            render_json(self, {
+            self.render_json({
                 'status': 'error',
                 'error': str(e),
                 'input': recipe_json
@@ -419,7 +419,7 @@ class RecipeHandler(webapp2.RequestHandler):
                 # Save a historic version of this recipe
                 recipe.put_historic_version()
             else:
-                render_json(self, {
+                self.render_json({
                     'status': 'error',
                     'error': 'Recipe not found'
                 })
@@ -427,7 +427,7 @@ class RecipeHandler(webapp2.RequestHandler):
 
         # Ensure you own this recipe
         if not recipe or recipe.owner.name != user.name:
-            render_json(self, {
+            self.render_json({
                 'status': 'error',
                 'error': 'Permission denied: you are not the recipe owner!'
             })
@@ -464,7 +464,7 @@ class RecipeHandler(webapp2.RequestHandler):
 
         action.put()
 
-        render_json(self, {
+        self.render_json({
             'status': 'ok',
             'redirect': '/users/%(username)s/recipes/%(slug)s' % {
                 'username': user.name,
@@ -477,10 +477,10 @@ class RecipeHandler(webapp2.RequestHandler):
         Handle recipe delete. This will remove a recipe and return success
         or failure.
         """
-        user = UserPrefs.get()
+        user = self.user
 
         if not user:
-            render_json(self, {
+            self.render_json({
                 'status': 'error',
                 'error': 'User not logged in'
             })
@@ -506,20 +506,20 @@ class RecipeHandler(webapp2.RequestHandler):
             # Delete the actual recipe itself
             recipe.delete()
 
-            render_json(self, {
+            self.render_json({
                 'status': 'ok',
                 'redirect': '/users/%(username)s/recipes' % {
                     'username': user.name
                 }
             })
         else:
-            render_json(self, {
+            self.render_json({
                 'status': 'error',
                 'error': 'Unable to delete recipe'
             })
 
 
-class RecipeHistoryHandler(webapp2.RequestHandler):
+class RecipeHistoryHandler(BaseHandler):
     """
     Recipe history handler. This handler renders the recipe history tree for
     a specific recipe. It is invoked via URLs like:
@@ -622,7 +622,7 @@ class RecipeHistoryHandler(webapp2.RequestHandler):
         # when it tries to render the recipe
         recipe.owner = publicuser
 
-        render(self, 'recipe-history.html', {
+        self.render('recipe-history.html', {
             'publicuser': publicuser,
             'recipe': recipe,
             'entries': entries

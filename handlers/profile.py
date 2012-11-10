@@ -1,13 +1,12 @@
 import cgi
 import settings
-import webapp2
 
+from handlers.base import BaseHandler
 from models.userprefs import UserPrefs
-from util import render
-from webapp2_extras.appengine.users import login_required
+from util import render, login_required
 
 
-class ProfileHandler(webapp2.RequestHandler):
+class ProfileHandler(BaseHandler):
     """
     Profile settings request handler. This handles requests to view and modify
     the profile settings of a logged in user. It is invoked via URLs like:
@@ -21,7 +20,7 @@ class ProfileHandler(webapp2.RequestHandler):
         Render the profile settings page with the currently logged-in user's
         profile settings.
         """
-        render(self, 'profile.html', {
+        self.render('profile.html', {
             'success': self.request.get('success')
         })
 
@@ -37,13 +36,13 @@ class ProfileHandler(webapp2.RequestHandler):
         # as validation happens on the page via javascript. If it does,
         # then just redirect to the profile URL
         if not name or len(name) < 4 or name in settings.RESERVED_USERNAMES:
-            return webapp2.redirect('/profile')
+            self.redirect('/profile')
 
         # Get the current user and ensure he/she exists
-        user = UserPrefs.get()
+        user = self.user
 
         if not user:
-            return webapp2.redirect('/profile')
+            self.redirect('/profile')
 
         # Set the values and save to the data store
         user.name = name
@@ -51,4 +50,4 @@ class ProfileHandler(webapp2.RequestHandler):
         user.put()
 
         # Redirect to show a success message to the user
-        return webapp2.redirect('/profile?success=1')
+        self.redirect('/profile?success=1')

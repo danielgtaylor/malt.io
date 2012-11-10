@@ -1,6 +1,5 @@
 import datetime
 import jinja2
-import json
 import re
 import settings
 
@@ -37,6 +36,58 @@ AWARDS = {
 template_cache = {}
 
 
+def login_required(handler_method, awards=None):
+    """
+    A decorator to require that a user be logged in to access a handler.
+
+    To use it, decorate your get() method like this::
+
+        @login_required
+        def get(self):
+            self.render('foo.html', {
+                user: self.user
+            })
+
+    If the user is not logged in, they will be redirected to /login
+    """
+    def check_login(self, *args, **kwargs):
+        if self.request.method != 'GET':
+            self.abort(400, detail='The login_required decorator '
+                'can only be used for GET requests.')
+
+        success = False
+        user = self.user
+        if user:
+            if awards:
+                for award in awards:
+                    if award in user.awards:
+                        # User is logged in and award found
+                        success = True
+                        break
+                else:
+                    # User is logged in, but no reward found
+                    success = False
+            else:
+                # User is logged in, no awards required
+                success = True
+
+        if not success:
+            self.session['next'] = str(self.request.path_qs)
+            return self.redirect('/login')
+        else:
+            handler_method(self, *args, **kwargs)
+
+    return check_login
+
+
+def admin_required(handler_method):
+    """
+    A decorator to require that a user be logged in and an admin
+    to access a handler.
+    """
+    return login_required(handler_method, awards=['admin'])
+
+
 def get_template(name):
     """
     Get a Jinja2 template by name. This method caches templates in memory
@@ -61,10 +112,8 @@ def render(handler, template, params=None):
     p = params and params.copy() or {}
     p.update({
         'debug': settings.DEBUG,
-        'user': UserPrefs.get(),
-        'is_admin': users.is_current_user_admin(),
+        'user': handler.user,
         'base_url': handler.request.host_url,
-        'logout_url': LOGOUT_URL
     })
 
     t = get_template(template)
@@ -75,9 +124,7 @@ def render(handler, template, params=None):
 
 
 def render_json(handler, value):
-    """
-    Render a Python object as JSON.
-    """
+    """Render JSON output, including proper headers"""
     handler.response.headers['Content-Type'] = 'application/json'
     handler.response.out.write(json.dumps(value))
 

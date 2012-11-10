@@ -11,7 +11,7 @@
     {% for user in users %}
         <div class="span3">
             <a href="/users/{{ user.name }}">
-                <div class="avatar-small" style="background-image: url({{ user.gravatar_small }});"></div>
+                <div class="avatar-small" style="background-image: url({{ user.avatar_small }});"></div>
             </a>
             <h6><a href="/users/{{ user.name }}">{{ user.name }}</a></h6>
             {{ user.recipes.count() }} recipes

@@ -3,12 +3,12 @@ import settings
 import webapp2
 
 from contrib import stripe
+from handlers.base import BaseHandler
 from models.useraction import UserAction
 from models.userprefs import UserPrefs
-from util import render
 
 
-class DonateHandler(webapp2.RequestHandler):
+class DonateHandler(BaseHandler):
     """
     Handle requests to the donation page, accessible via the URLs:
 
@@ -27,7 +27,7 @@ class DonateHandler(webapp2.RequestHandler):
                              .order('-donated')\
                              .fetch(10)
 
-        render(self, 'donate.html', {
+        self.render('donate.html', {
             'STRIPE_PUBLIC_KEY': settings.STRIPE_PUBLIC_KEY,
             'top_users': top_users,
             'success': self.request.get('success')
@@ -37,7 +37,7 @@ class DonateHandler(webapp2.RequestHandler):
         """
         Process a donation payment given a Stripe single-use token.
         """
-        user = UserPrefs.get()
+        user = self.user
         stripe.api_key = settings.STRIPE_PRIVATE_KEY
 
         amount = int(cgi.escape(self.request.get('amount')))
@@ -63,4 +63,4 @@ class DonateHandler(webapp2.RequestHandler):
             action.type = action.TYPE_USER_DONATED
             action.put()
 
-        return webapp2.redirect('/donate?success=true')
+        self.redirect('/donate?success=true')

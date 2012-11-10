@@ -12,12 +12,18 @@ class UserPrefs(db.Model):
     """
     A data model to store per-user preferences. This stores things such as
     the username, email, when the user joined, earned awards, etc and links
-    them all to a global Google account ID.
+    them all to a global account ID.
+
+    Admin users will have an 'admin' award, which can be checked via the
+    is_admin property.
     """
     # Unique ID, user-chosen name and email
     user_id = db.StringProperty()
     name = db.StringProperty()
     email = db.StringProperty()
+
+    # URL to avatar image
+    avatar = db.StringProperty()
 
     # The date when the user joined
     joined = db.DateProperty()
@@ -36,58 +42,73 @@ class UserPrefs(db.Model):
     following = db.StringListProperty()
 
     @staticmethod
-    def get():
+    def get(auth_id):
         """
         Get or create the preferences database value for the
         currently logged in user. First try to get the object via
         memcache, falling back to the database and then updating
         memcache for the next time the object is needed.
         """
-        from models.useraction import UserAction
+        # Attempt to fetch from memcache
+        prefs = memcache.get('userprefs-' + auth_id)
 
-        user = users.get_current_user()
+        # Attempt to fetch from data store
+        if not prefs:
+            prefs = UserPrefs.all()\
+                             .filter('user_id =', auth_id).get()
 
-        prefs = None
-        if user:
-            # Attempt to fetch from memcache
-            prefs = memcache.get('userprefs-' + str(user.user_id()))
+            if prefs:
+                memcache.add('userprefs-' + str(auth_id), prefs)
 
-            # Attempt to fetch from data store
-            if not prefs:
-                prefs = UserPrefs.all()\
-                                 .filter('user_id =', user.user_id()).get()
-                memcache.add('userprefs-' + str(user.user_id()), prefs, 3600)
+        return prefs
 
-            # Not found yet... time to create a new one!
-            if not prefs:
-                # Generate a nice username from the email
-                username = user.email().split('@')[0].lower().replace(' ', '')
-                count = 0
+    @staticmethod
+    def create_or_update(auth_id, user_info, auth_info):
+        """
+        Create a new user or update an existing one with information such
+        as id, name, email, avatar, etc.
+        """
+        prefs = UserPrefs.get(auth_id)
 
-                while True:
-                    check_name = count and username + str(count) or username
-                    if not UserPrefs.all()\
-                                    .filter('name =', check_name)\
-                                    .count() and check_name not in settings.RESERVED_USERNAMES:
-                        if count:
-                            username = username + str(count)
-                        break
+        # Not found yet... time to create a new one!
+        if not prefs:
+            # Generate a nice username from the email
+            username = user_info['email'].split('@')[0].lower().replace(' ', '')
+            count = 0
 
-                    count += 1
+            while True:
+                check_name = count and username + str(count) or username
+                if not UserPrefs.all()\
+                                .filter('name =', check_name)\
+                                .count() and check_name not in settings.RESERVED_USERNAMES:
+                    if count:
+                        username = username + str(count)
+                    break
 
-                # Create the preferences object and store it
-                prefs = UserPrefs(**{
-                    'user_id': user.user_id(),
-                    'name': username,
-                    'email': user.email(),
-                    'joined': Date().date
-                })
-                prefs.put()
+                count += 1
 
-                action = UserAction()
-                action.owner = prefs
-                action.type = action.TYPE_USER_JOINED
-                action.put()
+            # Create the preferences object and store it
+            prefs = UserPrefs(**{
+                'user_id': auth_id,
+                'name': username,
+                'joined': Date().date,
+            })
+
+            # Write to the db so this user object gets a proper id, which
+            # is required to reference it in the action created below
+            prefs.put()
+
+            from models.useraction import UserAction
+
+            action = UserAction()
+            action.owner = prefs
+            action.type = action.TYPE_USER_JOINED
+            action.put()
+
+        # Update fields based on latest user info
+        prefs.email = user_info['email']
+        prefs.avatar = user_info['avatar']
+        prefs.put()
 
         return prefs
 
@@ -111,33 +132,20 @@ class UserPrefs(db.Model):
         # Update the cache, invalidating old data
         memcache.set('userprefs-' + str(self.user_id), self, 3600)
 
-    def gravatar(self, size):
-        """
-        Get an avatar image link with a particular size.
-        """
-        hash = hashlib.md5(self.email.strip().lower()).hexdigest()
-        return 'http://www.gravatar.com/avatar/%(hash)s?s=%(size)d&d=identicon' % locals()
+    @property
+    def is_admin(self):
+        return 'admin' in self.awards
+
+    def avatar_size(self, size):
+        return self.avatar.format(size)
 
     @property
-    def gravatar_large(self):
-        """
-        Get an avatar image link that is 80x80px.
-        """
-        return self.gravatar(80)
+    def avatar_small(self):
+        return self.avatar_size(40)
 
     @property
-    def gravatar_small(self):
-        """
-        Get an avatar image link that is 40x40px.
-        """
-        return self.gravatar(40)
-
-    @property
-    def gravatar_tiny(self):
-        """
-        Get an avatar image link that is 14x14, useful for menus.
-        """
-        return self.gravatar(14)
+    def avatar_tiny(self):
+        return self.avatar_size(14)
 
     @property
     def following_users(self):

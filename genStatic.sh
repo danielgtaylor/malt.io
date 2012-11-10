@@ -1,5 +1,10 @@
 #!/bin/bash
 
+# Secrets file, create if it doesn't exist
+if [ ! -e secrets.py ] ; then
+    cp secrets.py.template secrets.py
+fi
+
 # Stylesheets
 echo 'Generating static/styles/main.css'
 lessc --yui-compress static/styles/main.less >static/styles/main.css

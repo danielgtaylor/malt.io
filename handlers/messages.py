@@ -1,14 +1,13 @@
 import cgi
 import json
-import webapp2
 
+from handlers.base import BaseHandler
 from models.message import Message
 from models.userprefs import UserPrefs
-from util import render, render_json
 from webapp2_extras.appengine.users import login_required
 
 
-class MessagesHandler(webapp2.RequestHandler):
+class MessagesHandler(BaseHandler):
     """
     Handle requests to the messages page, accessible via the URLs:
 
@@ -21,13 +20,13 @@ class MessagesHandler(webapp2.RequestHandler):
         Render the messages page. This includes all messages relevant
         to the currently logged in user.
         """
-        render(self, 'messages.html')
+        self.render('messages.html')
 
     def post(self):
         """
         Send a new message to a user.
         """
-        user = UserPrefs.get()
+        user = self.user
 
         if not user:
             return render_json(self, {
@@ -58,7 +57,7 @@ class MessagesHandler(webapp2.RequestHandler):
         recipient.unread_messages += 1
         recipient.put()
 
-        render_json(self, {
+        self.render_json({
             'status': 'ok'
         })
 
@@ -105,7 +104,7 @@ class MessagesHandler(webapp2.RequestHandler):
             recipient.unread_messages += 1
         recipient.put()
 
-        render_json(self, {
+        self.render_json({
             'status': 'ok'
         })
 
@@ -143,6 +142,6 @@ class MessagesHandler(webapp2.RequestHandler):
         # Delete this message from the data store
         msg.delete()
 
-        render_json(self, {
+        self.render_json({
             'status': 'ok'
         })

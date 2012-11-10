@@ -1,3 +1,5 @@
+from handlers.auth import AuthHandler, AuthCallbackHandler, \
+                          LoginHandler, LogoutHandler
 from handlers.donate import DonateHandler
 from handlers.formulas import FormulasHandler
 from handlers.index import MainHandler
@@ -31,5 +33,9 @@ urls = [
     ('/embed/(.*?)/(.*?)', RecipeEmbedHandler),
     ('/homebrew-formulas', FormulasHandler),
     ('/donate', DonateHandler),
+    ('/auth/(.*?)/callback', AuthCallbackHandler),
+    ('/auth/(.*?)', AuthHandler),
+    ('/login', LoginHandler),
+    ('/logout', LogoutHandler),
     ('/', MainHandler)
 ]
