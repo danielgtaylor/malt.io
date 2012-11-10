@@ -68,7 +68,19 @@ class UserPrefs(db.Model):
         Create a new user or update an existing one with information such
         as id, name, email, avatar, etc.
         """
-        prefs = UserPrefs.get(auth_id)
+        prefs = UserPrefs.all()\
+                         .filter('user_id =', auth_id)\
+                         .get()
+
+        # Backwards compatibility
+        if not prefs:
+            prefs = UserPrefs.all()\
+                             .filter('email =', user_info['email'])\
+                             .get()
+
+            if prefs and ':' not in prefs.user_id:
+                # Old-style user and the emails match, so update!
+                prefs.user_id = auth_id
 
         # Not found yet... time to create a new one!
         if not prefs:
