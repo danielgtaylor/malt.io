@@ -78,9 +78,13 @@ class UserPrefs(db.Model):
                              .filter('email =', user_info['email'])\
                              .get()
 
-            if prefs and ':' not in prefs.user_id:
-                # Old-style user and the emails match, so update!
-                prefs.user_id = auth_id
+            if prefs:
+                if ':' not in prefs.user_id:
+                    # Old-style user and the emails match, so update!
+                    prefs.user_id = auth_id
+                else:
+                    # New-style user, ignore
+                    prefs = None
 
         # Not found yet... time to create a new one!
         if not prefs:

@@ -1,6 +1,7 @@
 import json
 import logging
 import settings
+import urlparse
 
 from google.appengine.api import urlfetch
 from handlers.base import BaseHandler
