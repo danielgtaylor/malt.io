@@ -1,7 +1,9 @@
+import hashlib
 import json
 import logging
 import settings
 import urlparse
+import uuid
 
 from google.appengine.api import urlfetch
 from handlers.base import BaseHandler
@@ -87,10 +89,20 @@ class AuthHandler(BaseAuthHandler):
         key = getattr(settings, provider.upper() + '_OAUTH_KEY')
         scope = getattr(settings, provider.upper() + '_OAUTH_SCOPE')
 
+        # Generate a random state parameter to prevent CSRF attacks
+        # This is both stored in the session and sent to the authorizing
+        # server, relayed back and then checked to make sure it matches
+        # up. If not, then the request likely did not originate from
+        # this site and it can be ignored.
+        csrf_state = hashlib.md5(uuid.uuid4().hex).hexdigest()
+
+        self.session['login_csrf'] = csrf_state
+
         params = {
             'response_type': 'code',
             'client_id': key,
-            'redirect_uri': self.callback_url(provider)
+            'redirect_uri': self.callback_url(provider),
+            'state': csrf_state
         }
 
         if scope:
@@ -117,6 +129,13 @@ class AuthCallbackHandler(BaseAuthHandler):
 
         # Get the access code so we can exchange it for a token
         code = self.request.get('code')
+
+        # Get the CSRF state
+        state = self.request.get('state')
+
+        if self.session['login_csrf'] != state:
+            logging.warning("Login aborted due to possible CSRF!")
+            return self.abort()
 
         # Get the access token using the access code
         key = getattr(settings, provider.upper() + '_OAUTH_KEY')
