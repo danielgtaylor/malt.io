@@ -104,11 +104,13 @@
         <h1 id="recipeName">{% if recipe.old %}{{ recipe.oldname }}{% else %}{{ recipe.name }}{% endif %}</h1>
         <p id="recipeDescription">{{ recipe.description }}</p>
         <p style="font-size: 100%; line-height: 12pt;">
-            Style: <span id="styleName" data-category="{{ recipe.category }}" data-style="{{ recipe.style }}">{{ recipe.style_display }}</span> <a class="btn btn-inverse btn-mini edit-show" data-toggle="modal" href="#styleModal" style="display: none; margin-top: -2px">Edit</a>
-            <br/>
-            Batch size: <span id="batchSize" class="validate positive number">{{ recipe.batch_size }}</span> gallons
-            <br/>
-            Boil size: <span id="boilSize" class="validate positive number">{{ recipe.boil_size }}</span> average gallons
+            Style: <span id="styleName" data-category="{{ recipe.category }}" data-style="{{ recipe.style }}">{{ recipe.style_display }}</span>
+            <div class="edit-hide">
+                <br/>
+                Batch size: <span id="batchSize">{{ recipe.batch_size }}</span> gallons
+                <br/>
+                Boil size: <span id="boilSize">{{ recipe.boil_size }}</span> average gallons
+            </div>
         </p>
         <div class="btn-group edit-hide" style="float: left;">
             {% if not recipe.old %}
@@ -134,6 +136,10 @@
                 <a class="btn" href="/users/{{ publicuser.name }}/recipes/{{ recipe.slug }}"><i class="icon-arrow-up"></i> Latest</a>
                 <a class="btn disabled"><i class="icon-download-alt"></i> Export</a>
             {% endif %}
+        </div>
+        <div class="btn-group edit-show" class="float: left; display: none;">
+            <a class="btn" data-toggle="modal" href="#styleModal"><i class="icon-tint"></i> Edit Style</a>
+            <a class="btn" data-toggle="modal" href="#scaleModal"><i class="icon-signal"></i> Scale</a>
         </div>
         <div class="edit-hide" style="float: left; margin-left: 1em; margin-top: 4px; position: relative;">
             <div class="g-plusone" data-size="medium" data-annotation="none"></div>&nbsp;
@@ -272,7 +278,7 @@
                             <td class="num validate positive integer">{{ ingredient.ppg }}</td>
                             <td class="num"><span class="srm" data-srm="{{ ingredient.color }}"></span> </td>
                             <td class="num validate positive integer" style="border-left: none;">{{ ingredient.color }}</td>
-                            <td class="edit-show"><a href="#" class="remove"><i class="icon-remove"></i></a></td>
+                            <td class="edit-show" style="display: block; padding: 10px 8px;"><a href="#" class="remove"><i class="icon-remove"></i></a></td>
                         </tr>
                     {% endfor %}
                 </tbody>
