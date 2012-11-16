@@ -1,3 +1,5 @@
+import settings
+
 from google.appengine.api import memcache
 from google.appengine.ext import db
 from google.appengine.ext.db import Key
@@ -22,7 +24,7 @@ class MainHandler(BaseHandler):
         if user:
             # Try to get rendered output from memcache
             rendered = memcache.get('dashboard-' + user.user_id)
-            if rendered:
+            if rendered and not settings.DEBUG:
                 return self.response.out.write(rendered)
 
             # Fetch following users
@@ -83,7 +85,7 @@ class MainHandler(BaseHandler):
         else:
             # Try to get rendered output from memcache
             rendered = memcache.get('index')
-            if rendered:
+            if rendered and not settings.DEBUG:
                 return self.response.out.write(rendered)
 
             recipes = Recipe.all()\
