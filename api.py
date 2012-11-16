@@ -67,8 +67,8 @@ def user_to_response(user):
         'user_name': user.name,
         'joined_date': str(user.joined),
         'awards': user.awards,
-        'avatar_small': user.gravatar_tiny,
-        'avatar': user.gravatar_small,
+        'avatar_small': user.avatar_tiny,
+        'avatar': user.avatar_small,
         'url': 'http://www.malt.io/users/%s' % user.name
     })
 
@@ -112,7 +112,12 @@ def recipe_to_response(recipe):
         }))
 
     owner = recipe.owner
-    parent = recipe.cloned_from
+
+    try:
+        parent = recipe.cloned_from
+    except:
+        parent = None
+
     parent_owner = parent and parent.owner or None
 
     return apimessages.RecipeGetResponse(**{
