@@ -1,0 +1,38 @@
+/* removing navagation bar and the various footers */
+.navbar, .breadcrumb, .license, .socialFooter , .footershortcut, .footerlinks {
+    padding: 0px;
+    margin: 0px;
+    display: none;
+}
+
+#contentContainer  {
+    margin-top: 0px;
+}
+
+/*formatting the hero text on the page */
+.hero-unit {
+    padding: 0px;
+    margin-bottom: 0px;
+    background-color: #FFF;
+}
+
+#recipeName {
+    text-align:center;
+}
+
+#recipeDescription {
+    font-style: italic;
+}
+
+.price-tag, .likes-container, .btn-group, .edit-hide {
+    display: none;
+}
+
+/*removing the discussion thread */
+#disqus_thread {
+    display: none;
+}
+
+.table-striped tbody tr:nth-child(odd) td, .table-striped tbody tr:nth-child(odd) th {
+    background-color: #FFF;
+}

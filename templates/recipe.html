@@ -4,6 +4,7 @@
     <meta name="description" content="{{ recipe.description }}"/>
     <meta property="og:title" content="{{ recipe.name }} - {% if publicuser %}{{ publicuser.name }} - {% endif %}Malt.io"/>
     <meta property="og:description" content="{{ recipe.description }}"/>
+    <link rel="stylesheet" type="text/css" href="/static/styles/printRecipe.css" media="print"/>
 {% endblock %}
 
 {% block scripts %}
