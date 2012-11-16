@@ -479,6 +479,16 @@ textarea.large {
         background-color: #333;
     }
 
+    .doorstop {
+        background-color: white;
+        height: 100%;
+        width: 10px;
+        position: absolute;
+        z-index: -1;
+        top: 2px;
+        left: 153px;
+    }
+
     .recipe {
         width: 290px;
         background-color: #fff;
@@ -490,6 +500,11 @@ textarea.large {
 
     .entry {
         margin-bottom: 3.5em;
+        position: relative;
+    }
+
+    .details {
+        overflow: hidden;
         position: relative;
     }
 
@@ -570,6 +585,23 @@ textarea.large {
 
     .tags {
         margin-right: 6px;
+    }
+
+    .expander {
+        width: 100%;
+        position: absolute;
+        bottom: 0px;
+        background-color: white;
+        padding-top: 6px;
+        padding-left: 1.5em;
+    }
+
+    .gradient {
+        position: absolute;
+        bottom: 24px;
+        width: 100%;
+        height: 10px;
+        background-image: -moz-linear-gradient(center top, rgba(255, 255, 255, 0), rgb(255, 255, 255));
     }
 }
 

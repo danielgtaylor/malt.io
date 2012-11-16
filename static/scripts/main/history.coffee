@@ -114,6 +114,18 @@ class RecipeHistory
         # useless without javascript
         $('#options').toggle()
 
+        # Setup for expanding and collapsing long entries
+        # We'll only add collapsing if the details as shown are taller than
+        # ten times the line height (completely arbitrary, but looks good)
+        details = $('.entry .details')
+        height = 8 * parseInt(details.css('line-height'))
+        for detail in details
+            detail = $(detail)
+            # Compare height to see if we need to make this detail collapse
+            if height < detail.height()
+                detail.height(height)
+                detail.append('<div class="gradient"></div><div class="expander"><a href="#">More</a></div>')
+
     # Toggle difference highlights on recipes.
     @toggleHighlight: (event) =>
         # Toggle the highlight class on the spans we added

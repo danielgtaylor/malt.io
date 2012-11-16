@@ -49,6 +49,8 @@
                     {{ entry.recipe|recipe_snippet }}
                     {% if not loop.last %}
                         <div class="downarrow"></div>
+                    {% else %}
+                        <div class="doorstop"></div>
                     {% endif %}
                 {% else %}
                     <div class="node">
@@ -57,7 +59,7 @@
                         <div class="downarrow"></div>
                     </div>
                 {% endif %}
-                <div class="offset4">
+                <div class="offset4 details">
                     <p>
                         <span class="tags">
                         {% if entry.customtag %}
