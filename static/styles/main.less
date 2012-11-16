@@ -16,6 +16,14 @@
     transition: @value;
 }
 
+.transition (@value1, @value2) {
+    -webkit-transition: @value1, @value2;
+    -moz-transition: @value1, @value2;
+    -ms-transition: @value1, @value2;
+    -o-transition: @value1, @value2;
+    transition: @value1, @value2;
+}
+
 .rotate (@value) {
     -webkit-transform: rotate(@value);
     -moz-transform: rotate(@value);
@@ -46,8 +54,47 @@
     .transition(none);
 }
 
-h1[contentEditable], p[contentEditable], span[contentEditable], td[contentEditable] {
-    color: #3A87AD;
+h1[contentEditable], p[contentEditable], span[contentEditable] {
+    position: relative;
+    color: #555;
+    background-color: white;
+    border: 1px solid #ccc;
+    border-radius: 3px;
+    box-shadow: inset 0 1px 1px rgba(0, 0, 0, 0.075);
+    .transition(border linear .2s, box-shadow linear .2s)
+}
+
+td[contentEditable] {
+    /*color: #3A87AD;*/
+    position: relative;
+    color: #555;
+    background-color: white;
+    /*box-shadow: inset 0 1px 1px rgba(0, 0, 0, 0.075);*/
+    .transition(border linear .2s, box-shadow linear .2s)
+}
+
+h1[contentEditable], p[contentEditable], span[contentEditable] {
+    padding: 4px;
+    margin: 6px 0;
+}
+
+h1[contentEditable]:focus, p[contentEditable]:focus, span[contentEditable]:focus, td[contentEditable]:focus {
+    z-index: 1;
+    outline: 0px solid transparent;
+    border-color: rgba(82, 168, 236, 0.8);
+    box-shadow: inset 0 1px 1px rgba(0, 0, 0, 0.075), 0 0 8px rgba(82, 168, 236, 0.6);
+    .transition(border linear .2s, box-shadow linear .2s)
+}
+
+.table-striped tr td[contentEditable] {
+    &:focus, &:hover {
+        background-color: white;
+        .transition(all .2s);
+    }
+}
+
+.hero-unit .btn-group {
+    margin-left: 0;
 }
 
 a {
@@ -168,8 +215,7 @@ textarea.large {
 .dropdown-toggle .avatar-tiny {
     float: none;
     display: inline-block;
-    margin-top: 0;
-    margin-bottom: -2px;
+    margin-top: -1px;
 }
 
 .srm {

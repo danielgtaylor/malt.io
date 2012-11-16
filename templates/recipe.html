@@ -105,11 +105,13 @@
         <h1 id="recipeName">{% if recipe.old %}{{ recipe.oldname }}{% else %}{{ recipe.name }}{% endif %}</h1>
         <p id="recipeDescription">{{ recipe.description }}</p>
         <p style="font-size: 100%; line-height: 12pt;">
-            Style: <span id="styleName" data-category="{{ recipe.category }}" data-style="{{ recipe.style }}">{{ recipe.style_display }}</span> <a class="btn btn-inverse btn-mini edit-show" data-toggle="modal" href="#styleModal" style="display: none; margin-top: -2px">Edit</a>
-            <br/>
-            Batch size: <span id="batchSize" class="validate positive number">{{ recipe.batch_size }}</span> gallons
-            <br/>
-            Boil size: <span id="boilSize" class="validate positive number">{{ recipe.boil_size }}</span> average gallons
+            Style: <span id="styleName" data-category="{{ recipe.category }}" data-style="{{ recipe.style }}">{{ recipe.style_display }}</span>
+            <div class="edit-hide">
+                <br/>
+                Batch size: <span id="batchSize">{{ recipe.batch_size }}</span> gallons
+                <br/>
+                Boil size: <span id="boilSize">{{ recipe.boil_size }}</span> average gallons
+            </div>
         </p>
         <div class="btn-group edit-hide" style="float: left;">
             {% if not recipe.old %}
@@ -135,6 +137,10 @@
                 <a class="btn" href="/users/{{ publicuser.name }}/recipes/{{ recipe.slug }}"><i class="icon-arrow-up"></i> Latest</a>
                 <a class="btn disabled"><i class="icon-download-alt"></i> Export</a>
             {% endif %}
+        </div>
+        <div class="btn-group edit-show" class="float: left; display: none;">
+            <a class="btn" data-toggle="modal" href="#styleModal"><i class="icon-tint"></i> Edit Style</a>
+            <a class="btn" data-toggle="modal" href="#scaleModal"><i class="icon-signal"></i> Scale</a>
         </div>
         <div class="edit-hide" style="float: left; margin-left: 1em; margin-top: 4px; position: relative;">
             <div class="g-plusone" data-size="medium" data-annotation="none"></div>&nbsp;
@@ -273,7 +279,7 @@
                             <td class="num validate positive integer">{{ ingredient.ppg }}</td>
                             <td class="num"><span class="srm" data-srm="{{ ingredient.color }}"></span> </td>
                             <td class="num validate positive integer" style="border-left: none;">{{ ingredient.color }}</td>
-                            <td class="edit-show"><a href="#" class="remove"><i class="icon-remove"></i></a></td>
+                            <td class="edit-show" style="display: block; padding: 10px 8px;"><a href="#" class="remove"><i class="icon-remove"></i></a></td>
                         </tr>
                     {% endfor %}
                 </tbody>
@@ -428,6 +434,37 @@
                 {{ ['Wyeast 2035 - American Lager&trade;', 'lager', 'liquid', 77, 9, 48, 58]|render_yeast_template }}
                 {{ ['Wyeast 2206 - Bavarian Lager&trade;', 'lager', 'liquid', 77, 9, 46, 58]|render_yeast_template }}
                 {{ ['Wyeast 2278 - Czech Pils&trade;', 'lager', 'liquid', 74, 9, 50, 58]|render_yeast_template }}
+            </ul>
+        </div>
+        <div class="btn-group">
+            <a class="btn dropdown-toggle" data-toggle="dropdown" href="#">
+                <i class="icon-plus-sign"></i> White Labs Ale
+                <span class="caret"></span>
+            </a>
+            <ul class="dropdown-menu">
+                {{ ['WLP001 - California Ale', 'ale', 'liquid', 76, 12, 68, 73]|render_yeast_template }}
+                {{ ['WLP002 - English Ale', 'ale', 'liquid', 67, 9, 65, 68]|render_yeast_template }}
+                {{ ['WLP004 - Irish Ale', 'ale', 'liquid', 72, 10, 65, 68]|render_yeast_template }}
+                {{ ['WLP029 - German Ale \ Kölsch', 'ale', 'liquid', 75, 9, 65, 69]|render_yeast_template }}
+                {{ ['WLP300 - Hefeweizen Ale', 'ale', 'liquid', 74, 9, 68, 72]|render_yeast_template }}
+                {{ ['WLP400 - Belgian Wit Ale', 'ale', 'liquid', 76, 9, 67, 74]|render_yeast_template }}
+                {{ ['WLP500 - Trappist Ale', 'ale', 'liquid', 78, 12, 65, 72]|render_yeast_template }}
+                {{ ['WLP530 - Abbey Ale', 'ale', 'liquid', 78, 15, 66, 72]|render_yeast_template }}
+                {{ ['WLP565 - Belgian Saison I', 'ale', 'liquid', 70, 9, 68, 75]|render_yeast_template }}
+            </ul>
+        </div>
+        <div class="btn-group">
+            <a class="btn dropdown-toggle" data-toggle="dropdown" href="#">
+                <i class="icon-plus-sign"></i> White Labs Lager
+                <span class="caret"></span>
+            </a>
+            <ul class="dropdown-menu">
+                {{ ['WLP800 - Pilsner Lager', 'ale', 'liquid', 74, 8, 50, 55]|render_yeast_template }}
+                {{ ['WLP810 - San Francisgo Lager', 'ale', 'liquid', 68, 8, 58, 65]|render_yeast_template }}
+                {{ ['WLP820 - Oktoberfest / Märzen Lager', 'ale', 'liquid', 69, 10, 52, 58]|render_yeast_template }}
+                {{ ['WLP830 - German Lager', 'ale', 'liquid', 76, 8, 50, 55]|render_yeast_template }}
+                {{ ['WLP840 - American Lager', 'ale', 'liquid', 77, 8, 50, 55]|render_yeast_template }}
+                {{ ['WLP940 - Mexican Lager', 'ale', 'liquid', 74, 8, 50, 55]|render_yeast_template }}
             </ul>
         </div>
         <div class="btn-group">

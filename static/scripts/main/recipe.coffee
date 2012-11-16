@@ -78,6 +78,11 @@ class Recipe
             Util.selectAll(event)
         )
 
+        # If this is the new recipe page, then see if we have a locally saved
+        # recipe to load.
+        if window.location.pathname is '/new'
+            @loadLocal()
+
         # Setup scaling
         $('#gallonsSlider').noUiSlider('init',
             knobs: 1,
@@ -100,11 +105,6 @@ class Recipe
         # Was the page loaded in edit mode? If so, enable editing!
         if window.location.pathname is '/new' or window.location.hash is '#edit'
             @enableEdit()
-
-        # If this is the new recipe page, then see if we have a locally saved
-        # recipe to load.
-        if window.location.pathname is '/new'
-            @loadLocal()
 
     # Initialize recipe import handling
     @initImport: =>
@@ -195,7 +195,7 @@ class Recipe
 
         _gaq.push(['_trackEvent', 'Recipe', 'Edit', $('#recipeName').text()])
 
-        $('#recipeName, #recipeDescription, #batchSize, #boilSize, #bottling_temp, #bottling_pressure').attr('contentEditable', 'true')
+        $('#recipeName, #recipeDescription, #bottling_temp, #bottling_pressure').attr('contentEditable', 'true')
         $('#fermentables_data tr td:nth-child(2), #fermentables_data tr td:nth-child(3), #fermentables_data tr td:nth-child(4), #fermentables_data tr td:nth-child(5), #fermentables_data tr td:nth-child(6), #fermentables_data tr td:nth-child(8), #hops_data tr td:nth-child(1), #hops_data tr td:nth-child(2), #hops_data tr td:nth-child(3), #hops_data tr td:nth-child(4), #hops_data tr td:nth-child(5), #hops_data tr td:nth-child(6), #yeast_data tr td:nth-child(1), #yeast_data tr td:nth-child(2), #yeast_data tr td:nth-child(3), #yeast_data tr td:nth-child(4)').attr('contentEditable', 'true')
         $('#saveMsg, .edit-show').show()
         $('.edit-hide').hide()
@@ -303,7 +303,7 @@ class Recipe
         table = $('#fermentables_data')[0]
         lb = Math.floor(weight)
         oz = Math.round((weight - lb) * 16)
-        row = '<tr><td class="num percent">?</td><td class="num validate positive integer" contentEditable="true">' + lb + '</td><td class="num validate positive integer" contentEditable="true">' + oz + '</td><td contentEditable="true">' + description + '</td><td contentEditable="true">' + late + '</td><td class="num validate positive integer" contentEditable="true">' + ppg + '</td><td class="num"><span class="srm" data-srm="' + srm + '" style="background-color: ' + Util.srmToRgb(srm) + '"></span> </td><td class="num validate positive integer" style="border-left: none;" contentEditable="true">' + srm + '</td><td class="edit-show" style="display: block"><a href="#" class="remove"><i class="icon-remove"></i></a></td></tr>'
+        row = '<tr><td class="num percent">?</td><td class="num validate positive integer" contentEditable="true">' + lb + '</td><td class="num validate positive integer" contentEditable="true">' + oz + '</td><td contentEditable="true">' + description + '</td><td contentEditable="true">' + late + '</td><td class="num validate positive integer" contentEditable="true">' + ppg + '</td><td class="num"><span class="srm" data-srm="' + srm + '" style="background-color: ' + Util.srmToRgb(srm) + '"></span> </td><td class="num validate positive integer" style="border-left: none;" contentEditable="true">' + srm + '</td><td class="edit-show" style="display: block; padding: 10px 8px;"><a href="#" class="remove"><i class="icon-remove"></i></a></td></tr>'
         table.innerHTML += row
     
     # Add a hop/spice row to the hops and spices table based on a hop
