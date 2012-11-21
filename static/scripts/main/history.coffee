@@ -118,13 +118,39 @@ class RecipeHistory
         # We'll only add collapsing if the details as shown are taller than
         # ten times the line height (completely arbitrary, but looks good)
         details = $('.entry .details')
-        height = 8 * parseInt(details.css('line-height'))
+        height = 10 * parseInt(details.css('line-height'))
         for detail in details
             detail = $(detail)
+            oh = detail.height()
             # Compare height to see if we need to make this detail collapse
-            if height < detail.height()
-                detail.height(height)
-                detail.append('<div class="gradient"></div><div class="expander"><a href="#">More</a></div>')
+            if height > oh
+                continue
+            # Now that we know the details are too tall, we need to find
+            # a good point to cut off the list. We don't want to cut off
+            # only a single item, nor do we want to cut subitems away from
+            # their parent.
+            listitems = detail.children('ul').children('li')
+            if listitems.length < 2
+                continue
+            # Find the first item that puts us over the height limit
+            for i in [0 ... listitems.length]
+                if listitems[i].offsetTop > height
+                    break
+            # Check if we ended on the last item
+            if i >= listitems.length - 1
+                continue
+            # Perform cutting!
+            detail.height(listitems[i].offsetTop + 16)
+            detail.append('<a href="#" class="more">More</a>')
+            for i in [i ... listitems.length]
+                listitems.eq(i).toggle()
+
+            # Set some data so we don't need to do these calculations again
+            detail.data({
+                'ci': i,
+                'ch': detail.height(),
+                'oh': oh + 18
+            })
 
     # Toggle difference highlights on recipes.
     @toggleHighlight: (event) =>
