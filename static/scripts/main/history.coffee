@@ -46,17 +46,15 @@ class RecipeHistory
                             'margin-left': '5px'
                             })
 
-                    # Use the new height to find an adjustment for the next
-                    # element beneath the current element. This could be a
-                    # following <ul>, the <li> following the parent <li>, or
-                    # the element's grandparent (the containing <div>)
+                    # Use the new height to find an adjustment for either the
+                    # next element beneath the current element or for the
+                    # parent. This could be a following <ul> or the parent
+                    # <li>.
                     adjust = element.height() - lineheight + 3
                     if element.next().length > 0
                         element.next().css('margin-top', '+=' + adjust)
-                    else if element.parent().next().length > 0
-                        element.parent().next().css('margin-top', '+=' + adjust)
                     else
-                        element.parent().parent().css('padding-bottom', '+=' + (adjust - 7))
+                        element.parent().height('+=' + adjust)
 
         # A list of elements that represent changes in the recipe snippets,
         # allowing easier toggling of highlights
@@ -114,6 +112,9 @@ class RecipeHistory
         # useless without javascript
         $('#options').toggle()
 
+        # Add the visibility flag for details
+        @visible = true
+
         # Setup for expanding and collapsing long entries
         # We'll only add collapsing if the details as shown are taller than
         # ten times the line height (completely arbitrary, but looks good)
@@ -121,9 +122,8 @@ class RecipeHistory
         height = 10 * parseInt(details.css('line-height'))
         for detail in details
             detail = $(detail)
-            oh = detail.height()
             # Compare height to see if we need to make this detail collapse
-            if height > oh
+            if height > detail.height()
                 continue
             # Now that we know the details are too tall, we need to find
             # a good point to cut off the list. We don't want to cut off
@@ -139,17 +139,22 @@ class RecipeHistory
             # Check if we ended on the last item
             if i >= listitems.length - 1
                 continue
+            # Create the "more changes" link
+            detail.append($(document.createElement('a'))
+                            .addClass('more')
+                            .attr('href', '#')
+                            .click(@toggleExpand)
+                            .text("Show #{listitems.length - i} more changes"))
             # Perform cutting!
-            detail.height(listitems[i].offsetTop + 16)
-            detail.append('<a href="#" class="more">More</a>')
-            for i in [i ... listitems.length]
-                listitems.eq(i).toggle()
+            for j in [i ... listitems.length]
+                listitems.eq(j).toggle()
 
             # Set some data so we don't need to do these calculations again
             detail.data({
                 'ci': i,
-                'ch': detail.height(),
-                'oh': oh + 18
+                'es': false,
+                'ot': "Show #{listitems.length - i} more changes",
+                'at': "Show #{listitems.length - i} fewer changes"
             })
 
     # Toggle difference highlights on recipes.
@@ -173,30 +178,47 @@ class RecipeHistory
 
     # Toggle visibility of ingredient change details (sub-lists to changes)
     @toggleDetails: (event) =>
+        elements = $('.entry li ul')
+
+        # Toggle visibility
+        @visible = !@visible
+        elements.toggle(@visible)
+
         # Need to check if each element we're about to show or hide has special
         # margins set to apply those margins to surrounding elements when this
         # element gets shown or hidden
-        elements = $('.entry li ul')
-        visible = elements.is(':visible')
-
         for element in elements
             element = $(element)
             margin = parseInt(element.css('margin-top'))
             if margin != 0
-                # Adjust the height of the following element or container. This
-                # could be the <li> following the parent <li>, or the element's
-                # grandparent (the containing <div>)
-                if element.parent().next().length > 0
-                    element.parent().next().css('margin-top', if visible then '+=' + margin else '-=' + margin)
+                # Adjust the height of the parent <li>
+                if @visible
+                    element.parent().css('height', 'auto')
                 else
-                    element.parent().parent().css('padding-bottom', if visible then '+=' + (margin - 7) else '-=' + (margin - 7))
+                    element.parent().height('+=' + margin)
 
-        # Toggle visibility
-        elements.toggle()
-
-        # visible is the old visibility, so visible === true means now hidden
-        if not visible
+        # Update the text to reflect the new state
+        if @visible
             $(event.currentTarget).text('Hide Details')
         else
             $(event.currentTarget).text('Show Details')
-        event.preventDefault();
+        event.preventDefault()
+
+    # Toggle expanding / collapsing details for a single entry
+    @toggleExpand: (event) =>
+        # Get the detail div so we can perform the transitions we need
+        a = $(event.currentTarget)
+        detail = $(a).parent()
+        data = detail.data()
+
+        # Update the displayed text depending on whether we're currently
+        # showing (true) or hiding (false)
+        a.text(if data['es'] then data['ot'] else data['at'])
+
+        # Toggle visibility for the listitems
+        listitems = detail.children('ul').children('li')
+        for i in [data['ci'] ... listitems.length]
+            listitems.eq(i).toggle()
+
+        detail.data('es', !data['es'])
+        event.preventDefault()

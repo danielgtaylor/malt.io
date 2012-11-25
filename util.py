@@ -398,7 +398,7 @@ def render_history_diff(value):
     modifications = value[2]
 
     if len(additions) == len(deletions) == len(modifications) == 0:
-        return '<p>Nothing\'s changed, why am I here!?</p>'
+        return '<p>Nothing\'s changed.</p>'
 
     for key in additions:
         if key == 'ingredients':
@@ -517,5 +517,7 @@ def key_for_display(key):
         return 'PPG'
     elif key == 'color':
         return '&deg;L'
+    elif key == 'oz':
+        return 'weight'
     else:
         return key.replace('_', ' ')

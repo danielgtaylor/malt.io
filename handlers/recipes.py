@@ -579,6 +579,10 @@ class RecipeHistoryHandler(BaseHandler):
         # Start going through the history looking at differences to decide how
         # we plan on displaying the info to the user (using a snippet or not)
         for i in range(len(differences)):
+            # Make sure this entry has differences before further processing
+            if self.is_empty(differences[i]):
+                continue
+
             # Set some required properties for the snippet to work
             history[i].owner = publicuser
             history[i].slug = recipe.slug + '/history/' + str(history[i].key().id())
@@ -590,11 +594,18 @@ class RecipeHistoryHandler(BaseHandler):
             # and we should show a snippet
             for snippetItem in RecipeHistoryHandler.SNIPPET_ITEMS:
                 if snippetItem in differences[i][2]:
-                    entry['recipe'] = history[i]
-                    # Make sure the color, ibu, and alcohol were created
-                    if not hasattr(history[i], 'color'):
-                        history[i].update_cache()
-                    break
+                    # See if the change was more than 10%, then show the
+                    # snippet, else show the orb
+                    try:
+                        change = differences[i][2][snippetItem][1] / differences[i][2][snippetItem][0]
+                    except:
+                        change = 2
+                    if change < 0.9 or change > 1.1:
+                        entry['recipe'] = history[i]
+                        # Make sure the color, ibu, and alcohol were created
+                        if not hasattr(history[i], 'color'):
+                            history[i].update_cache()
+                        break
 
             # Set the required properties
             entry['differences'] = self.delete_ignored_keys(differences[i])
@@ -639,3 +650,12 @@ class RecipeHistoryHandler(BaseHandler):
                 del differences[2][key]
 
         return differences
+
+    def is_empty(self, differences):
+        """
+        Check if the are no differences.
+        """
+        for diff in differences:
+            if len(diff) > 0:
+                return False
+        return True
