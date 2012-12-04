@@ -415,10 +415,7 @@ class RecipeHandler(BaseHandler):
                            .filter('slug =', recipe_slug)\
                            .get()
 
-            if recipe:
-                # Save a historic version of this recipe
-                recipe.put_historic_version()
-            else:
+            if not recipe:
                 self.render_json({
                     'status': 'error',
                     'error': 'Recipe not found'
@@ -432,6 +429,9 @@ class RecipeHandler(BaseHandler):
                 'error': 'Permission denied: you are not the recipe owner!'
             })
             return
+
+        # Create a historic version to save
+        historic = recipe.create_historic_version()
 
         # Update recipe
         recipe.name = recipe_data['name']
@@ -450,19 +450,31 @@ class RecipeHandler(BaseHandler):
         # Update slug
         recipe.slug = generate_usable_slug(recipe)
 
-        # Save recipe to database
-        key = recipe.put()
+        # Perform a diff on the new and historic recipes to see if any actual
+        # changes were made
+        diff = recipe.diff(historic, False)
 
-        action = UserAction()
-        action.owner = user
-        action.object_id = key.id()
+        # See if any changes were actually made
+        if len(diff[0]) != 0 or \
+           len(diff[1]) != 0 or \
+           len(diff[2]) != 0:
+            
+            # Save recipe to database
+            key = recipe.put()
 
-        if not recipe_slug:
-            action.type = action.TYPE_RECIPE_CREATED
-        else:
-            action.type = action.TYPE_RECIPE_EDITED
+            # Save the historic version to database
+            historic.put()
 
-        action.put()
+            action = UserAction()
+            action.owner = user
+            action.object_id = key.id()
+
+            if not recipe_slug:
+                action.type = action.TYPE_RECIPE_CREATED
+            else:
+                action.type = action.TYPE_RECIPE_EDITED
+
+            action.put()
 
         self.render_json({
             'status': 'ok',

@@ -340,7 +340,7 @@ class RecipeBase(db.Model):
                                 oldIngredients[ingredient][prop],
                                 newIngredients[ingredient][prop]
                             )
-                else:
+                elif newIngredients[ingredient] != oldIngredients[ingredient]:
                     # Make the dictionary chain if necessary
                     if not 'ingredients' in modifications:
                         modifications['ingredients'] = {}
@@ -573,13 +573,13 @@ class Recipe(RecipeBase):
 
         return super(Recipe, self).put(*args)
 
-    def put_historic_version(self):
+    def create_historic_version(self):
         """
-        Save a historic version of this recipe in the data store. The contents
-        of this recipe are copied to the RecipeHistory store with a link back
-        to this recipe.
+        Create a historic version of this recipe. The contents of this recipe
+        are copied to the RecipeHistory with a link back to this recipe. The
+        history is not yet commited to the datastore.
         """
-        history = RecipeHistory(self, **{
+        return RecipeHistory(self, **{
             'created': self.edited,
             'name': self.name,
             'description': self.description,
@@ -592,7 +592,6 @@ class Recipe(RecipeBase):
             'bottling_pressure': self.bottling_pressure,
             '_ingredients': self._ingredients
         })
-        history.put()
 
 
 class RecipeHistory(RecipeBase):
