@@ -605,7 +605,9 @@
             <p id="brewTime">2.5 hours</p>
         </div>
     </div>
-    <div id="disqus_thread" {% if recipe.new or recipe.old %}style="display: none;"{% endif %}></div>
+    {% if not recipe.new and not recipe.old %}
+        <div id="disqus_thread"></div>
+    {% endif %}
     <div class="license">
         Creative Commons <a rel="license" href="http://creativecommons.org/licenses/by-sa/3.0/deed.en_US"><img style="border-width:0" src="http://i.creativecommons.org/l/by-sa/3.0/88x31.png" alt="This recipe is licensed under a Creative Commons Attribution-ShareAlike 3.0 Unported license." title="This recipe is licensed under a Creative Commons Attribution-ShareAlike 3.0 Unported license."/></a> Attribution ShareAlike
     </div>

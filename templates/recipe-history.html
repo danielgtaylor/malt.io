@@ -42,7 +42,7 @@
         <div class="line"></div>
         {% for entry in entries %}
             <div class="entry clearfix">
-                {% if entry.recipe %}
+                {% if entry.show_snippet and entry.recipe %}
                     {% if not loop.first %}
                         <div class="uparrow"></div>
                     {% endif %}

@@ -539,7 +539,7 @@ class RecipeHistoryHandler(BaseHandler):
         /users/USERNAME/recipes/RECIPE-SLUG/history
     """
     IGNORED_KEYS = ('color', 'ibu', 'alcohol')
-    SNIPPET_ITEMS = IGNORED_KEYS + ('name', 'description')
+    SNIPPET_ITEMS = ('name', 'description')
 
     def get(self, username=None, recipe_slug=None):
         """
@@ -570,7 +570,8 @@ class RecipeHistoryHandler(BaseHandler):
             'recipe': recipe,
             'edited': recipe.edited,
             'slug': recipe.slug,
-            'customtag': 'Most Recent'
+            'customtag': 'Most Recent',
+            'show_snippet': True
         }]
 
         # Check if there is any history to diff with
@@ -600,29 +601,25 @@ class RecipeHistoryHandler(BaseHandler):
             history[i].slug = recipe.slug + '/history/' + str(history[i].key().id())
 
             # Create the entry
-            entry = {}
+            entry = {
+                'recipe': history[i],
+                'differences': self.delete_ignored_keys(differences[i]),
+                'edited': history[i].created,
+                'slug': history[i].slug,
+                'show_snippet': False
+            }
 
-            # Check if the name, description, color, ibu, or alcohol changed
-            # and we should show a snippet
+            # Check if the name or description changed and we should show
+            # a snippet
             for snippetItem in RecipeHistoryHandler.SNIPPET_ITEMS:
                 if snippetItem in differences[i][2]:
-                    # See if the change was more than 10%, then show the
-                    # snippet, else show the orb
-                    try:
-                        change = differences[i][2][snippetItem][1] / differences[i][2][snippetItem][0]
-                    except:
-                        change = 2
-                    if change < 0.9 or change > 1.1:
-                        entry['recipe'] = history[i]
-                        # Make sure the color, ibu, and alcohol were created
-                        if not hasattr(history[i], 'color'):
-                            history[i].update_cache()
-                        break
+                    entry['show_snippet'] = True
+                    # Make sure the color, ibu, and alcohol were created
+                    if not hasattr(history[i], 'color'):
+                        history[i].update_cache()
+                    break
 
-            # Set the required properties
-            entry['differences'] = self.delete_ignored_keys(differences[i])
-            entry['edited'] = history[i].created
-            entry['slug'] = history[i].slug
+            # Save the entry
             entries.append(entry)
 
         # Add the final entry only if it's the original recipe, otherwise it
@@ -633,6 +630,8 @@ class RecipeHistoryHandler(BaseHandler):
             if recipe.created - delta < last.created < recipe.created + delta:
                 last.owner = publicuser
                 last.slug = recipe.slug + '/history/' + str(last.key().id())
+                if not hasattr(last, 'color'):
+                    last.update_cache()
                 entries.append({
                     'recipe': last,
                     'edited': last.created,
@@ -640,6 +639,39 @@ class RecipeHistoryHandler(BaseHandler):
                     'customtag': 'Original',
                     'first': True
                 })
+
+        # Perform a second pass in reverse to check for large changes that
+        # should show up as a snippet but were missed in the pairwise
+        # checking above.
+        entries[-1]['show_snippet'] = True
+        for i in range(len(entries) - 1, 0, -1):
+            # Check if the snippet is already showing
+            if entries[i]['show_snippet']:
+                last_snippet = entries[i]['recipe']
+                continue
+
+            # Check if the name, description, color, ibu, or alcohol changed
+            # and we should show a snippet
+            for snippetItem in RecipeHistoryHandler.IGNORED_KEYS:
+                if not hasattr(entries[i]['recipe'], snippetItem):
+                    continue 
+                
+                attr = getattr(entries[i]['recipe'], snippetItem)
+                if type(attr) != int and type(attr) != float:
+                    continue
+
+                # See if the change was more than 10%, then show the
+                # snippet, else show the orb
+                try:
+                    change = float(attr) / getattr(last_snippet, snippetItem)
+                except:
+                    change = 2
+                logging.info(snippetItem)
+                logging.info(change)
+                if change < 0.9 or change > 1.1:
+                    last_snippet = entries[i]['recipe']
+                    entries[i]['show_snippet'] = True
+                    break
 
         # Stop the template from performing another query for the username
         # when it tries to render the recipe
