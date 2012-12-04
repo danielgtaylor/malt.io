@@ -8,6 +8,15 @@ $(document).ready(->
         }
     })
 
+    # Setup date / time pickers
+    $('.datepicker').datepicker(
+        format: 'd b yyyy'
+    )
+
+    $('.timepicker').timepicker(
+        showMeridian: false
+    )
+
     # Setup search bar
     $('#searchForm').submit((event) =>
         event.preventDefault();

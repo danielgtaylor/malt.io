@@ -299,7 +299,7 @@ def format_date(value, format="%d %b %Y"):
         16 Jun 2012
 
     """
-    return value.strftime(format)
+    return value and value.strftime(format) or ''
 
 JINJA_ENV.filters['format_date'] = format_date
 
