@@ -37,3 +37,18 @@ libraries:
 builtins:
 - admin_redirect: on
 - appstats: on
+
+skip_files:
+- ^(.*/)?app\.yaml
+- ^(.*/)?app\.yml
+- ^(.*/)?index\.yaml
+- ^(.*/)?index\.yml
+- ^(.*/)?#.*#
+- ^(.*/)?.*~
+- ^(.*/)?.*\.py[co]
+- ^(.*/)?.*/RCS/.*
+- ^(.*/)?\..*
+- ^(.*/)?.*\.coffee
+- ^(.*/)?.*\.less
+- node_modules
+- build
