@@ -28,8 +28,11 @@ You can run a local copy of the site for development. Several prerequisites must
 sudo apt-get install git python-pip nodejs npm
 
 # Get Google AppEngine
-wget http://googleappengine.googlecode.com/files/google_appengine_1.7.1.zip
-unzip google_appengine_1.7.1.zip
+wget http://googleappengine.googlecode.com/files/google_appengine_1.7.3.zip
+unzip google_appengine_1.7.3.zip
+
+# Modify your path, e.g put the following into your ~/.bashrc:
+export PATH=$PATH:/home/<username>/google_appengine
 
 # Get other dependencies
 pip install pycco nose NoseGAE nose-exclude
@@ -40,8 +43,7 @@ git clone https://github.com/danielgtaylor/malt.io.git
 
 # Run the development server
 cd malt.io
-./genStatic.sh
-../google_appengine/dev_appserver.py .
+cake server
 ```
 
 You should now be able to access the site at [http://localhost:8080/](http://localhost:8080)
@@ -59,9 +61,9 @@ You should now be able to access the site at [http://localhost:8080/](http://loc
 	1. Click *Advanced system settings*
 	1. Click *Environment variables*
 	1. Select *PATH* and click *Edit* in the top half of the window
-	1. Ensure your path contains python, python scripts, app engine and npm: `...;C:\Program Files\Google\google_appengine;C:\Python27;C:\Python27\Scripts;C:\Users\username\AppData\Roaming\npm\`
+	1. Ensure your path contains python, python scripts, app engine and npm: `...;C:\Program Files\Google\google_appengine;C:\Python27;C:\Python27\Scripts;C:\Users\<username>\AppData\Roaming\npm\`
  * Click *Clone in Windows* above to clone Malt.io
- * Then run *Git Shell* from your start menu and do:
+ * Then run *Git Shell* (or check out [ConEmu](http://code.google.com/p/conemu-maximus5/)) from your start menu and do:
 
  	```bash
 	# Install other dependencies
@@ -70,8 +72,7 @@ You should now be able to access the site at [http://localhost:8080/](http://loc
 
 	# Run the development server
 	cd malt.io
-	./genStatic.sh
-	dev_appserver.py .
+	cake server
 	```
 
 You should now be able to access the site at [http://localhost:8080/](http://localhost:8080)
@@ -84,7 +85,7 @@ In order to see changes to these files in the browser you must first regenerate 
 
 ```bash
 cd malt.io
-./genStatic.sh
+cake static
 ```
 
 This script generates a main CSS file, a main Javascript file, and updates query strings so that browser caching isn't an issue. You **must** run this script to see your changes.
