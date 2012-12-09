@@ -156,6 +156,19 @@
         </div>
         {% endif %}
     </div>
+    {% if recipe.brews.count() %}
+        <h2>Recent Brews</h2>
+        <div class="row">
+        {% for brew in recipe.brews.order('-started').fetch(5) %}
+            <div class="brew span4 pull-left">
+                <div style="float: right">{{ brew|render_rating }}</div>
+                <div><strong>{{ brew.started|format_date }}</strong> by <a href="/users/{{ brew.owner.name }}">{{ brew.owner.name }}</a></div>
+                <div style="font-size: 80%;"><strong>OG</strong> {{ brew.og|fixed3 }}&nbsp;&nbsp;<strong>FG</strong> {{ brew.fg|fixed3 }}</div>
+                <span class="ellipsize">{{ brew.notes }}</span>
+            </div>
+        {% endfor %}
+        </div>
+    {% endif %}
     <h2>
         Fermentable Sugars
     </h2>
