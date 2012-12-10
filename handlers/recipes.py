@@ -186,7 +186,7 @@ class RecipeLikeHandler(BaseHandler):
         """
         Process a request to add or remove a user from the liked list.
         """
-        user = UserPrefs.get()
+        user = self.user
         publicuser = UserPrefs.all()\
                               .filter('name = ', username)\
                               .get()

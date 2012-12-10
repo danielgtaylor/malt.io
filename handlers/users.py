@@ -103,7 +103,7 @@ class UserFollowHandler(BaseHandler):
         """
         Follow the given user.
         """
-        user = UserPrefs.get()
+        user = self.user
         publicuser = UserPrefs.all().filter('name =', username).get()
 
         if not user or not publicuser:
