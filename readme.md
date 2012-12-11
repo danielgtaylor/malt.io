@@ -37,6 +37,7 @@ export PATH=$PATH:/home/<username>/google_appengine
 # Get other dependencies
 pip install pycco nose NoseGAE nose-exclude
 npm install --global coffee-script less uglify-js jasmine-node
+npm install colors
 
 # Get Malt.io codebase
 git clone https://github.com/danielgtaylor/malt.io.git
@@ -69,6 +70,7 @@ You should now be able to access the site at [http://localhost:8080/](http://loc
 	# Install other dependencies
 	easy_install pycco nose NoseGAE nose-exclude
 	npm install --global coffee-script less uglify-js jasmine-node
+	npm install colors
 
 	# Run the development server
 	cd malt.io
