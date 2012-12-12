@@ -39,3 +39,6 @@ static/scripts/embed.js
 
 # Secret account keys
 secrets.py
+
+# Local node modules
+node_modules
