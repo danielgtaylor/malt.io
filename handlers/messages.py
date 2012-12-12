@@ -4,7 +4,7 @@ import json
 from handlers.base import BaseHandler
 from models.message import Message
 from models.userprefs import UserPrefs
-from webapp2_extras.appengine.users import login_required
+from util import login_required
 
 
 class MessagesHandler(BaseHandler):
