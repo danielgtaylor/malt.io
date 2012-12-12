@@ -20,7 +20,7 @@ shell = 'bash'
 coffee = 'coffee'
 uglifyjs = 'uglifyjs'
 lessc = 'lessc'
-devserver = ['dev_appserver.py', '.']
+devserver = ['dev_appserver.py', '--skip_sdk_update_check', '.']
 
 # Command modifications for Windows
 if os.platform() in ['win32', 'win64']
