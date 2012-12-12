@@ -11,7 +11,7 @@
         {% set u = user_map[action.object_id] %}
         <a href="/users/{{ owner.name }}"><img class="avatar-tiny" src="{{ owner.avatar_tiny }}"/> {{ owner.name }}</a> followed another user {{ action.created|timesince }} ago
         <div class="content">
-            <a href="/users/{{ u.name }}"><img class="avatar-tiny" src="{{ owner.avatar_tiny }}"/> {{ u.name }}</a> - {{ u.recipes.count() }} recipes
+            <a href="/users/{{ u.name }}"><img class="avatar-tiny" src="{{ u.avatar_tiny }}"/> {{ u.name }}</a> - {{ u.recipes.count() }} recipes
         </div>
     {% elif action.type == action.TYPE_RECIPE_CREATED %}
         {% set recipe = recipe_map[action.object_id] %}
