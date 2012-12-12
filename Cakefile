@@ -78,6 +78,9 @@ task 'server', 'run a development server', (options) ->
 task 'static', 'generate static files (scripts, styles, etc)', (options) ->
     verbose = options.verbose
 
+    if not fs.existsSync 'secrets.py'
+        fs.createReadStream('secrets.py.template').pipe fs.createWriteStream('secrets.py')
+
     console.log '[CSS] Generating static/styles/main.css'.green
     run lessc, ['--yui-compress', join(STYLES , 'main.less'), join(STYLES, 'main.css')]
     
