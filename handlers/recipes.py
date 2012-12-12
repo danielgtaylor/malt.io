@@ -335,6 +335,7 @@ class RecipeHandler(BaseHandler):
             recipe = Recipe()
             recipe.owner = publicuser
             recipe.new = True
+            brews = []
         else:
             publicuser = UserPrefs.all().filter('name =', username).get()
 
@@ -348,6 +349,8 @@ class RecipeHandler(BaseHandler):
 
             if not recipe:
                 self.abort(404)
+
+            brews = recipe.brews.order('-started').fetch(3)
 
             if version:
                 try:
@@ -381,7 +384,8 @@ class RecipeHandler(BaseHandler):
         self.render('recipe.html', {
             'publicuser': publicuser,
             'recipe': recipe,
-            'cloned_from': cloned_from
+            'cloned_from': cloned_from,
+            'brews': brews
         })
 
     def post(self, username=None, recipe_slug=None):
@@ -406,9 +410,11 @@ class RecipeHandler(BaseHandler):
             return
 
         # Load recipe from db or create a new one
+        new_recipe = False
         if not recipe_slug:
             recipe = Recipe()
             recipe.owner = user
+            new_recipe = True
         else:
             recipe = Recipe.all()\
                            .filter('owner =', user)\
@@ -431,7 +437,9 @@ class RecipeHandler(BaseHandler):
             return
 
         # Create a historic version to save
-        historic = recipe.create_historic_version()
+        historic = None
+        if not new_recipe:
+            historic = recipe.create_historic_version()
 
         # Update recipe
         recipe.name = recipe_data['name']
@@ -450,31 +458,34 @@ class RecipeHandler(BaseHandler):
         # Update slug
         recipe.slug = generate_usable_slug(recipe)
 
-        # Perform a diff on the new and historic recipes to see if any actual
-        # changes were made
-        diff = recipe.diff(historic, False)
+        recipe.put()
 
-        # See if any changes were actually made
-        if len(diff[0]) != 0 or \
-           len(diff[1]) != 0 or \
-           len(diff[2]) != 0:
-            
-            # Save recipe to database
-            key = recipe.put()
+        if historic:
+            # Perform a diff on the new and historic recipes to see if any actual
+            # changes were made
+            diff = recipe.diff(historic, False)
 
-            # Save the historic version to database
-            historic.put()
+            # See if any changes were actually made
+            if len(diff[0]) != 0 or \
+               len(diff[1]) != 0 or \
+               len(diff[2]) != 0:
+                
+                # Save recipe to database
+                key = recipe.key()
 
-            action = UserAction()
-            action.owner = user
-            action.object_id = key.id()
+                # Save the historic version to database
+                historic.put()
 
-            if not recipe_slug:
-                action.type = action.TYPE_RECIPE_CREATED
-            else:
-                action.type = action.TYPE_RECIPE_EDITED
+                action = UserAction()
+                action.owner = user
+                action.object_id = key.id()
 
-            action.put()
+                if not recipe_slug:
+                    action.type = action.TYPE_RECIPE_CREATED
+                else:
+                    action.type = action.TYPE_RECIPE_EDITED
+
+                action.put()
 
         self.render_json({
             'status': 'ok',

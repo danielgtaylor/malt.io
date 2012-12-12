@@ -156,10 +156,10 @@
         </div>
         {% endif %}
     </div>
-    {% if recipe.brews.count() %}
+    {% if brews %}
         <h2>Recent Brews</h2>
         <div class="row">
-        {% for brew in recipe.brews.order('-started').fetch(5) %}
+        {% for brew in brews %}
             <div class="brew span4 pull-left">
                 <div style="float: right">{{ brew|render_rating }}</div>
                 <div><strong>{{ brew.started|format_date }}</strong> by <a href="/users/{{ brew.owner.name }}">{{ brew.owner.name }}</a></div>

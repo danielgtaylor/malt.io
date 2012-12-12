@@ -22,4 +22,4 @@ class Brew
             data:
                 brew: JSON.stringify brew
             success: (data, status, xhr) =>
-                console.log data
+                location.reload()
