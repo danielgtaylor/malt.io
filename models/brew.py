@@ -29,3 +29,7 @@ class Brew(db.Model):
     # Rating and notes
     rating = db.IntegerProperty()
     notes = db.TextProperty()
+
+    @property
+    def recipe_key(self):
+        return Brew.recipe.get_value_for_datastore(self)

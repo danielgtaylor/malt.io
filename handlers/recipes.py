@@ -460,8 +460,7 @@ class RecipeHandler(BaseHandler):
         # Update slug
         recipe.slug = generate_usable_slug(recipe)
 
-        recipe.put()
-
+        changed = False
         if historic:
             # Perform a diff on the new and historic recipes to see if any actual
             # changes were made
@@ -473,21 +472,27 @@ class RecipeHandler(BaseHandler):
                len(diff[2]) != 0:
                 
                 # Save recipe to database
-                key = recipe.key()
+                key = recipe.put()
 
                 # Save the historic version to database
                 historic.put()
 
-                action = UserAction()
-                action.owner = user
-                action.object_id = key.id()
+                changed = True
+        else:
+            # Save recipe to database
+            key = recipe.put()
 
-                if not recipe_slug:
-                    action.type = action.TYPE_RECIPE_CREATED
-                else:
-                    action.type = action.TYPE_RECIPE_EDITED
+        if not historic or changed:
+            action = UserAction()
+            action.owner = user
+            action.object_id = key.id()
 
-                action.put()
+            if not recipe_slug:
+                action.type = action.TYPE_RECIPE_CREATED
+            else:
+                action.type = action.TYPE_RECIPE_EDITED
+
+            action.put()
 
         self.render_json({
             'status': 'ok',

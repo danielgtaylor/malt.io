@@ -52,6 +52,9 @@ class MainHandler(BaseHandler):
             # Start async fetch of relevant recipes
             recipes = db.get_async([Key.from_path('Recipe', id) for id in object_ids['recipes']])
 
+            # Start async fetch of relevant brews
+            brews = db.get_async([Key.from_path('Brew', id) for id in object_ids['brews']])
+
             # Convert iterators to  lists of items in memory and setup a map
             # of user id -> user for easy lookups
             following = list(following)
@@ -74,11 +77,18 @@ class MainHandler(BaseHandler):
             for r in recipes.get_result():
                 recipe_map[r.key().id()] = r
 
+            # Setup a map of brew id -> brew for easy lookups
+            brew_map = {}
+
+            for b in brews.get_result():
+                brew_map[b.key().id()] = b
+
             # Render and cache for 1 minute
             memcache.set('dashboard-' + user.user_id, self.render('dashboard.html', {
                 'following': following,
                 'user_map': user_map,
                 'recipe_map': recipe_map,
+                'brew_map': brew_map,
                 'top_recipes': top_recipes,
                 'interesting_events': interesting_events
             }), 60)

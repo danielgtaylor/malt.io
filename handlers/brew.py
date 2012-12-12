@@ -6,6 +6,7 @@ from contrib.paodate import Date
 from handlers.base import BaseHandler
 from models.brew import Brew
 from models.recipe import Recipe
+from models.useraction import UserAction
 from models.userprefs import UserPrefs
 from util import slugify
 
@@ -126,7 +127,17 @@ class BrewHandler(BaseHandler):
         brew.notes = submitted['notes']
 
         brew.slug = generate_usable_slug(brew)
-        brew.save()
+        key = brew.put()
+
+        # Add user action
+        action = UserAction()
+        action.owner = self.user
+        action.object_id = key.id()
+
+        if not brew_slug:
+            action.type = action.TYPE_BREW_CREATED
+
+        action.put()
 
         self.render_json({
             'status': 'ok'
