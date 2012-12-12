@@ -5,6 +5,7 @@ import json
 import logging
 import webapp2
 
+from contrib.paodate import Date
 from handlers.base import BaseHandler
 from models.recipe import Recipe, RecipeHistory
 from models.useraction import UserAction
@@ -385,7 +386,8 @@ class RecipeHandler(BaseHandler):
             'publicuser': publicuser,
             'recipe': recipe,
             'cloned_from': cloned_from,
-            'brews': brews
+            'brews': brews,
+            'now': Date().datetime
         })
 
     def post(self, username=None, recipe_slug=None):

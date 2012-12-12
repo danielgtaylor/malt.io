@@ -9,8 +9,8 @@ class Brew
     @getFromPage: =>
         started: $('#brewStartTime').val() + ' ' + $('#brewStartDate').val()
         bottled: $('#brewBottleTime').val() + ' ' + $('#brewBottleDate').val()
-        og: parseFloat $('#brewOg').val() or 0
-        fg: parseFloat $('#brewFg').val() or 0
+        og: parseFloat $('#brewOg').val() or 0.0
+        fg: parseFloat $('#brewFg').val() or 0.0
         rating: parseInt $('input[name=brewRating]:checked').val() or 0
         notes: $('#brewNotes').val()
 

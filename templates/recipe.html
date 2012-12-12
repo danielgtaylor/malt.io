@@ -674,9 +674,9 @@
                 <h3>Dates</h3>
                 <form class="form-horizontal">
                     <div class="control-group">
-                        <input id="brewStartTime" class="timepicker" type="text" placeholder="Time"/><i class="icon-time icon-timepicker"></i>
+                        <input id="brewStartTime" class="timepicker" type="text" placeholder="Time" value="{{ now|format_date('%H:%M') }}"/><i class="icon-time icon-timepicker"></i>
                         &nbsp;&nbsp;
-                        <input id="brewStartDate" class="datepicker span2" size="16" type="text" placeholder="Brew date"/><i class="icon-calendar icon-datepicker"></i>
+                        <input id="brewStartDate" class="datepicker span2" size="16" type="text" placeholder="Brew date" value="{{ now|format_date('%d %b %Y') }}"/><i class="icon-calendar icon-datepicker"></i>
                         <div class="pull-right">
                             <input id="brewBottleTime" class="timepicker" type="text" placeholder="Time"/><i class="icon-time icon-timepicker"></i>
                             &nbsp;&nbsp;

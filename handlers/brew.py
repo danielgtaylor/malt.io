@@ -103,6 +103,8 @@ class BrewHandler(BaseHandler):
 
         submitted = json.loads(cgi.escape(self.request.get('brew')))
 
+        logging.info(submitted)
+
         started = submitted['started']
         bottled = submitted['bottled']
 
@@ -118,10 +120,9 @@ class BrewHandler(BaseHandler):
 
                 setattr(brew, k, d.datetime)
 
-        brew.og = submitted['og']
-        brew.fg = submitted['fg']
+        brew.og = float(submitted['og'])
+        brew.fg = float(submitted['fg'])
         brew.rating = submitted['rating']
-        logging.info(submitted)
         brew.notes = submitted['notes']
 
         brew.slug = generate_usable_slug(brew)
