@@ -4,6 +4,7 @@ import settings
 import webapp2
 
 from handlers.base import BaseHandler
+from models.brew import Brew
 from models.recipe import Recipe
 from models.useraction import UserAction
 from models.userprefs import UserPrefs
@@ -76,12 +77,18 @@ class UserHandler(BaseHandler):
         for recipe in Recipe.get_by_id(object_ids['recipes']):
             recipe_map[recipe.key().id()] = recipe
 
+        brew_map = {}
+
+        for brew in Brew.get_by_id(object_ids['brews']):
+            brew_map[brew.key().id()] = brew
+
         self.render('user.html', {
             'publicuser': publicuser,
             'recipes': recipes,
             'actions': actions,
             'user_map': user_map,
-            'recipe_map': recipe_map
+            'recipe_map': recipe_map,
+            'brew_map': brew_map
         })
 
 
