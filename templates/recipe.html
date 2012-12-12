@@ -17,6 +17,7 @@
             Recipe.init();
             Recipe.updateStats();
             BeerStyles.init();
+            Brew.init();
         });
 
         window.fbAsyncInit = function () {
@@ -127,7 +128,7 @@
             {% else %}
                 <a class="btn" data-toggle="modal" href="#cloneModal"><i class="icon-share"></i> Clone</a>
             {% endif %}
-            <a class="btn disabled"><i class="icon-fire"></i> Brew</a>
+            <a class="btn" data-toggle="modal" href="#brewModal"><i class="icon-fire"></i> Brew</a>
             <a class="btn" data-toggle="modal" href="#scaleModal"><i class="icon-signal"></i> Scale</a>
             <a class="btn" href="/users/{{ publicuser.name }}/recipes/{{ recipe.slug }}/history"><i class="icon-time"></i> History</a>
             {% if not recipe.old %}
@@ -155,6 +156,19 @@
         </div>
         {% endif %}
     </div>
+    {% if brews %}
+        <h2>Recent Brews</h2>
+        <div class="row">
+        {% for brew in brews %}
+            <div class="brew span4 pull-left">
+                <div style="float: right">{{ brew|render_rating }}</div>
+                <div><strong>{{ brew.started|format_date }}</strong> by <a href="/users/{{ brew.owner.name }}">{{ brew.owner.name }}</a></div>
+                <div style="font-size: 80%;"><strong>OG</strong> {{ brew.og|fixed3 }}&nbsp;&nbsp;<strong>FG</strong> {{ brew.fg|fixed3 }}</div>
+                <span class="ellipsize">{{ brew.notes }}</span>
+            </div>
+        {% endfor %}
+        </div>
+    {% endif %}
     <h2>
         Fermentable Sugars
     </h2>
@@ -645,6 +659,41 @@
         <div class="modal-footer">
             <a href="#" class="btn" data-dismiss="modal">Cancel</a>
             <a id="clone-button" href="#" class="btn btn-success" data-dismiss="modal"><i class="icon-share icon-white"></i> Clone Recipe</a>
+        </div>
+    </div>
+    <div id="brewModal" class="modal fade hide">
+        <div class="modal-header">
+            <button type="button" class="close" data-dismiss="modal">×</button>
+            <h3>Brew Recipe</h3>
+        </div>
+        <div class="modal-body">
+            <p>
+                Brewing this recipe will log that you have made this beer. You can optionally give measurements, a rating, and brewing notes.
+            </p>
+            <div>
+                <h3>Dates</h3>
+                <form class="form-horizontal">
+                    <div class="control-group">
+                        <input id="brewStartTime" class="timepicker" type="text" placeholder="Time" value="{{ now|format_date('%H:%M') }}"/><i class="icon-time icon-timepicker"></i>
+                        &nbsp;&nbsp;
+                        <input id="brewStartDate" class="datepicker span2" size="16" type="text" placeholder="Brew date" value="{{ now|format_date('%d %b %Y') }}"/><i class="icon-calendar icon-datepicker"></i>
+                        <div class="pull-right">
+                            <input id="brewBottleTime" class="timepicker" type="text" placeholder="Time"/><i class="icon-time icon-timepicker"></i>
+                            &nbsp;&nbsp;
+                            <input id="brewBottleDate" class="datepicker span2" size="16" type="text" placeholder="Bottle date"/><i class="icon-calendar icon-datepicker"></i>
+                        </div>
+                    </div>
+                </form>
+                <h3>Measurements</h3>
+                <input id="brewOg" type="text" placeholder="Original gravity"/>
+                <input id="brewFg" type="text" placeholder="Final gravity" class="pull-right"/>
+                <h3 class="pull-left">Rating &amp; Notes</h3><span style="display: inline-block; margin-top: 4px; margin-left: 5px;"><input name="brewRating" type="radio" class="star" value="1"/><input name="brewRating" type="radio" class="star" value="2"/><input name="brewRating" type="radio" class="star" value="3"/><input name="brewRating" type="radio" class="star" value="4"/><input name="brewRating" type="radio" class="star" value="5"/></span>
+                <textarea id="brewNotes" placeholder="Notes" rows="5" style="width: 98%"></textarea>
+            </div>
+        </div>
+        <div class="modal-footer">
+            <a href="#" class="btn" data-dismiss="modal">Cancel</a>
+            <a id="brew-button" href="#" class="btn btn-success" data-dismiss="modal"><i class="icon-fire icon-white"></i> Log Brew</a>
         </div>
     </div>
     <div id="scaleModal" class="modal fade hide">

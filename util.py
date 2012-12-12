@@ -521,3 +521,27 @@ def key_for_display(key):
         return 'weight'
     else:
         return key.replace('_', ' ')
+
+def render_rating(brew):
+    """
+    Render a rating out of 5 with stars.
+    """
+    rating_str = ''
+
+    for x in range(1, 6):
+        if x != brew.rating:
+            rating_str += '<input name="%s" type="radio" class="star" disabled/>' % brew.key().id
+        else:
+            rating_str += '<input name="%s" type="radio" class="star" disabled checked/>' % brew.key().id
+
+    return rating_str
+
+JINJA_ENV.filters['render_rating'] = render_rating
+
+def fixed3(value):
+    """
+    Render a floating point value to 3 decimal places
+    """
+    return '%.3f' % value
+
+JINJA_ENV.filters['fixed3'] = fixed3

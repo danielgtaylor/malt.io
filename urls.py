@@ -1,5 +1,6 @@
 from handlers.auth import AuthHandler, AuthCallbackHandler, \
                           LoginHandler, LogoutHandler
+from handlers.brew import BrewHandler
 from handlers.donate import DonateHandler
 from handlers.formulas import FormulasHandler
 from handlers.index import MainHandler
@@ -17,6 +18,8 @@ from handlers.users import UsersHandler, UserHandler, UserFollowHandler, \
 urls = [
     ('/users/(.*?)/recipes/(.*?)/like', RecipeLikeHandler),
     ('/users/(.*?)/recipes/(.*?)/clone', RecipeCloneHandler),
+    ('/users/(.*?)/recipes/(.*?)/brew', BrewHandler),
+    ('/users/(.*?)/recipes/(.*?)/brew/(.*)', BrewHandler),
     ('/users/(.*?)/recipes/(.*?)/beerxml', RecipeXmlHandler),
     ('/users/(.*?)/recipes/(.*?)/history', RecipeHistoryHandler),
     ('/users/(.*?)/recipes/(.*?)/history/(.*)', RecipeHandler),

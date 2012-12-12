@@ -5,6 +5,7 @@ import json
 import logging
 import webapp2
 
+from contrib.paodate import Date
 from handlers.base import BaseHandler
 from models.recipe import Recipe, RecipeHistory
 from models.useraction import UserAction
@@ -335,6 +336,7 @@ class RecipeHandler(BaseHandler):
             recipe = Recipe()
             recipe.owner = publicuser
             recipe.new = True
+            brews = []
         else:
             publicuser = UserPrefs.all().filter('name =', username).get()
 
@@ -348,6 +350,8 @@ class RecipeHandler(BaseHandler):
 
             if not recipe:
                 self.abort(404)
+
+            brews = recipe.brews.order('-started').fetch(3)
 
             if version:
                 try:
@@ -381,7 +385,9 @@ class RecipeHandler(BaseHandler):
         self.render('recipe.html', {
             'publicuser': publicuser,
             'recipe': recipe,
-            'cloned_from': cloned_from
+            'cloned_from': cloned_from,
+            'brews': brews,
+            'now': Date().datetime
         })
 
     def post(self, username=None, recipe_slug=None):
@@ -406,9 +412,11 @@ class RecipeHandler(BaseHandler):
             return
 
         # Load recipe from db or create a new one
+        new_recipe = False
         if not recipe_slug:
             recipe = Recipe()
             recipe.owner = user
+            new_recipe = True
         else:
             recipe = Recipe.all()\
                            .filter('owner =', user)\
@@ -431,7 +439,9 @@ class RecipeHandler(BaseHandler):
             return
 
         # Create a historic version to save
-        historic = recipe.create_historic_version()
+        historic = None
+        if not new_recipe:
+            historic = recipe.create_historic_version()
 
         # Update recipe
         recipe.name = recipe_data['name']
@@ -450,21 +460,29 @@ class RecipeHandler(BaseHandler):
         # Update slug
         recipe.slug = generate_usable_slug(recipe)
 
-        # Perform a diff on the new and historic recipes to see if any actual
-        # changes were made
-        diff = recipe.diff(historic, False)
+        changed = False
+        if historic:
+            # Perform a diff on the new and historic recipes to see if any actual
+            # changes were made
+            diff = recipe.diff(historic, False)
 
-        # See if any changes were actually made
-        if len(diff[0]) != 0 or \
-           len(diff[1]) != 0 or \
-           len(diff[2]) != 0:
-            
+            # See if any changes were actually made
+            if len(diff[0]) != 0 or \
+               len(diff[1]) != 0 or \
+               len(diff[2]) != 0:
+                
+                # Save recipe to database
+                key = recipe.put()
+
+                # Save the historic version to database
+                historic.put()
+
+                changed = True
+        else:
             # Save recipe to database
             key = recipe.put()
 
-            # Save the historic version to database
-            historic.put()
-
+        if not historic or changed:
             action = UserAction()
             action.owner = user
             action.object_id = key.id()
