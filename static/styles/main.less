@@ -633,12 +633,41 @@ textarea.large {
 }
 
 .brew {
-    width: 286px;
-    padding: 6px;
+    width: 298px;
+    height: 67px;
     margin-top: 0.5em;
     margin-bottom: 0.5em;
     border: 1px solid #eee;
     border-radius: 3px;
+}
+
+.brewContent {
+    position: absolute;
+    width: 286px;
+    padding: 6px;
+    overflow: hidden;
+    border-radius: 3px;
+    .transition(all 0.3s);
+}
+
+.brewContent:hover {
+    background-color: white;
+    box-shadow: 0px 0px 10px rgba(0, 0, 0, 0.5);
+    .transition(all 0.3s);
+}
+
+.brewContent .notes {
+    max-height: 10px;
+    .transition(all 0.3s);
+}
+
+.brewContent:hover .notes {
+    max-height: 150px;
+    .transition(all 0.5s);
+}
+
+.pre {
+    white-space: pre;
 }
 
 .license {

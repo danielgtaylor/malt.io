@@ -161,10 +161,12 @@
         <div class="row">
         {% for brew in brews %}
             <div class="brew span4 pull-left">
-                <div style="float: right">{{ brew|render_rating }}</div>
-                <div><strong>{{ brew.started|format_date }}</strong> by <a href="/users/{{ brew.owner.name }}">{{ brew.owner.name }}</a></div>
-                <div style="font-size: 80%;"><strong>OG</strong> {{ brew.og|fixed3 }}&nbsp;&nbsp;<strong>FG</strong> {{ brew.fg|fixed3 }}</div>
-                <span class="ellipsize">{{ brew.notes }}</span>
+                <div class="brewContent">
+                    <div style="float: right">{{ brew|render_rating }}</div>
+                    <div><strong>{{ brew.started|format_date }}</strong> by <a href="/users/{{ brew.owner.name }}">{{ brew.owner.name }}</a></div>
+                    <div style="font-size: 80%;"><strong>OG</strong> {% if brew.og %}{{ brew.og|fixed3 }}{% else %}not measured{% endif %}&nbsp;&nbsp;<strong>FG</strong> {% if brew.fg %}{{ brew.fg|fixed3 }}{% else %}not measured{% endif %}</div>
+                    <div class="notes">{{ brew.notes.replace('\n', '<br/>') }}{% if brew.bottled %}<br/>Bottled on {{ brew.bottled|format_date }}.{% endif %}</div>
+                </div>
             </div>
         {% endfor %}
         </div>
