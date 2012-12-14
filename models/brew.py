@@ -37,4 +37,4 @@ class Brew(db.Model):
     @property
     def notes_safe(self):
         """Return a safe version of the notes for use in javascript"""
-        return self.notes.replace('\n', '\\n').replace('\'', '&#39;').replace('"', '&quot;')
+        return self.notes.replace('\n', '\\n').replace('\'', '\\\'').replace('"', '&quot;')
