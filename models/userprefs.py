@@ -126,7 +126,11 @@ class UserPrefs(db.Model):
 
         # Update fields based on latest user info
         prefs.email = user_info['email']
-        prefs.avatar = user_info['avatar']
+
+        # Update the avatar, except for special users
+        if prefs.name not in ['examples']:
+            prefs.avatar = user_info['avatar']
+
         prefs.put()
 
         return prefs
