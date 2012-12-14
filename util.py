@@ -530,9 +530,9 @@ def render_rating(brew):
 
     for x in range(1, 6):
         if x != brew.rating:
-            rating_str += '<input name="%s" type="radio" class="star" disabled/>' % brew.key().id
+            rating_str += '<input name="%s" type="radio" class="star" disabled/>' % brew.key().id()
         else:
-            rating_str += '<input name="%s" type="radio" class="star" disabled checked/>' % brew.key().id
+            rating_str += '<input name="%s" type="radio" class="star" disabled checked/>' % brew.key().id()
 
     return rating_str
 
