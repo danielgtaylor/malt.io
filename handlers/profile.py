@@ -1,6 +1,7 @@
 import cgi
 import settings
 
+from google.appengine.ext import db
 from handlers.base import BaseHandler
 from models.userprefs import UserPrefs
 from util import render, login_required
@@ -31,6 +32,8 @@ class ProfileHandler(BaseHandler):
         """
         name = cgi.escape(self.request.get('name'))
         email = cgi.escape(self.request.get('email'))
+        lat = cgi.escape(self.request.get('lat'))
+        lng = cgi.escape(self.request.get('lng'))
 
         # Do not save unless validated - this should never happen
         # as validation happens on the page via javascript. If it does,
@@ -47,6 +50,16 @@ class ProfileHandler(BaseHandler):
         # Set the values and save to the data store
         user.name = name
         user.email = email
+
+        if lat or lng:
+            lat = float(lat)
+            lng = float(lng)
+            if not user.location:
+                user.location = db.GeoPt(lat, lng)
+            else:
+                user.location.lat = lat
+                user.location.lon = lng
+        
         user.put()
 
         # Redirect to show a success message to the user

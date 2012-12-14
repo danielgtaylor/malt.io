@@ -1,11 +1,17 @@
 {% extends 'page.html' %}
 
 {% block scripts %}
+    <script type="text/javascript"
+      src="https://maps.googleapis.com/maps/api/js?key=AIzaSyA7bBRbj46VC1Ly3doCnmLp3a-k0k9oWnI&sensor=false">
+    </script>
     <script type="text/javascript">
         $(document).ready(function () {
             Recipe.init();
             Messages.init();
             User.init();
+            {% if publicuser.location %}
+                Map.draw('map_canvas', {{ publicuser.location.lat }}, {{ publicuser.location.lon }});
+            {% endif %}
         });
     </script>
 {% endblock %}
@@ -38,6 +44,10 @@
         {% endfor %}
     </div>
     <div class="vert-recipe-list span4 pull-left" style="margin-left: 0;">
+        {% if publicuser.location %}
+            <h6>Location</h6>
+            <div id="map_canvas" style="width: 328px; height: 150px; margin-bottom: 1em;"></div>
+        {% endif %}
         <h6>Recipes ({{ recipes|length }} total)</h6>
         {% for recipe in recipes %}
             {{ recipe|recipe_snippet }}

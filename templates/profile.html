@@ -2,8 +2,15 @@
 
 {% block scripts %}
     <script type="text/javascript" src="http://fgnass.github.com/spin.js/dist/spin.min.js"></script>
+    <script type="text/javascript"
+      src="https://maps.googleapis.com/maps/api/js?key=AIzaSyA7bBRbj46VC1Ly3doCnmLp3a-k0k9oWnI&sensor=false">
+    </script>
     <script type="text/javascript">
         Username.init();
+
+        $(document).ready(function () {
+            Map.draw('map_canvas', $('#lat').val(), $('#lng').val());
+        });
     </script>
 {% endblock %}
 
@@ -60,6 +67,17 @@
                         <input name="email" type="email" class="span3" value="{{ user.email }}"/>
                         <p class="help-block">Never shown to other users</p>
                     </div>
+                </div>
+            </fieldset>
+            <fieldset>
+                <div class="control-group">
+                    <label class="control-label">Location</label>
+                    <div class="controls">
+                        <div id="map_canvas" style="width: 328px; height: 150px;"></div>
+                        <p class="help-block">Drag the map to your location</p>
+                    </div>
+                    <input id="lat" type="hidden" name="lat" value="{{ user.location.lat }}"/>
+                    <input id="lng" type="hidden" name="lng" value="{{ user.location.lon }}"/>
                 </div>
             </fieldset>
             <fieldset>

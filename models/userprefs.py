@@ -41,6 +41,9 @@ class UserPrefs(db.Model):
     # List of user IDs that this user is following
     following = db.StringListProperty()
 
+    # User location
+    location = db.GeoPtProperty()
+
     @staticmethod
     def get(auth_id):
         """
