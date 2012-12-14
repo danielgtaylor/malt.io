@@ -46,7 +46,7 @@
     <div class="vert-recipe-list span4 pull-left" style="margin-left: 0;">
         {% if publicuser.location %}
             <h6>Location</h6>
-            <div id="map_canvas" style="width: 328px; height: 150px; margin-bottom: 1em;"></div>
+            <div id="map_canvas" style="margin-top: 1em; margin-bottom: 1em;"></div>
         {% endif %}
         <h6>Recipes ({{ recipes|length }} total)</h6>
         {% for recipe in recipes %}
