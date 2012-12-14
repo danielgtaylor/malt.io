@@ -148,6 +148,14 @@ class UserPrefs(db.Model):
         # Update the cache, invalidating old data
         memcache.set('userprefs-' + str(self.user_id), self, 3600)
 
+    def name_crop(self, length=18):
+        name = self.name
+
+        if len(name) > length:
+            name = name[:length - 3] + u'\u2026'
+
+        return name
+
     @property
     def is_admin(self):
         return 'admin' in self.awards
