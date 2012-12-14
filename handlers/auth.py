@@ -72,12 +72,16 @@ class AuthHandler(BaseAuthHandler):
         if settings.DEBUG and provider == "dummy":
             # Handle test dev login
             auth_id = 'dummy:test'
-            UserPrefs.create_or_update(auth_id, {
+            u = UserPrefs.create_or_update(auth_id, {
                 'id': '1234',
                 'name': 'Test User',
                 'email': 'test@example.com',
                 'avatar': 'http://www.gravatar.com/avatar/55502f40dc8b7c769880b10874abc9d0?s={0}&d=identicon'
             }, {})
+
+            # Give dev admin
+            u.awards.append('admin')
+            u.put()
 
             # Update session
             self.session['auth_id'] = auth_id
