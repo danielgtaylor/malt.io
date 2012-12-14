@@ -1,5 +1,6 @@
 import datetime
 import jinja2
+import random
 import re
 import settings
 
@@ -526,13 +527,14 @@ def render_rating(brew):
     """
     Render a rating out of 5 with stars.
     """
+    slug = brew.slug + '-' + str(random.randint(0, 1000))
     rating_str = ''
 
     for x in range(1, 6):
         if x != brew.rating:
-            rating_str += '<input name="%s" type="radio" class="star" disabled/>' % brew.key().id()
+            rating_str += '<input name="%s" type="radio" class="star" value="%s" disabled="disabled"/>' % (slug, x)
         else:
-            rating_str += '<input name="%s" type="radio" class="star" disabled checked/>' % brew.key().id()
+            rating_str += '<input name="%s" type="radio" class="star" value="%s" disabled="disabled" checked="checked"/>' % (slug, x)
 
     return rating_str
 

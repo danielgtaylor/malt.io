@@ -128,7 +128,7 @@
             {% else %}
                 <a class="btn" data-toggle="modal" href="#cloneModal"><i class="icon-share"></i> Clone</a>
             {% endif %}
-            <a class="btn" data-toggle="modal" href="#brewModal"><i class="icon-fire"></i> Brew</a>
+            <a class="btn" onclick="Brew.show('', '{{ now|format_date('%H:%M') }}', '{{ now|format_date('%d %b %Y') }}');"><i class="icon-fire"></i> Brew</a>
             <a class="btn" data-toggle="modal" href="#scaleModal"><i class="icon-signal"></i> Scale</a>
             <a class="btn" href="/users/{{ publicuser.name }}/recipes/{{ recipe.slug }}/history"><i class="icon-time"></i> History</a>
             {% if not recipe.old %}
@@ -162,6 +162,9 @@
         {% for brew in brews %}
             <div class="brew span4 pull-left">
                 <div class="brewContent">
+                    {% if brew.owner.name == user.name %}
+                        <a class="pull-right btn btn-inverse btn-mini" onclick="Brew.show('{{ brew.slug }}', '{{ brew.started|format_date('%H:%M') }}', '{{ brew.started|format_date('%d %b %Y') }}', '{{ brew.bottled|format_date('%H:%M') }}', '{{ brew.bottled|format_date('%d %b %Y') }}', {{ brew.og|fixed3 }}, {{ brew.fg|fixed3 }}, {{ brew.rating }}, '{{ brew.notes_safe }}');">edit</a>
+                    {% endif %}
                     <div style="float: right">{{ brew|render_rating }}</div>
                     <div><strong>{{ brew.started|format_date }}</strong> by <a href="/users/{{ brew.owner.name }}">{{ brew.owner.name }}</a></div>
                     <div style="font-size: 80%;"><strong>OG</strong> {% if brew.og %}{{ brew.og|fixed3 }}{% else %}not measured{% endif %}&nbsp;&nbsp;<strong>FG</strong> {% if brew.fg %}{{ brew.fg|fixed3 }}{% else %}not measured{% endif %}</div>
@@ -674,6 +677,7 @@
             </p>
             <div>
                 <h3>Dates</h3>
+                <input id="brewId" type="hidden"/>
                 <form class="form-horizontal">
                     <div class="control-group">
                         <input id="brewStartTime" class="timepicker" type="text" placeholder="Time" value="{{ now|format_date('%H:%M') }}"/><i class="icon-time icon-timepicker"></i>

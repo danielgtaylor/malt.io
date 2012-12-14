@@ -33,3 +33,8 @@ class Brew(db.Model):
     @property
     def recipe_key(self):
         return Brew.recipe.get_value_for_datastore(self)
+
+    @property
+    def notes_safe(self):
+        """Return a safe version of the notes for use in javascript"""
+        return self.notes.replace('\n', '\\n').replace('\'', '&#39;').replace('"', '&quot;')

@@ -42,7 +42,14 @@
         {% set recipe = recipe_map[brew.recipe_key.id()] %}
         <a href="/users/{{ owner.name }}"><img class="avatar-tiny" src="{{ owner.avatar_tiny }}"/> {{ owner.name }}</a> logged a brew {{ action.created|timesince }} ago
         <div class="content">
-            {{ brew|render_rating }}&nbsp;&nbsp;<span class="srm" data-srm="{{ recipe.color }}"></span> <a href="/users/{{ recipe.owner.name }}/recipes/{{ recipe.slug }}">{{ recipe.name }}</a>
+            {{ brew|render_rating }}&nbsp;&nbsp;<span class="srm" data-srm="{{ recipe.color }}"></span> <a href="/users/{{ recipe.owner.name }}/recipes/{{ recipe.slug }}">{{ recipe.name }}</a>: {{ brew.notes }}
+        </div>
+    {% elif action.type == action.TYPE_BREW_UPDATED %}
+        {% set brew = brew_map[action.object_id] %}
+        {% set recipe = recipe_map[brew.recipe_key.id()] %}
+        <a href="/users/{{ owner.name }}"><img class="avatar-tiny" src="{{ owner.avatar_tiny }}"/> {{ owner.name }}</a> updated a brew {{ action.created|timesince }} ago
+        <div class="content">
+            {{ brew|render_rating }}&nbsp;&nbsp;<span class="srm" data-srm="{{ recipe.color }}"></span> <a href="/users/{{ recipe.owner.name }}/recipes/{{ recipe.slug }}">{{ recipe.name }}</a>: {{ brew.notes }}
         </div>
     {% else %}
         <a href="/users/{{ owner.name }}"><img class="avatar-tiny" src="{{ owner.avatar_tiny }}"/> {{ owner.name }}</a> took an action {{ action.created|timesince }} ago

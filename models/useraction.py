@@ -21,6 +21,7 @@ class UserAction(db.Model):
 
     # Brew-related actions
     TYPE_BREW_CREATED = 20
+    TYPE_BREW_UPDATED = 21
 
     owner = db.ReferenceProperty(UserPrefs, collection_name='actions')
     created = db.DateTimeProperty(auto_now_add=True)
@@ -47,7 +48,8 @@ class UserAction(db.Model):
                                  UserAction.TYPE_RECIPE_CLONED,
                                  UserAction.TYPE_RECIPE_LIKED]:
                 ids['recipes'].add(action.object_id)
-            elif action.type in [UserAction.TYPE_BREW_CREATED]:
+            elif action.type in [UserAction.TYPE_BREW_CREATED,
+                                 UserAction.TYPE_BREW_UPDATED]:
                 ids['brews'].add(action.object_id)
 
         return ids
@@ -66,6 +68,7 @@ class UserAction(db.Model):
                            self.TYPE_RECIPE_LIKED]:
             from models.recipe import Recipe
             return Recipe.get_by_id(self.object_id)
-        elif self.type in [self.TYPE_BREW_CREATED]:
+        elif self.type in [self.TYPE_BREW_CREATED,
+                           self.TYPE_BREW_UPDATED]:
             from models.brew import Brew
             return Brew.get_by_id(self.object_id)

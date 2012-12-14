@@ -99,7 +99,7 @@ class BrewHandler(BaseHandler):
             return self.abort(404)
 
         # Does the current user own this? If not, then fail
-        if brew.owner != self.user:
+        if brew.owner.name != self.user.name:
             return self.abort(403)
 
         submitted = json.loads(cgi.escape(self.request.get('brew')))
@@ -136,6 +136,8 @@ class BrewHandler(BaseHandler):
 
         if not brew_slug:
             action.type = action.TYPE_BREW_CREATED
+        else:
+            action.type = action.TYPE_BREW_UPDATED
 
         action.put()
 
