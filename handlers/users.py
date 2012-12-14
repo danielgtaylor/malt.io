@@ -190,7 +190,7 @@ class UsernameCheckHandler(BaseHandler):
         return that it is available, otherwise return that it is not via a
         simple JSON response.
         """
-        user = UserPrefs.get()
+        user = self.user
 
         if not user:
             self.abort(404)
