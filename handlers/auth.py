@@ -88,7 +88,7 @@ class AuthHandler(BaseAuthHandler):
             # Update session
             self.session['auth_id'] = auth_id
 
-            return self.redirect(self.session.pop('next', '/'))
+            return self.redirect(self.session.pop('next', '/dashboard'))
 
         auth_url = AUTH_URLS[provider][0]
 
@@ -182,7 +182,7 @@ class AuthCallbackHandler(BaseAuthHandler):
         # Update session
         self.session['auth_id'] = auth_id
 
-        self.redirect(self.session.pop('next', '/'))
+        self.redirect(self.session.pop('next', '/dashboard'))
 
     def _oauth2_request(self, url, token):
         """Perform an OAuth2 API request"""
