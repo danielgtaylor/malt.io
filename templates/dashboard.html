@@ -34,6 +34,9 @@
     </ul>
     <div class="span7">
         <h6>Recent events</h6>
+        <div class="alert alert-success" style="margin: 6px 0 0 0">
+            Don't know where to start? Try cloning one of our <a href="/users/examples/recipes">Example Recipes</a>!
+        </div>
         {% for action in interesting_events %}
             {% include "action.html" %}
         {% else %}
