@@ -757,8 +757,24 @@ body {
     border-bottom-left-radius: 10px;
 }
 
-.navbar-inner {
+.modal-header {
+    border-top-left-radius: 2px;
+    border-top-right-radius: 2px;
+}
+
+.modal-header h3 {
+    color: white;
+}
+
+.modal-header .close {
+    color: white;
+}
+
+.navbar-inner, .modal-header {
     background: -webkit-linear-gradient(#3A3A3A, #303030 48%, #343434 48%, #222 51%, #111);
+    background: -moz-linear-gradient(#3A3A3A, #303030 48%, #343434 48%, #222 51%, #111);
+    background: -ms-linear-gradient(#3A3A3A, #303030 48%, #343434 48%, #222 51%, #111);
+    background: linear-gradient(#3A3A3A, #303030 48%, #343434 48%, #222 51%, #111);
     box-shadow: 0px 3px 10px rgba(0, 0, 0, 0.3);
 }
 
