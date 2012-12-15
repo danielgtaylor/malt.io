@@ -82,7 +82,7 @@ class RecipesHandler(BaseHandler):
         Import a new recipe or list of recipes from BeerXML to the
         currently logged in user's account.
         """
-        user = UserPrefs.get()
+        user = self.user
         recipesxml = self.request.POST['file'].value
 
         for recipe in Recipe.new_from_beerxml(recipesxml):
