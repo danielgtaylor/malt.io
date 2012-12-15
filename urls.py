@@ -5,6 +5,7 @@ from handlers.donate import DonateHandler
 from handlers.formulas import FormulasHandler
 from handlers.index import MainHandler
 from handlers.messages import MessagesHandler
+from handlers.privacy import PrivacyHandler
 from handlers.profile import ProfileHandler
 from handlers.recipes import RecipesHandler, RecipeEmbedHandler, \
                              RecipeLikeHandler, RecipeCloneHandler, \
@@ -36,6 +37,7 @@ urls = [
     ('/embed/(.*?)/(.*?)', RecipeEmbedHandler),
     ('/homebrew-formulas', FormulasHandler),
     ('/donate', DonateHandler),
+    ('/privacy-policy', PrivacyHandler),
     ('/auth/(.*?)/callback', AuthCallbackHandler),
     ('/auth/(.*?)', AuthHandler),
     ('/login', LoginHandler),
