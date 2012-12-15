@@ -49,9 +49,9 @@ class BaseHandler(webapp2.RequestHandler):
         """Returns true if a user is currently logged in, false otherwise"""
         return self.session.get('auth_id') is not None
 
-    def render(self, template, params=None):
+    def render(self, template, params=None, write_to_stream=True):
         """Render a template"""
-        return render(self, template, params)
+        return render(self, template, params, write_to_stream)
 
     def render_json(self, value):
         """Render JSON output, including proper headers"""

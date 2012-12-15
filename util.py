@@ -107,7 +107,7 @@ def get_template(name):
     return t
 
 
-def render(handler, template, params=None):
+def render(handler, template, params=None, write_to_stream=True):
     """
     Render a page through Jinja2, passing in optional parameters.
     """
@@ -121,7 +121,10 @@ def render(handler, template, params=None):
     t = get_template(template)
 
     rendered = t.render(p)
-    handler.response.out.write(rendered)
+    
+    if write_to_stream:
+        handler.response.out.write(rendered)
+    
     return rendered
 
 
