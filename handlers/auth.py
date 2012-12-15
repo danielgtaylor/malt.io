@@ -80,7 +80,9 @@ class AuthHandler(BaseAuthHandler):
             }, {})
 
             # Give dev admin
-            u.awards.append('admin')
+            if not u.awards:
+                u.awards.append('admin')
+
             u.put()
 
             # Update session
