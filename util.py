@@ -214,7 +214,7 @@ def render_hops_template(values):
     # Only show rating information for hops
     if values[1]:
         for i in range(3):
-            rating += '<i class="icon-asterisk"'
+            rating += '<i class="icon-asterisk icon-white"'
             if i >= values[1] / 5.0:
                 rating += ' style="opacity: 0.2"'
             rating += '></i>'

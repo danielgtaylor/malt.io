@@ -21,10 +21,12 @@
             <li>recipes</li>
         {% endif %}
     </ul>
-    {% if not recipes|count %}
-    	This user has no public recipes!
-    {% endif %}
-	{% for recipe in recipes %}
-		{{ recipe|recipe_snippet }}
-	{% endfor %}
+    <div class="row">
+        {% if not recipes|count %}
+        	This user has no public recipes!
+        {% endif %}
+    	{% for recipe in recipes %}
+    		{{ recipe|recipe_snippet }}
+    	{% endfor %}
+    </div>
 {% endblock %}
