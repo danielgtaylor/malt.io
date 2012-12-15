@@ -15,17 +15,22 @@
 {% endblock %}
 
 {% block content %}
-    <div class="hero-unit" style="text-align: center;">
-        <h1 style="font-size: 800%;">Malt<span style="color: #999">.io</span></h1>
-        <span style="font-size: 150%;">the free community for brewers</span>
-        <div class="btn-toolbar">
-            <div class="btn-group">
-                <a class="btn" href="/login">Join / Login</a>
-                <a class="btn" href="/donate">Donate</a>
-                <a class="btn" href="/new">New recipe</a>
+    <div class="hero-unit" style="position: relative; margin-bottom: 0">
+        <div class="pull-left" style="text-align: center;">
+            <h1 style="font-size: 800%;">Malt<span style="color: #999">.io</span></h1>
+            <span style="font-size: 150%;">the free community for brewers</span>
+            <div class="btn-toolbar">
+                <div class="btn-group">
+                    <a class="btn" href="/login">Join / Login</a>
+                    <a class="btn" href="/donate">Donate</a>
+                    <a class="btn" href="/new">New recipe</a>
+                </div>
             </div>
         </div>
+        <img id="screenshots" src="/static/img/screenshots.png"/>
+        <div class="clearfix"></div>
     </div>
+    <div class="topsep"></div>
     <div class="row">
         <h6 style="padding-left: 24px;">Top Recipes</h6>
         {% for recipe in recipes %}
