@@ -740,7 +740,6 @@ textarea.large {
     background-color: #ffa;
 }
 
-
 /* New Style Stuff */
 
 body {
@@ -904,4 +903,53 @@ th {
 
 .footerlogo {
     color: transparent;
+}
+
+/* Print Stylesheet for recipes */
+
+@media print {
+    body {
+        color: black;
+        background: white;
+    }
+
+    h1, h2, h3, h4, h5, h6 {
+        color: black;
+    }
+
+    /* removing navagation bar and the various footers */
+    .navbar, .breadcrumb, #disqus_thread, .license, .socialFooter , .footershortcut, .footerlinks {
+        padding: 0px;
+        margin: 0px;
+        display: none;
+    }
+
+    #contentContainer  {
+        background: white;
+        margin-top: 0px;
+        box-shadow: none;
+    }
+
+    /*formatting the hero text on the page */
+    .hero-unit {
+        padding: 0px;
+        margin-bottom: 0px;
+        background-color: #FFF;
+    }
+
+    #recipeName {
+        text-align:center;
+    }
+
+    #recipeDescription {
+        font-style: italic;
+    }
+
+    .price-tag, .likes-container, .btn-group, .edit-hide {
+        display: none;
+    }
+
+    .table-striped tbody tr:nth-child(odd) td, .table-striped tbody tr:nth-child(odd) th {
+        background-color: #FFF;
+    }
 }
