@@ -34,7 +34,9 @@
                                 <li><a href="/users/{{ user.name }}/recipes">My recipes</a></li>
                             {% endif %}
                             <li><a href="/recipes">All recipes</a></li>
+                            <li class="divider"></li>
                             <li><a href="/homebrew-formulas">Homebrew formulas</a></li>
+                            <li class="divider"></li>
                             {% if user %}
                                 <li><a href="#importModal" data-toggle="modal">Import recipes</a></li>
                             {% else %}
@@ -58,8 +60,10 @@
                             </a>
                             <ul class="dropdown-menu">
                                 <li><a href="/messages">Private Messages</a></li>
+                                <li class="divider"></li>
                                 <li><a href="/users/{{ user.name }}">Public profile</a></li>
                                 <li><a href="/profile">User Settings</a></li>
+                                <li class="divider"></li>
                                 <li><a href="https://github.com/danielgtaylor/malt.io/issues?state=open">Report a problem</a></li>
                                 {% if user.is_admin %}
                                     <li><a href="/_ah/stats">App Stats</a></li>
