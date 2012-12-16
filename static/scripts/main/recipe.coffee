@@ -378,14 +378,16 @@ class Recipe
     
     # Are we mashing? Guess based on ingredients and overrides.
     @getMashingInfo: =>
+        mashing = false
+
         $('#fermentables_data tr').each((index, element) =>
             desc = $(element.children[3]).text()
 
             if /mash/i.exec(desc) or not (@BOIL_FERMENTABLES.exec(desc) or @STEEP_FERMENTABLES.exec(desc))
-                return true
+                mashing = true
         )
 
-        return false
+        return mashing
 
     # Get information about a fermentable table row, such as the weight, ppg
     # gravity, addition type, etc.
