@@ -50,5 +50,6 @@ skip_files:
 - ^(.*/)?\..*
 - ^(.*/)?.*\.coffee
 - ^(.*/)?.*\.less
+- ^(.*/)?.*\.xcf
 - node_modules
 - build
