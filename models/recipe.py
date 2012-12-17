@@ -48,6 +48,10 @@ class RecipeBase(db.Model):
     bottling_temp = db.FloatProperty(default=70.0)
     bottling_pressure = db.FloatProperty(default=2.5)
 
+    # Efficiencies
+    mash_efficiency = db.IntegerProperty(default=75)
+    steep_efficiency = db.IntegerProperty(default=50)
+
     # Serialized JSON data for the ingredients
     _ingredients = db.TextProperty(default=json.dumps({
         'fermentables': [],
@@ -94,7 +98,7 @@ class RecipeBase(db.Model):
         xml += '<BREWER>' + xmlescape(self.owner.name) + '</BREWER>'
         xml += '<BATCH_SIZE>' + xmlescape(self.batch_size * GAL_TO_LITERS) + '</BATCH_SIZE>'
         xml += '<BOIL_SIZE>' + xmlescape(self.boil_size * GAL_TO_LITERS) + '</BOIL_SIZE>'
-        xml += '<EFFICIENCY>75.0</EFFICIENCY>'
+        xml += '<EFFICIENCY>' + xmlescape(self.mash_efficiency) + '</EFFICIENCY>'
         
         xml += '<HOPS>'
         for hop in [spice for spice in self.ingredients['spices'] if spice['aa'] > 0]:
@@ -206,9 +210,9 @@ class RecipeBase(db.Model):
                 addition = 'mash'
 
             if addition == 'steep':
-                gravity *= 0.5
+                gravity *= self.steep_efficiency
             elif addition == 'mash':
-                gravity *= 0.75
+                gravity *= self.mash_efficiency
 
             if 'late' not in fermentable or fermentable['late'] not in ['y', 'yes', 'x']:
                 early_gu += gravity
@@ -590,6 +594,8 @@ class Recipe(RecipeBase):
             'boil_size': self.boil_size,
             'bottling_temp': self.bottling_temp,
             'bottling_pressure': self.bottling_pressure,
+            'mash_efficiency': self.mash_efficiency,
+            'steep_efficiency': self.steep_efficiency,
             '_ingredients': self._ingredients
         })
 

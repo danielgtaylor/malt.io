@@ -195,7 +195,7 @@ class Recipe
 
         _gaq.push(['_trackEvent', 'Recipe', 'Edit', $('#recipeName').text()])
 
-        $('#recipeName, #recipeDescription, #bottling_temp, #bottling_pressure').attr('contentEditable', 'true')
+        $('#recipeName, #recipeDescription, #bottling_temp, #bottling_pressure, #mashEfficiency, #steepEfficiency').attr('contentEditable', 'true')
         $('#fermentables_data tr td:nth-child(2), #fermentables_data tr td:nth-child(3), #fermentables_data tr td:nth-child(4), #fermentables_data tr td:nth-child(5), #fermentables_data tr td:nth-child(6), #fermentables_data tr td:nth-child(8), #hops_data tr td:nth-child(1), #hops_data tr td:nth-child(2), #hops_data tr td:nth-child(3), #hops_data tr td:nth-child(4), #hops_data tr td:nth-child(5), #hops_data tr td:nth-child(6), #yeast_data tr td:nth-child(1), #yeast_data tr td:nth-child(2), #yeast_data tr td:nth-child(3), #yeast_data tr td:nth-child(4)').attr('contentEditable', 'true')
         $('#saveMsg, .edit-show').show()
         $('.edit-hide').hide()
@@ -263,7 +263,7 @@ class Recipe
     
     # Disable recipe edit mode, e.g. after a save
     @disableEdit: =>
-        $('#recipeName, #recipeDescription, #batchSize, #boilSize, #bottling_temp, #bottling_pressure').removeAttr('contentEditable')
+        $('#recipeName, #recipeDescription, #batchSize, #boilSize, #bottling_temp, #bottling_pressure, #mashEfficiency, #steepEfficiency').removeAttr('contentEditable')
         $('#fermentables_data tr td:nth-child(2), #fermentables_data tr td:nth-child(3), #fermentables_data tr td:nth-child(4), #fermentables_data tr td:nth-child(5), #fermentables_data tr td:nth-child(7), #hops_data tr td:nth-child(1), #hops_data tr td:nth-child(2), #hops_data tr td:nth-child(3), #hops_data tr td:nth-child(4), #hops_data tr td:nth-child(5), #hops_data tr td:nth-child(6), #yeast_data tr td:nth-child(1), #yeast_data tr td:nth-child(2), #yeast_data tr td:nth-child(3), #yeast_data tr td:nth-child(4)').removeAttr('contentEditable')
         $('#saveMsg, .edit-show').hide()
         $('.edit-hide').show()
@@ -398,6 +398,9 @@ class Recipe
         late = ($(element.children[4]).text() or '') in ['y', 'yes']
         ppg = parseInt($(element.children[5]).text()) or 0
         srm = parseInt($(element.children[7]).text()) or 0
+
+        mashEfficiency = parseInt($('#mashEfficiency').text()) / 100.0
+        steepEfficiency = parseInt($('#steepEfficiency').text()) / 100.0
         
         weight = lb + (oz / 16.0)
         gravity = ppg * weight / gallons
@@ -426,12 +429,11 @@ class Recipe
             addition = 'mash'
 
         if addition is 'steep'
-            # Steeped grains have considerably lower efficiency of 30%
-            gravity *= 0.5
+            # Steeped grains have considerably lower efficiency
+            gravity *= steepEfficiency
         else if addition is 'mash'
             # Mashed grains have an average efficiency of about 75%
-            # TODO: Make this configurable later
-            gravity *= 0.75
+            gravity *= mashEfficiency
 
         return [lb, oz, desc, late, ppg, srm, weight, gravity, addition, forced]
 
@@ -880,6 +882,8 @@ class Recipe
             alcohol: parseFloat($('#abv').text()) or 0.0
             bottlingTemp: parseInt($('#bottling_temp').text()) or 70
             bottlingPressure: parseFloat($('#bottling_pressure').text()) or 2.5
+            mashEfficiency: parseInt($('#mashEfficiency').text()) or 75
+            steepEfficiency: parseInt($('#steepEfficiency').text()) or 50
             ingredients:
                 fermentables: []
                 spices: []
@@ -979,6 +983,8 @@ class Recipe
         $('#boilSize').text(recipe.boilSize)
         $('#bottling_temp').text(recipe.bottlingTemp)
         $('#bottling_pressure').text(recipe.bottlingPressure)
+        $('#mashEfficiency').text(recipe.mashEfficiency)
+        $('#steepEfficiency').text(recipe.steepEfficiency)
 
         # Load fermentables, spices, yeast
         for fermentable in recipe.ingredients.fermentables
