@@ -49,12 +49,14 @@ class Recipe
 
         # Setup action buttons
         if not @oldVersion
-            $('#edit-button').click(@enableEdit)
-            $('#delete-button').click(@onDelete)
-        $('#like-button').click(@onLiked)
-        $('#clone-button').click(@onCloned)
-        $('#scale-button').click(@onScaled)
-        $('#widget-button').click(@onWidget)
+            $('#edit-button').click @enableEdit
+            $('#delete-button').click @onDelete
+
+        $('#like-button').click @onLiked
+        $('#clone-button').click @onCloned
+        $('#scale-button').click @onScaled
+        $('#widget-button').click @onWidget
+        $('#ferment-button').click @onFerment
         
         # Setup editing delegates
         $('#fermentables_data, #hops_data, #yeast_data, .editable').on('keydown', '[contentEditable]', (event) =>
@@ -85,22 +87,47 @@ class Recipe
 
         # Setup scaling
         $('#gallonsSlider').noUiSlider('init',
-            knobs: 1,
-            connect: 'lower',
-            scale: [0, 20],
-            start: parseFloat($('#gallonsValue').text()) * 2,
+            knobs: 1
+            connect: 'lower'
+            scale: [0, 20]
+            start: parseFloat($('#gallonsValue').text()) * 2
             change: =>
                 $('#gallonsValue').text(($('#gallonsSlider').noUiSlider('value')[1] / 2.0).toFixed(1))
         )
 
         $('#boilGallonsSlider').noUiSlider('init',
-            knobs: 1,
-            connect: 'lower',
-            scale: [0, 20],
-            start: parseFloat($('#boilGallonsValue').text()) * 2,
+            knobs: 1
+            connect: 'lower'
+            scale: [0, 20]
+            start: parseFloat($('#boilGallonsValue').text()) * 2
             change: =>
                 $('#boilGallonsValue').text(($('#boilGallonsSlider').noUiSlider('value')[1] / 2.0).toFixed(1));
         )
+
+        # Setup ferment sliders
+        $('#primarySlider').noUiSlider 'init',
+            knobs: 1
+            connect: 'lower'
+            scale: [0, 30]
+            start: parseInt $('#primaryDays').val()
+            change: =>
+                $('#primaryValue').text $('#primarySlider').noUiSlider('value')[1]
+        
+        $('#secondarySlider').noUiSlider 'init',
+            knobs: 1
+            connect: 'lower'
+            scale: [0, 30]
+            start: parseInt $('#secondaryDays').val()
+            change: =>
+                $('#secondaryValue').text $('#secondarySlider').noUiSlider('value')[1]
+
+        $('#tertiarySlider').noUiSlider 'init',
+            knobs: 1
+            connect: 'lower'
+            scale: [0, 30]
+            start: parseInt $('#tertiaryDays').val()
+            change: =>
+                $('#tertiaryValue').text $('#tertiarySlider').noUiSlider('value')[1]
 
         # Was the page loaded in edit mode? If so, enable editing!
         if window.location.pathname is '/new' or window.location.hash is '#edit'
@@ -186,6 +213,28 @@ class Recipe
             frame = $('#widgetModal iframe').get(0)
             frame.src = frame.getAttribute('data-src')
         , 300)
+
+    # Update ferment information based on chosen day counts from dialog
+    @onFerment: =>
+        @updateFerment $('#primaryValue').text(), $('#secondaryValue').text(), $('#tertiaryValue').text()
+
+    # Set the ferment values and update the recipe page
+    @updateFerment: (primary, secondary, tertiary) =>
+        _gaq.push(['_trackEvent', 'Recipe', 'Ferment', ''])
+
+        $('#primaryDays').val primary
+        $('#secondaryDays').val secondary
+        $('#tertiaryDays').val tertiary
+
+        @updateStats()
+
+    # Set the aging days and update the recipe page
+    @updateAging: (days) =>
+        _gaq.push(['_trackEvent', 'Recipe', 'Aging', days])
+
+        $('#agingDays').val days
+
+        @updateStats()
 
     # Enable recipe edit mode
     @enableEdit: =>
@@ -676,6 +725,12 @@ class Recipe
 
             return output
 
+        mash = $('#mashSteps').val()
+        primaryDays = parseInt $('#primaryDays').val()
+        secondaryDays = parseInt $('#secondaryDays').val()
+        tertiaryDays = parseInt $('#tertiaryDays').val()
+        agingDays = parseInt $('#agingDays').val()
+
         boilName = 'water'
         timeline = '<li><span class="label label-inverse">start</span> Get ready to brew!'
 
@@ -733,10 +788,22 @@ class Recipe
 
         timeline += '<li><span class="label label-info">0 minutes</span> Flame out; begin chilling to 70&deg; - 100&deg;F</li>
             <li><span class="label label-info">30 minutes</span> Chilling complete; top up with water to total ' + gallons + ' gallons; aerate and pitch ' + get_items([], [], timeline_map.yeast) + '</li>
-            <li><span class="unknown-time">...</span>&nbsp;</li>
-            <li><span class="label label-info">14 days</span> Prime and bottle about ' + bottleCount + ' bottles</li>
-            <li><span class="unknown-time">...</span>&nbsp;</li>
-            <li><span class="label label-inverse">28 days</span> Relax, don\'t worry, and have a homebrew!</li>'
+            <li><span class="unknown-time">...</span>&nbsp;</li>'
+
+        if not primaryDays and not secondaryDays and not tertiaryDays
+            timeline += '<li><span class="label label-inverse">Drink</span> Drink immediately (about ' + bottleCount + ' bottles)</li>'
+        else if tertiaryDays
+            timeline += '<li><span class="label label-info">' + primaryDays + ' days</span> Move to secondary fermenter after ' + primaryDays + ' days</li>'
+            timeline += '<li><span class="label label-info">' + (primaryDays + secondaryDays) + ' days </span> Move to tertiary fermenter after ' + secondaryDays + ' days</li>'
+            timeline += '<li><span class="label label-info">' + (primaryDays + secondaryDays + tertiaryDays) + ' days </span> Prime and bottle about ' + bottleCount + ' bottles after ' + tertiaryDays + ' days</li>'
+        else if secondaryDays
+            timeline += '<li><span class="label label-info">' + primaryDays + ' days</span> Move to secondary fermenter after ' + primaryDays + ' days</li>'
+            timeline += '<li><span class="label label-info">' + (primaryDays + secondaryDays) + ' days </span> Prime and bottle about ' + bottleCount + ' bottles after ' + secondaryDays + ' days</li>'
+        else
+            timeline += '<li><span class="label label-info">' + primaryDays + ' days</span> Prime and bottle about ' + bottleCount + ' bottles</li>'
+
+        timeline += '<li><span class="unknown-time">...</span>&nbsp;</li>
+            <li><span class="label label-inverse">' + (primaryDays + secondaryDays + tertiaryDays + agingDays) + ' days</span> Relax, don\'t worry, and have a homebrew after ' + agingDays + ' days!</li>'
 
         $('#timeline ol').html(timeline)
 
@@ -884,6 +951,10 @@ class Recipe
             bottlingPressure: parseFloat($('#bottling_pressure').text()) or 2.5
             mashEfficiency: parseInt($('#mashEfficiency').text()) or 75
             steepEfficiency: parseInt($('#steepEfficiency').text()) or 50
+            primaryDays: parseInt($('#primaryDays').val()) or 14
+            secondaryDays: parseInt($('#secondaryDays').val()) or 0
+            tertiaryDays: parseInt($('#tertiaryDays').val()) or 0
+            agingDays: parseInt($('#agingDays').val()) or 14
             ingredients:
                 fermentables: []
                 spices: []
@@ -985,6 +1056,10 @@ class Recipe
         $('#bottling_pressure').text(recipe.bottlingPressure)
         $('#mashEfficiency').text(recipe.mashEfficiency)
         $('#steepEfficiency').text(recipe.steepEfficiency)
+        $('#primaryDays').val(recipe.primaryDays)
+        $('#secondaryDays').val(recipe.secondaryDays)
+        $('#tertiaryDays').val(recipe.tertiaryDays)
+        $('#agingDays').val(recipe.agingDays)
 
         # Load fermentables, spices, yeast
         for fermentable in recipe.ingredients.fermentables

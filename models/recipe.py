@@ -52,6 +52,13 @@ class RecipeBase(db.Model):
     mash_efficiency = db.IntegerProperty(default=75)
     steep_efficiency = db.IntegerProperty(default=50)
 
+    # Mash, ferment, and aging info
+    mash = db.StringProperty()
+    primary_days = db.IntegerProperty(default=14)
+    secondary_days = db.IntegerProperty(default=0)
+    tertiary_days = db.IntegerProperty(default=0)
+    aging_days = db.IntegerProperty(default=14)
+
     # Serialized JSON data for the ingredients
     _ingredients = db.TextProperty(default=json.dumps({
         'fermentables': [],
@@ -291,7 +298,9 @@ class RecipeBase(db.Model):
 
         # First check the overall properties
         properties = ('name', 'description', 'type', 'category', 'style', 'batch_size',
-                      'boil_size', 'bottling_temp', 'bottling_pressure')
+                      'boil_size', 'bottling_temp', 'bottling_pressure', 'mash_efficiency',
+                      'steep_efficiency', 'primary_days', 'secondary_days', 'tertiary_days',
+                      'aging_days')
         for p in properties:
             oldVal = getattr(other, p, None)
             newVal = getattr(self, p, None)
@@ -414,7 +423,9 @@ class RecipeBase(db.Model):
            'ingredients' in deletions or \
            'batch_size' in modifications or \
            'boil_size' in modifications or \
-           'ingredients' in modifications:
+           'ingredients' in modifications or \
+           'mash_efficiency' in modifications or \
+           'steep_efficiency' in modifications:
 
             # Update the caches if needed
             if not hasattr(self, 'color'):
@@ -596,6 +607,10 @@ class Recipe(RecipeBase):
             'bottling_pressure': self.bottling_pressure,
             'mash_efficiency': self.mash_efficiency,
             'steep_efficiency': self.steep_efficiency,
+            'primary_days': self.primary_days,
+            'secondary_days': self.secondary_days,
+            'tertiary_days': self.tertiary_days,
+            'aging_days': self.aging_days,
             '_ingredients': self._ingredients
         })
 

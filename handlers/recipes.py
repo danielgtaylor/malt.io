@@ -374,6 +374,12 @@ class RecipeHandler(BaseHandler):
                 recipe.boil_size = history.boil_size
                 recipe.bottling_temp = history.bottling_temp
                 recipe.bottling_pressure = history.bottling_pressure
+                recipe.mash_efficiency = history.mash_efficiency
+                recipe.steep_efficiency = history.steep_efficiency
+                recipe.primary_days = history.primary_days
+                recipe.secondary_days = history.secondary_days
+                recipe.tertiary_days = history.tertiary_days
+                recipe.aging_days = history.aging_days
                 recipe._ingredients = history._ingredients
 
         cloned_from = None
@@ -455,6 +461,12 @@ class RecipeHandler(BaseHandler):
         recipe.alcohol = float(recipe_data['alcohol'])
         recipe.bottling_temp = float(recipe_data['bottlingTemp'])
         recipe.bottling_pressure = float(recipe_data['bottlingPressure'])
+        recipe.mash_efficiency = int(recipe_data['mashEfficiency'])
+        recipe.steep_efficiency = int(recipe_data['steepEfficiency'])
+        recipe.primary_days = int(recipe_data['primaryDays'])
+        recipe.secondary_days = int(recipe_data['secondaryDays'])
+        recipe.tertiary_days = int(recipe_data['tertiaryDays'])
+        recipe.aging_days = int(recipe_data['agingDays'])
         recipe.ingredients = recipe_data['ingredients']
 
         # Update slug

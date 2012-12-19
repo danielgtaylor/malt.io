@@ -611,6 +611,47 @@
         </div>
     </div>
     <h2>Brew Timeline</h2>
+    <div class="btn-toolbar edit-show" style="display: none;">
+        <div class="btn-group">
+            <a class="btn dropdown-toggle" data-toggle="dropdown" href="#">
+                <i class="icon-tasks"></i> Customize mash
+                <span class="caret"></span>
+            </a>
+            <ul class="dropdown-menu">
+                <li><a><i class="icon-tasks icon-white"></i> Single infusion 154&deg;F</a></li>
+                <!--<li class="divider"></li>
+                <li><a><i class="icon-plus-sign icon-white"></i> Add mash profile</a></li>-->
+            </ul>
+        </div>
+        <div class="btn-group">
+            <a class="btn dropdown-toggle" data-toggle="dropdown" href="#">
+                <i class="icon-tint"></i> Customize ferment
+                <span class="caret"></span>
+            </a>
+            <ul class="dropdown-menu">
+                <li><a href="#" onclick="Recipe.updateFerment(14, 0, 0); return false;"><i class="icon-tint icon-white"></i> 2-week primary</a></li>
+                <li><a href="#" onclick="Recipe.updateFerment(14, 14, 0); return false;"><i class="icon-tint icon-white"></i> 2-week primary, 2-week secondary</a></li>
+                <li><a href="#" onclick="Recipe.updateFerment(14, 30, 0); return false;"><i class="icon-tint icon-white"></i> 2-week primary, 1-month secondary</a></li>
+                <li class="divider"></li>
+                <li><a href="#fermentModal" data-toggle="modal"><i class="icon-plus-sign icon-white"></i> Customize ferment profile</a></li>
+            </ul>
+        </div>
+        <div class="btn-group">
+            <a class="btn dropdown-toggle" data-toggle="dropdown" href="#">
+                <i class="icon-time"></i> Customize aging
+                <span class="caret"></span>
+            </a>
+            <ul class="dropdown-menu">
+                <li><a href="#" onclick="Recipe.updateAging(0); return false;"><i class="icon-glass icon-white"></i> Drink immediately</a></li>
+                <li><a href="#" onclick="Recipe.updateAging(14); return false;"><i class="icon-time icon-white"></i> 2 weeks</a></li>
+                <li><a href="#" onclick="Recipe.updateAging(30); return false;"><i class="icon-time icon-white"></i> 1 month</a></li>
+                <li><a href="#" onclick="Recipe.updateAging(60); return false;"><i class="icon-time icon-white"></i> 2 months</a></li>
+                <li><a href="#" onclick="Recipe.updateAging(90); return false;"><i class="icon-time icon-white"></i> 3 months</a></li>
+                <li><a href="#" onclick="Recipe.updateAging(180); return false;"><i class="icon-time icon-white"></i> 6 months</a></li>
+                <li><a href="#" onclick="Recipe.updateAging(365); return false;"><i class="icon-time icon-white"></i> 1 year</a></li>
+            </ul>
+        </div>
+    </div>
     <div id="timeline" class="row">
         <div class="line"></div>
         <ol class="span10">
@@ -628,6 +669,11 @@
             <h6>Brewday Time</h6>
             <p id="brewTime">2.5 hours</p>
         </div>
+        <input type="hidden" id="mashSteps" value="{{ recipe.mash }}"/>
+        <input type="hidden" id="primaryDays" value="{{ recipe.primary_days }}"/>
+        <input type="hidden" id="secondaryDays" value="{{ recipe.secondary_days }}"/>
+        <input type="hidden" id="tertiaryDays" value="{{ recipe.tertiary_days }}"/>
+        <input type="hidden" id="agingDays" value="{{ recipe.aging_days }}"/>
     </div>
     {% if not recipe.new and not recipe.old %}
         <div id="disqus_thread"></div>
@@ -758,6 +804,41 @@
         </div>
         <div class="modal-footer">
             <a href="#" class="btn" data-dismiss="modal">Close</a>
+        </div>
+    </div>
+    <div id="fermentModal" class="modal fade hide">
+        <div class="modal-header">
+            <button type="button" class="close" data-dismiss="modal">×</button>
+            <h3>Customize Ferment</h3>
+        </div>
+        <div class="modal-body">
+            <div>
+                Below you can customize the fermentation profile of this recipe by specifying the number of days spent in primary, secondary, and tertiary. Setting the secondary or tertiary ferment to zero will exclude it from the recipe.<br/><br/>
+            </div>
+            <div class="row" style="position: relative;">
+                <div class="scaler">
+                    <span>Primary:</span>
+                    <div id="primarySlider" class="noUiSlider"></div>
+                    <span id="primaryValue">{{ recipe.primary_days }}</span>
+                    <span>days</span>
+                </div>
+                <div class="scaler">
+                    <span>Secondary:</span>
+                    <div id="secondarySlider" class="noUiSlider"></div>
+                    <span id="secondaryValue">{{ recipe.secondary_days }}</span>
+                    <span>days</span>
+                </div>
+                <div class="scaler">
+                    <span>Tertiary:</span>
+                    <div id="tertiarySlider" class="noUiSlider"></div>
+                    <span id="tertiaryValue">{{ recipe.tertiary_days }}</span>
+                    <span>days</span>
+                </div>
+            </div>
+        </div>
+        <div class="modal-footer">
+            <a href="#" class="btn" data-dismiss="modal">Cancel</a>
+            <a id="ferment-button" href="#" class="btn btn-success" data-dismiss="modal"><i class="icon-tint icon-white"></i> Save Ferment</a>
         </div>
     </div>
     <div id="badBrowserModal" class="modal fade hide">
