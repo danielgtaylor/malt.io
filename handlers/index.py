@@ -24,7 +24,7 @@ class MainHandler(BaseHandler):
         if not recipes_html or settings.DEBUG:
             # No such luck... query the data store
             recipes = Recipe.all()\
-                            .order('-likes_count')\
+                            .order('-grade')\
                             .run(limit=15)
             recipes_html = self.render('index-recipes.html', {
                 'recipes': recipes
@@ -61,7 +61,7 @@ class DashboardHandler(BaseHandler):
         # Start async fetch of top recipes
         top_recipes = Recipe.all()\
                             .filter('owner IN', user_keys)\
-                            .order('-likes_count')\
+                            .order('-grade')\
                             .run(limit=15)
 
         # Get and process interesting events
