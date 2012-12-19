@@ -283,7 +283,7 @@ class RecipeCloneHandler(BaseHandler):
             return
 
         new_recipe = Recipe(**{
-            'owner': UserPrefs.get(),
+            'owner': self.user,
             'cloned_from': recipe,
             'color': recipe.color,
             'ibu': recipe.ibu,
@@ -303,7 +303,7 @@ class RecipeCloneHandler(BaseHandler):
         new_recipe.put()
 
         action = UserAction()
-        action.owner = UserPrefs.get()
+        action.owner = self.user
         action.type = action.TYPE_RECIPE_CLONED
         action.object_id = new_recipe.key().id()
         action.put()
