@@ -59,6 +59,7 @@ class RecipesHandler(BaseHandler):
         """
         Render the public recipe list for a user or all users.
         """
+        show_owners = False
         if username:
             publicuser = UserPrefs.all().filter('name =', username).get()
             recipes = Recipe.all()\
@@ -72,10 +73,12 @@ class RecipesHandler(BaseHandler):
             publicuser = None
             recipes = Recipe.all().order('-grade')
             recipes = [r for r in recipes]
+            show_owners = True
 
         self.render('recipes.html', {
             'publicuser': publicuser,
-            'recipes': recipes
+            'recipes': recipes,
+            'show_owners': show_owners
         })
 
     def post(self):

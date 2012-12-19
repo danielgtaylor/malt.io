@@ -373,9 +373,10 @@ def timesince(d, now=None):
 JINJA_ENV.filters['timesince'] = timesince
 
 
-def recipe_snippet(value):
+def recipe_snippet(value, show_owner=False):
     return JINJA_ENV.get_template('recipe_snippet.html').render({
-        'recipe': value
+        'recipe': value,
+        'show_owner': show_owner
     })
 
 JINJA_ENV.filters['recipe_snippet'] = recipe_snippet

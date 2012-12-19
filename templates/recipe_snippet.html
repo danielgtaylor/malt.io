@@ -1,4 +1,7 @@
 <div class="recipe">
+    {% if show_owner %}
+        <a class="owner" href="/users/{{ recipe.owner.name }}">{{ recipe.owner.name }}</a>
+    {% endif %}
     <span class="title ellipsize"><a href="/users/{{ recipe.owner.name }}/recipes/{{ recipe.slug }}">{{ recipe.name }}</a></span>
     <br/>
     <span class="ellipsize">{{ recipe.description }}</span>
