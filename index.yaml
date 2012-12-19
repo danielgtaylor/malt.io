@@ -37,6 +37,12 @@ indexes:
 - kind: Recipe
   properties:
   - name: owner
+  - name: grade
+    direction: desc
+
+- kind: Recipe
+  properties:
+  - name: owner
   - name: likes_count
 
 - kind: Recipe

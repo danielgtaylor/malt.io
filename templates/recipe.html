@@ -146,14 +146,6 @@
             <div class="g-plusone" data-size="medium" data-annotation="none"></div>&nbsp;
             <div class="fb-like" data-layout="button_count" data-width="90" data-show-faces="false" style="top: -3px;"></div>
         </div>
-        {% if not recipe.old %}
-        <div class="clear"></div>
-        <div class="likes-container edit-hide">
-            <div class="likes-tag">
-                {{ recipe.likes|length }} like{% if recipe.likes != 1 %}s{% endif %}
-            </div>
-        </div>
-        {% endif %}
     </div>
     {% if brews %}
         <h2 class="edit-hide">Recent Brews</h2>

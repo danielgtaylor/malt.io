@@ -31,6 +31,10 @@ class Brew(db.Model):
     notes = db.TextProperty()
 
     @property
+    def owner_key(self):
+        return Brew.owner.get_value_for_datastore(self)
+
+    @property
     def recipe_key(self):
         return Brew.recipe.get_value_for_datastore(self)
 

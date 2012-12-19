@@ -62,14 +62,15 @@ class RecipesHandler(BaseHandler):
         if username:
             publicuser = UserPrefs.all().filter('name =', username).get()
             recipes = Recipe.all()\
-                            .filter('owner =', publicuser)
+                            .filter('owner =', publicuser)\
+                            .order('-grade')
             def setowner(recipe):
                 recipe.owner = publicuser
                 return recipe
             recipes = map(setowner, recipes)
         else:
             publicuser = None
-            recipes = Recipe.all()
+            recipes = Recipe.all().order('-grade')
             recipes = [r for r in recipes]
 
         self.render('recipes.html', {
@@ -301,6 +302,10 @@ class RecipeCloneHandler(BaseHandler):
 
         new_recipe.slug = generate_usable_slug(new_recipe)
         new_recipe.put()
+
+        # Update recipe ranking for sorting
+        recipe.update_grade()
+        recipe.put()
 
         action = UserAction()
         action.owner = self.user

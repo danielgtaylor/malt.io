@@ -1,5 +1,6 @@
 import json
 import logging
+import math
 import re
 import xml.etree.ElementTree as et
 
@@ -465,9 +466,8 @@ class Recipe(RecipeBase):
     ibu = db.FloatProperty(default=0.0)
     alcohol = db.FloatProperty(default=0.0)
 
-    # Users who have liked tihs recipe
-    likes = db.StringListProperty()
-    likes_count = db.IntegerProperty(default=0)
+    # Grade: a generated rating for this recipe, see update_grade()
+    grade = db.FloatProperty(default=0.0)
 
     @staticmethod
     def new_from_beerxml(data):
@@ -582,9 +582,8 @@ class Recipe(RecipeBase):
         Save this recipe, updating any caches as needed before writing
         to the data store.
         """
-        # Update the cached number of likes so we can sort on this field
-        # later for displaying the most popular recipes
-        self.likes_count = len(self.likes)
+        # Update grade so that sorting is up to date
+        self.update_grade()
 
         return super(Recipe, self).put(*args)
 
@@ -613,6 +612,83 @@ class Recipe(RecipeBase):
             'aging_days': self.aging_days,
             '_ingredients': self._ingredients
         })
+
+    def update_grade(self):
+        """
+        Grade a recipe based on several factors:
+
+          * Recipe completeness (title, description, ingredients)
+          * Average brew rating weighted inverse temporally
+          * Average completeness of brews (measurements, rating, notes)
+          * Total number of clones, brews and unique brewers
+
+        The calculated grade is used to rank recipes - those with the highest
+        grade will move toward the front of the list. This should hopefully
+        mean that recipes that are very popular, that many people like, that
+        have many clones or reviews, and that have many positive reviews
+        should be shown before others.
+
+        What actions can someone take to increase the grade of a recipe?
+        The owner can make sure it has a proper title, description, and at
+        least one of each type of ingredient. A normal user can clone and/or
+        brew the recipe, making sure to fill in as much as possible for the
+        brew.
+        """
+        from models.brew import Brew
+
+        grade = 0.0
+
+        clone_count = Recipe.all().filter('cloned_from =', self).count()
+        logging.info('clone count ' + str(clone_count))
+        brew_count = Brew.all().filter('recipe =', self).count()
+        brews = Brew.all().filter('recipe =', self).order('-started').fetch(25)
+
+        # Grade completeness
+        if self.name.lower() not in ['', 'untitled', 'untitled brew', 'no name']:
+            grade += 1.0
+
+        if self.description.lower() not in ['', 'no description', 'none']:
+            grade += 1.0
+
+        if len(self.ingredients['fermentables']) and len(self.ingredients['spices']) and len(self.ingredients['yeast']):
+            grade += 1.0
+
+        if clone_count and brew_count:
+            grade += 1.0
+
+        # Grade average weighted reviews
+        count = 0
+        brewers = set()
+        for i, brew in enumerate(brews):
+            brew_grade = 0.0
+
+            brewers.add(brew.owner_key)
+
+            # Completeness of brew
+            if brew.started:
+                brew_grade += 1.0
+
+            if brew.og and brew.fg:
+                brew_grade += 1.0
+
+            if brew.notes:
+                brew_grade += 1.0
+
+            # Brew rating
+            if brew.rating is not None:
+                brew_grade += brew.rating
+
+            # Weighted average (0.5, 0.25, 0.125, ...)
+            grade += brew_grade * (0.5 / (i + 1))
+
+        # Total unique brewers
+        grade += math.ceil(math.log(len(brewers) + 1, 3))
+
+        # Total clones and brews
+        grade += math.ceil(math.log(clone_count + 1, 3))
+        grade += math.ceil(math.log(brew_count + 1, 3))
+
+        self.grade = grade
 
 
 class RecipeHistory(RecipeBase):

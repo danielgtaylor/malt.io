@@ -129,6 +129,10 @@ class BrewHandler(BaseHandler):
         brew.slug = generate_usable_slug(brew)
         key = brew.put()
 
+        # Update recipe ranking information for sorting
+        recipe.update_grade()
+        recipe.put()
+
         # Add user action
         action = UserAction()
         action.owner = self.user
