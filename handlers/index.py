@@ -1,3 +1,4 @@
+import logging
 import settings
 
 from google.appengine.api import memcache
@@ -95,17 +96,26 @@ class DashboardHandler(BaseHandler):
             for u in UserPrefs.get_by_id(object_ids['users']):
                 user_map[u.key().id()] = u
 
+        # Setup a map of brew id -> brew for easy lookups
+        brew_map = {}
+        brew_recipe_ids = set()
+
+        for b in brews.get_result():
+            brew_recipe_ids.add(b.recipe_key.id())
+            brew_map[b.key().id()] = b
+
+        # Async fetch of any recipes brews reference that weren't
+        # included in the recipe fetch above...
+        brew_recipes = db.get_async([Key.from_path('Recipe', id) for id in brew_recipe_ids if id not in object_ids['recipes']])
+
         # Setup a map of recipe id -> recipe for easy lookups
         recipe_map = {}
 
         for r in recipes.get_result():
             recipe_map[r.key().id()] = r
 
-        # Setup a map of brew id -> brew for easy lookups
-        brew_map = {}
-
-        for b in brews.get_result():
-            brew_map[b.key().id()] = b
+        for r in brew_recipes.get_result():
+            recipe_map[r.key().id()] = r
 
         # Render and cache for 1 minute
         memcache.set('dashboard-' + user.user_id, self.render('dashboard.html', {
