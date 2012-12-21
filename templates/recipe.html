@@ -118,8 +118,6 @@
             {% if publicuser and user and user.name == publicuser.name %}
                 <a id="edit-button" class="btn{% if recipe.old %} disabled{% endif %}"><i class="icon-pencil"></i> Edit</a>
                 <a class="btn{% if recipe.old %} disabled{% endif %}"{% if not recipe.old %} data-toggle="modal" href="#deleteModal"{% endif %}><i class="icon-remove"></i> Delete</a>
-            {% else %}
-                <a id="like-button" class="btn{% if user and user.user_id in recipe.likes %} active{% endif %}" data-toggle="button"><i class="icon-thumbs-up"></i> Like</a>
             {% endif %}
             {% endif %}
             {% if recipe.old %}

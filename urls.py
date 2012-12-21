@@ -8,16 +8,14 @@ from handlers.messages import MessagesHandler
 from handlers.privacy import PrivacyHandler
 from handlers.profile import ProfileHandler
 from handlers.recipes import RecipesHandler, RecipeEmbedHandler, \
-                             RecipeLikeHandler, RecipeCloneHandler, \
-                             RecipeHandler, RecipeXmlHandler, \
-                             RecipeHistoryHandler
+                             RecipeCloneHandler, RecipeHandler, \
+                             RecipeXmlHandler, RecipeHistoryHandler
 from handlers.users import UsersHandler, UserHandler, UserFollowHandler, \
                            UsernameCheckHandler
 
 # The following maps regular expressions to specific handlers.
 # Matched groups become positional arguments to the handler's methods.
 urls = [
-    ('/users/(.*?)/recipes/(.*?)/like', RecipeLikeHandler),
     ('/users/(.*?)/recipes/(.*?)/clone', RecipeCloneHandler),
     ('/users/(.*?)/recipes/(.*?)/brew', BrewHandler),
     ('/users/(.*?)/recipes/(.*?)/brew/(.*)', BrewHandler),

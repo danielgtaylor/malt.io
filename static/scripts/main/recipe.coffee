@@ -52,7 +52,6 @@ class Recipe
             $('#edit-button').click @enableEdit
             $('#delete-button').click @onDelete
 
-        $('#like-button').click @onLiked
         $('#clone-button').click @onCloned
         $('#scale-button').click @onScaled
         $('#widget-button').click @onWidget
@@ -161,27 +160,6 @@ class Recipe
             )
 
         return [inTable, tbody, row, trIndex, tdIndex]
-    
-    # Handle clicks on the like button
-    @onLiked: (event) =>
-        if not user
-            window.location.href = '/profile'
-            return
-
-        if $('#like-button').hasClass('active')
-            action = 'delete'
-        else
-            action = 'post'
-
-        _gaq.push(['_trackEvent', 'Recipe', 'Like', $('#recipeName').text()])
-
-        $.ajax(
-            url: location.href + '/like'
-            type: action
-            success: (data, status, xhr) =>
-                # TODO: handle errors here
-                $('.likes-tag').html(data.likes + ' likes')
-        )
 
     # Handle clicks on the clone button, creating a cloned copy of another
     # user's recipe
