@@ -53,3 +53,6 @@ skip_files:
 - ^(.*/)?.*\.xcf
 - node_modules
 - build
+
+inbound_services:
+- warmup
