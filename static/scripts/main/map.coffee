@@ -3,7 +3,7 @@ class Map
     @draw: (id, lat, lng) =>
         mapOptions =
           center: new google.maps.LatLng lat || 40.7142, lng || -74.0064
-          zoom: 12
+          zoom: 11
           mapTypeId: google.maps.MapTypeId.ROADMAP
           mapTypeControl: false
           streetViewControl: false
