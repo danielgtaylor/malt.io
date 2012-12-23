@@ -89,7 +89,7 @@
             This is an old version of a recipe that has been updated. The latest version of this recipe can be found <a href="/users/{{ publicuser.name }}/recipes/{{ recipe.slug }}">here</a>.
         </div>
     {% endif %}
-    <div class="hero-unit editable">
+    <div class="hero-unit editable" style="padding: 30px 60px;">
         {% if cloned_from %}
             <p style="opacity: 0.5;">
                 Cloned from <a href="/users/{{ cloned_from.owner.name }}">{{ cloned_from.owner.name }}</a> / <a href="/users/{{ cloned_from.owner.name }}/recipes/{{ cloned_from.slug }}">{{ cloned_from.name }}</a>
@@ -144,6 +144,7 @@
             <div class="g-plusone" data-size="medium" data-annotation="none"></div>&nbsp;
             <div class="fb-like" data-layout="button_count" data-width="90" data-show-faces="false" style="top: -3px;"></div>
         </div>
+        <div class="clearfix"></div>
     </div>
     {% if brews %}
         <h2 class="edit-hide">Recent Brews</h2>
