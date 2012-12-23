@@ -582,9 +582,6 @@ class Recipe(RecipeBase):
         Save this recipe, updating any caches as needed before writing
         to the data store.
         """
-        # Update grade so that sorting is up to date
-        self.update_grade()
-
         return super(Recipe, self).put(*args)
 
     def create_historic_version(self):

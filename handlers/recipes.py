@@ -212,10 +212,18 @@ class RecipeCloneHandler(BaseHandler):
             'boil_size': recipe.boil_size,
             'bottling_temp': recipe.bottling_temp,
             'bottling_pressure': recipe.bottling_pressure,
+            'steep_efficiency': recipe.steep_efficiency,
+            'mash_efficiency': recipe.mash_efficiency,
+            'primary_days': recipe.primary_days,
+            'secondary_days': recipe.secondary_days,
+            'tertiary_days': recipe.tertiary_days,
+            'aging_days': recipe.aging_days,
             '_ingredients': recipe._ingredients
         })
 
         new_recipe.slug = generate_usable_slug(new_recipe)
+        new_recipe.put()
+        new_recipe.update_grade()
         new_recipe.put()
 
         # Update recipe ranking for sorting
@@ -413,6 +421,10 @@ class RecipeHandler(BaseHandler):
         else:
             # Save recipe to database
             key = recipe.put()
+
+        # Update grade now that we have a key
+        recipe.update_grade()
+        recipe.put()
 
         if not historic or changed:
             action = UserAction()
