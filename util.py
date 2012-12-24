@@ -155,6 +155,9 @@ def time_to_min(value):
 
     """
     conversions = {
+        'd': 60 * 24,
+        'day': 60 * 24,
+        'days': 60 * 24,
         'h': 60,
         'hr': 60,
         'hrs': 60,

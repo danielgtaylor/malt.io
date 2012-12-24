@@ -601,6 +601,7 @@ class Recipe
         rows = []
         ibu = 0.0
         $('#hops_data tr').each((index, element) =>
+            use = $(element.children[0]).text() or ''
             time = parseInt($(element.children[1]).text()) or 0.0
             oz = parseFloat($(element.children[2]).text()) or 0.0
             desc = $(element.children[3]).text() or ''
@@ -610,7 +611,7 @@ class Recipe
                 utilization_factor = 1.15
             aa = parseFloat($(element.children[5]).text()) or 0.0
 
-            if aa
+            if aa and use is 'boil'
                 bitterness = 1.65 * Math.pow(0.000125, earlyGu - 1.0) * ((1 - Math.pow(2.718, -0.04 * time)) / 4.15) * ((aa / 100.0 * oz * 7490.0) / boilGallons) * utilization_factor
                 ibu += bitterness
             else
