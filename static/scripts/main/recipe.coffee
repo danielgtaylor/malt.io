@@ -339,7 +339,7 @@ class Recipe
         # Try to guess a reasonable time for the next addition
         if parseFloat(template.getAttribute('data-aa'))
             latest = parseInt($('#hops_data tr:last td:nth-child(2)').html?()) || 90
-            next = Recipe.NEXT_HOP_SCHEDULE[latest]
+            next = Recipe.NEXT_HOP_SCHEDULE[latest] or 5
             form = 'pellet'
         else
             next = 5
