@@ -38,6 +38,7 @@ def handle_error(request, response, exception, code, msg):
 
     # Render and error template
     template = get_template('error.html')
+    response.status = code
     response.out.write(template.render({
         'user': user,
         'code': code,
