@@ -601,7 +601,7 @@ class Recipe
         rows = []
         ibu = 0.0
         $('#hops_data tr').each((index, element) =>
-            use = $(element.children[0]).text() or ''
+            use = $(element.children[0]).text().toLowerCase() or ''
             time = parseInt($(element.children[1]).text()) or 0.0
             oz = parseFloat($(element.children[2]).text()) or 0.0
             desc = $(element.children[3]).text() or ''

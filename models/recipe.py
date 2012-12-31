@@ -243,7 +243,7 @@ class RecipeBase(db.Model):
 
         ibu = 0
         for hop in self.ingredients['spices']:
-            if not hop['aa'] or hop['use'] != 'boil':
+            if not hop['aa'] or hop['use'].lower() != 'boil':
                 continue
 
             utilization_factor = 1.0
