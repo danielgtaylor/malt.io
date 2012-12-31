@@ -218,9 +218,9 @@ class RecipeBase(db.Model):
                 addition = 'mash'
 
             if addition == 'steep':
-                gravity *= self.steep_efficiency
+                gravity *= (self.steep_efficiency / 100.0)
             elif addition == 'mash':
-                gravity *= self.mash_efficiency
+                gravity *= (self.mash_efficiency / 100.0)
 
             if 'late' not in fermentable or fermentable['late'] not in ['y', 'yes', 'x']:
                 early_gu += gravity
