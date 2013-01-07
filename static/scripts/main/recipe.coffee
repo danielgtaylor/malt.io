@@ -633,11 +633,13 @@ class Recipe
 
                 timeline_map['drySpice'][time] ?= []
                 timeline_map['drySpice'][time].push([oz, desc, bitterness])
+
+                rows.push([time, element])
             else
                 timeline_map['times'][time] ?= []
                 timeline_map['times'][time].push([oz, desc, bitterness])
 
-            rows.push([time, element])
+                rows.push([1000 - time, element])
         )
         @reorderRows($('#hops_data'), rows, (x, y) -> x[0] - y[0])
         
