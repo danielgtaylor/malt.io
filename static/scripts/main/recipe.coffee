@@ -111,7 +111,7 @@ class Recipe
             knobs: 1
             connect: 'lower'
             scale: [0, 30]
-            start: parseInt $('#primaryDays').text()
+            start: parseInt $('#primaryDays').val()
             change: =>
                 $('#primaryValue').text $('#primarySlider').noUiSlider('value')[1]
         
@@ -119,7 +119,7 @@ class Recipe
             knobs: 1
             connect: 'lower'
             scale: [0, 30]
-            start: parseInt $('#secondaryDays').text()
+            start: parseInt $('#secondaryDays').val()
             change: =>
                 $('#secondaryValue').text $('#secondarySlider').noUiSlider('value')[1]
 
@@ -127,7 +127,7 @@ class Recipe
             knobs: 1
             connect: 'lower'
             scale: [0, 30]
-            start: parseInt $('#tertiaryDays').text()
+            start: parseInt $('#tertiaryDays').val()
             change: =>
                 $('#tertiaryValue').text $('#tertiarySlider').noUiSlider('value')[1]
 
