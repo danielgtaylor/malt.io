@@ -639,7 +639,7 @@ class Recipe
 
             rows.push([time, element])
         )
-        @reorderRows($('#hops_data'), rows)
+        @reorderRows($('#hops_data'), rows, (x, y) -> x[0] - y[0])
         
         ibu_element.html(ibu.toFixed(1))
         
