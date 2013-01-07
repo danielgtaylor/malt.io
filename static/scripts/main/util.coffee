@@ -55,4 +55,43 @@ class Util
 
         return valid
 
+    # Convert a time string into a number of minutes
+    @timeToMin: (value) =>
+        conversions =
+            d: 60 * 24
+            day: 60 * 24
+            days: 60 * 24
+            h: 60
+            hr: 60
+            hrs: 60
+            hour: 60
+            hours: 60
+            m: 1
+            min: 1
+            mins: 1
+            s: 1 / 60.0
+            sec: 1 / 60.0
+            seconds: 1 / 60.0
+
+        for own unit, factor of conversions
+            if unit in value
+                return parseFloat(value) * factor
+
+        return parseFloat(value)
+
+    @minToTime: (value) =>
+        if value >= 60 * 24
+            value /= (60 * 24)
+            label = 'day'
+        else if value >= 60
+            value /= 60
+            label = 'hour'
+        else
+            label = 'minute'
+
+        if value isnt 1
+            label += 's'
+
+        return value + ' ' + label
+
 exports.Util = Util if exports?

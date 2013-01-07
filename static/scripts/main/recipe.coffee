@@ -38,6 +38,9 @@ class Recipe
     # This is used to create the recipe timeline.
     @BOIL_FERMENTABLES = /candi|candy|dme|dry|extract|honey|lme|liquid|sugar|syrup|turbinado|boil/i
     
+    # Regular expressions to match for dry hopping vs. mash/boil additions
+    @DRY_SPICE = /primary|secondary|dry/i
+
     # Initialize the recipe by rendering color swatches on the page and
     # setting up event delegates to handle editing if the recipe is put
     # into edit view.
@@ -489,6 +492,7 @@ class Recipe
                 boil: []
                 boilEnd: []
             times: {}
+            drySpice: {}
             yeast: []
 
         # Update breadcrumb name
@@ -602,7 +606,7 @@ class Recipe
         ibu = 0.0
         $('#hops_data tr').each((index, element) =>
             use = $(element.children[0]).text().toLowerCase() or ''
-            time = parseInt($(element.children[1]).text()) or 0.0
+            time = Util.timeToMin($(element.children[1]).text()) or 0.0
             oz = parseFloat($(element.children[2]).text()) or 0.0
             desc = $(element.children[3]).text() or ''
             form = $(element.children[4]).text() or 'pellet'
@@ -623,8 +627,15 @@ class Recipe
                     approx_cost += Math.ceil(oz) * cost
                     break
 
-            timeline_map['times'][time] ?= []
-            timeline_map['times'][time].push([oz, desc, bitterness])
+            if @DRY_SPICE.exec use
+                if aa
+                    desc += ' (dry hop)'
+
+                timeline_map['drySpice'][time] ?= []
+                timeline_map['drySpice'][time].push([oz, desc, bitterness])
+            else
+                timeline_map['times'][time] ?= []
+                timeline_map['times'][time].push([oz, desc, bitterness])
 
             rows.push([time, element])
         )
@@ -768,6 +779,11 @@ class Recipe
         timeline += '<li><span class="label label-info">0 minutes</span> Flame out; begin chilling to 70&deg; - 100&deg;F</li>
             <li><span class="label label-info">30 minutes</span> Chilling complete; top up with water to total ' + gallons + ' gallons; aerate and pitch ' + get_items([], [], timeline_map.yeast) + '</li>
             <li><span class="unknown-time">...</span>&nbsp;</li>'
+
+        for own time, i of timeline_map.drySpice
+            timeline += '<li><span class="label label-info">' + Util.minToTime(time) + '</span> Add '
+            timeline += get_items([], timeline_map.drySpice[time], [])
+            timeline += '</li>'
 
         if not primaryDays and not secondaryDays and not tertiaryDays
             timeline += '<li><span class="label label-inverse">Drink</span> Drink immediately (about ' + bottleCount + ' bottles)</li>'
