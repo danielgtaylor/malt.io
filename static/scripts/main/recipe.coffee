@@ -752,7 +752,7 @@ class Recipe
         timeline += Math.round(boilGallons * 10) + ' minutes).</li>'
         totalTime += parseFloat(boilGallons * 10)
 
-        times = (parseInt(key) for key, value of timeline_map.times)
+        times = (parseInt(key) for own key, value of timeline_map.times)
 
         # If we have late additions and no late addition time, add it
         if timeline_map.fermentables.boilEnd.length and 5 not in times
