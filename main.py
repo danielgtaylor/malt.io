@@ -36,6 +36,9 @@ def handle_error(request, response, exception, code, msg):
     if auth_id:
         user = UserPrefs.get(auth_id)
 
+    if user:
+        logging.error('Currently logged in user is ' + user.name + ' (' + user.email + ')')
+
     # Render and error template
     template = get_template('error.html')
     response.status = code
