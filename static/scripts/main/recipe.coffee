@@ -103,7 +103,7 @@ class Recipe
             scale: [0, 20]
             start: parseFloat($('#boilGallonsValue').text()) * 2
             change: =>
-                $('#boilGallonsValue').text(($('#boilGallonsSlider').noUiSlider('value')[1] / 2.0).toFixed(1));
+                $('#boilGallonsValue').text(($('#boilGallonsSlider').noUiSlider('value')[1] / 2.0).toFixed(1))
         )
 
         # Setup ferment sliders
@@ -111,7 +111,7 @@ class Recipe
             knobs: 1
             connect: 'lower'
             scale: [0, 30]
-            start: parseInt $('#primaryDays').val()
+            start: parseInt $('#primaryDays').text()
             change: =>
                 $('#primaryValue').text $('#primarySlider').noUiSlider('value')[1]
         
@@ -119,7 +119,7 @@ class Recipe
             knobs: 1
             connect: 'lower'
             scale: [0, 30]
-            start: parseInt $('#secondaryDays').val()
+            start: parseInt $('#secondaryDays').text()
             change: =>
                 $('#secondaryValue').text $('#secondarySlider').noUiSlider('value')[1]
 
@@ -127,7 +127,7 @@ class Recipe
             knobs: 1
             connect: 'lower'
             scale: [0, 30]
-            start: parseInt $('#tertiaryDays').val()
+            start: parseInt $('#tertiaryDays').text()
             change: =>
                 $('#tertiaryValue').text $('#tertiarySlider').noUiSlider('value')[1]
 
