@@ -185,7 +185,8 @@ class Recipe
     # Scale a recipe to the desired batch and boil sizes
     @onScaled: (event) =>
         _gaq.push(['_trackEvent', 'Recipe', 'Scale', $('#recipeName').text()])
-        @scale(parseFloat($('#gallonsValue').text()), parseFloat($('#boilGallonsValue').text()))
+        scaleIngredients = $('#scaleIngredients .active').text() is 'On'
+        @scale(parseFloat($('#gallonsValue').text()), parseFloat($('#boilGallonsValue').text()), scaleIngredients)
 
     # Show widget dialog
     @onWidget: (event) =>
@@ -869,58 +870,59 @@ class Recipe
             @saveLocal()
 
     # Scale a recipe to a new batch and boil size, trying to keep the gravities
-    # and bitterness the same.
-    @scale: (newGallons, newBoilGallons) =>
+    # and bitterness the same if scaleIngredients is true.
+    @scale: (newGallons, newBoilGallons, scaleIngredients) =>
         earlyGu = 0.0
 
         # Get current sizes
         gallons = parseFloat($('#batchSize').text())
         boilGallons = parseFloat($('#boilSize').text())
 
-        # Are we mashing?
-        mashing = @getMashingInfo()
+        if scaleIngredients
+            # Are we mashing?
+            mashing = @getMashingInfo()
 
-        $('#fermentables_data tr').each((index, element) =>
-            [lb, oz, desc, late, ppg, srm, weight, gravity, addition, forced] = @getFermentableInfo(element, gallons, mashing)
-            weight = lb + (oz / 16.0)
+            $('#fermentables_data tr').each((index, element) =>
+                [lb, oz, desc, late, ppg, srm, weight, gravity, addition, forced] = @getFermentableInfo(element, gallons, mashing)
+                weight = lb + (oz / 16.0)
 
-            newWeight = weight / gallons * newGallons;
-            newLb = Math.floor(newWeight)
-            newOz = Math.round((newWeight - newLb) * 16.0)
+                newWeight = weight / gallons * newGallons;
+                newLb = Math.floor(newWeight)
+                newOz = Math.round((newWeight - newLb) * 16.0)
 
-            if newOz is 16
-                newLb += 1
-                newOz = 0
+                if newOz is 16
+                    newLb += 1
+                    newOz = 0
 
-            if not late
-                earlyGu += gravity
-            
-            $(element.children[1]).text(newLb)
-            $(element.children[2]).text(newOz)
-        )
+                if not late
+                    earlyGu += gravity
+                
+                $(element.children[1]).text(newLb)
+                $(element.children[2]).text(newOz)
+            )
 
-        $('#hops_data tr').each((index, element) =>
-            time = parseInt($(element.children[1]).text()) or 0.0
-            oz = parseFloat($(element.children[2]).text()) or 0.0
-            form = $(element.children[4]).text() or 'pellet'
+            $('#hops_data tr').each((index, element) =>
+                time = parseInt($(element.children[1]).text()) or 0.0
+                oz = parseFloat($(element.children[2]).text()) or 0.0
+                form = $(element.children[4]).text() or 'pellet'
 
-            utilization_factor = 1.0
-            if form is 'pellet'
-                utilization_factor = 1.15
+                utilization_factor = 1.0
+                if form is 'pellet'
+                    utilization_factor = 1.15
 
-            aa = parseFloat($(element.children[5]).text()) or 0.0
+                aa = parseFloat($(element.children[5]).text()) or 0.0
 
-            if aa
-                # This is a bittering ingredient, so scale using the bitterness formula
-                bitterness = 1.65 * Math.pow(0.000125, earlyGu - 1.0) * ((1 - Math.pow(2.718, -0.04 * time)) / 4.15) * ((aa / 100.0 * oz * 7490.0) / boilGallons) * utilization_factor
+                if aa
+                    # This is a bittering ingredient, so scale using the bitterness formula
+                    bitterness = 1.65 * Math.pow(0.000125, earlyGu - 1.0) * ((1 - Math.pow(2.718, -0.04 * time)) / 4.15) * ((aa / 100.0 * oz * 7490.0) / boilGallons) * utilization_factor
 
-                newOz = Math.round(((bitterness * newBoilGallons) / (1.65 * Math.pow(0.000125, earlyGu - 1.0) * ((1 - Math.pow(2.718, -0.04 * time)) / 4.15) * (aa / 100.0 * 7490.0) * utilization_factor)) * 100) / 100.0
-            else
-                # Non-bittering ingredient, scale linearly
-                newOz = Math.round((oz / gallons * newGallons) * 100) / 100.0
+                    newOz = Math.round(((bitterness * newBoilGallons) / (1.65 * Math.pow(0.000125, earlyGu - 1.0) * ((1 - Math.pow(2.718, -0.04 * time)) / 4.15) * (aa / 100.0 * 7490.0) * utilization_factor)) * 100) / 100.0
+                else
+                    # Non-bittering ingredient, scale linearly
+                    newOz = Math.round((oz / gallons * newGallons) * 100) / 100.0
 
-            $(element.children[2]).text(newOz)
-        )
+                $(element.children[2]).text(newOz)
+            )
 
         # Update sizes on page
         $('#batchSize').text(newGallons)
