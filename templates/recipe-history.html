@@ -49,8 +49,6 @@
                     {{ entry.recipe|recipe_snippet }}
                     {% if not loop.last %}
                         <div class="downarrow"></div>
-                    {% else %}
-                        <div class="doorstop"></div>
                     {% endif %}
                 {% else %}
                     <div class="node">
@@ -82,7 +80,10 @@
                     {% if entry.differences %}
                         {{ entry.differences|render_history_diff }}
                     {% elif entry.first %}
-                        <p>This is where it all began</p>
+                        <p>This is where it all began.</p>
+                        {% if recipe.cloned_from %}
+                            <p>Cloned from <a href="/users/{{ recipe.cloned_from.owner.name }}">{{ recipe.cloned_from.owner.name }}</a> / <a href="/users/{{ recipe.cloned_from.owner.name }}/recipes/{{ recipe.cloned_from.slug }}">{{ recipe.cloned_from.name }}</a></p>
+                        {% endif %}
                     {% else %}
                         <p>Nothing's changed.</p>
                     {% endif %}

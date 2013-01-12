@@ -28,7 +28,7 @@ if os.platform() in ['win32', 'win64']
     uglifyjs += '.cmd'
     lessc += '.cmd'
     pycco = ['python.exe', 'C:\\Python27\\Scripts\\pycco']
-    devserver = ['python.exe', 'C:\\Program Files (x86)\\Google\\google_appengine\\dev_appserver.py', '.']
+    devserver = ['python.exe', 'C:\\Program Files (x86)\\Google\\google_appengine\\dev_appserver.py', '--skip_sdk_update_check', '.']
 
 # Modify string to give it a method to compare endings
 String.prototype.endsWith = (suffix) ->

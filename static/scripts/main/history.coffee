@@ -157,6 +157,12 @@ class RecipeHistory
                 'at': "Show #{listitems.length - i} fewer changes"
             })
 
+        # Adjust the look of the line so it doesn't pop out the bottom of the
+        # first history element
+        line = $('div.line')
+        uparrow = $('div.uparrow').last()
+        line.css('bottom', '+=' + (line.offset().top + line.height() - uparrow.offset().top - 10))
+
     # Toggle difference highlights on recipes.
     @toggleHighlight: (event) =>
         # Toggle the highlight class on the spans we added
