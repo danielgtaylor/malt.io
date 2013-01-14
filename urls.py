@@ -3,7 +3,7 @@ from handlers.auth import AuthHandler, AuthCallbackHandler, \
 from handlers.brew import BrewHandler
 from handlers.donate import DonateHandler
 from handlers.formulas import FormulasHandler
-from handlers.index import MainHandler, DashboardHandler
+from handlers.index import AboutHandler, MainHandler, DashboardHandler
 from handlers.messages import MessagesHandler
 from handlers.privacy import PrivacyHandler
 from handlers.profile import ProfileHandler
@@ -41,5 +41,6 @@ urls = [
     ('/login/?', LoginHandler),
     ('/logout/?', LogoutHandler),
     ('/dashboard/?', DashboardHandler),
+    ('/about/?', AboutHandler),
     ('/', MainHandler)
 ]

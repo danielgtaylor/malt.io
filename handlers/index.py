@@ -38,6 +38,12 @@ class MainHandler(BaseHandler):
         })
 
 
+class AboutHandler(BaseHandler):
+    """A basic about page"""
+    def get(self):
+        self.render('about.html')
+
+
 class DashboardHandler(BaseHandler):
     """
     Render the user's dashboard with info about her recipes, followers,
