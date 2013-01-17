@@ -3,6 +3,7 @@ import logging
 import settings
 import webapp2
 
+from google.appengine.api import memcache
 from handlers.base import BaseHandler
 from models.brew import Brew
 from models.recipe import Recipe
@@ -19,12 +20,22 @@ class UsersHandler(BaseHandler):
         /users
 
     """
+    # Time in seconds to cache parts of the page
+    CACHE_TIME = 60 * 60
     def get(self):
         """
         Render the public users list.
         """
+        # Try to get users list from memcache instead of datastore
+        users_html = memcache.get('users-content')
+        if not users_html or settings.DEBUG:
+            users_html = self.render('users-content.html', {
+                'users': UserPrefs.all()
+            }, write_to_stream=False)
+            memcache.set('users-content', users_html, self.CACHE_TIME)
+
         self.render('users.html', {
-            'users': UserPrefs.all()
+            'users_content': users_html
         })
 
 

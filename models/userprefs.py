@@ -124,6 +124,9 @@ class UserPrefs(db.Model):
             action.type = action.TYPE_USER_JOINED
             action.put()
 
+            # Invalidate cached user list pages
+            memcache.delete('users-content')
+
         # Update fields based on latest user info
         prefs.email = user_info['email']
 

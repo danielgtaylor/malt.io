@@ -1,6 +1,7 @@
 import cgi
 import settings
 
+from google.appengine.api import memcache
 from google.appengine.ext import db
 from handlers.base import BaseHandler
 from models.userprefs import UserPrefs
@@ -61,6 +62,9 @@ class ProfileHandler(BaseHandler):
                 user.location.lon = lng
         
         user.put()
+
+        # Invalidate cached user list pages
+        memcache.delete('users-content')
 
         # Redirect to show a success message to the user
         self.redirect('/profile?success=1')

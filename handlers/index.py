@@ -15,6 +15,9 @@ class MainHandler(BaseHandler):
     """
     Handle requests to the index page, i.e. http://www.malt.io/
     """
+    # Time in seconds to cache parts of the page
+    CACHE_TIME = 2 * 60 * 60
+
     def get(self):
         """
         Render the index page. Currently this renders a 'Coming soon' landing
@@ -30,9 +33,8 @@ class MainHandler(BaseHandler):
             recipes_html = self.render('index-recipes.html', {
                 'recipes': recipes
             }, write_to_stream=False)
-            memcache.set('index-recipes', recipes_html, 1800)
+            memcache.set('index-recipes', recipes_html, self.CACHE_TIME)
 
-        # Render and cache for 15 minutes
         self.render('index.html', {
             'recipes_html': recipes_html
         })
@@ -49,6 +51,9 @@ class DashboardHandler(BaseHandler):
     Render the user's dashboard with info about her recipes, followers,
     actions, etc.
     """
+    # Time in seconds to cache parts of the page
+    CACHE_TIME = 60
+    
     @login_required
     def get(self):
         user = self.user
@@ -131,4 +136,4 @@ class DashboardHandler(BaseHandler):
             'brew_map': brew_map,
             'top_recipes': top_recipes,
             'interesting_events': interesting_events
-        }), 60)
+        }), self.CACHE_TIME)

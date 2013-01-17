@@ -1,0 +1,9 @@
+{% for user in users %}
+    <div class="span3">
+        <a href="/users/{{ user.name }}">
+            <img class="avatar-small" src="{{ user.avatar_small }}"/>
+        </a>
+        <h6><a href="/users/{{ user.name }}">{{ user.name }}</a></h6>
+        {{ user.recipes.count() }} recipes
+    </div>
+{% endfor %}
