@@ -935,6 +935,107 @@ div.btn-group[data-toggle=buttons-radio] button.active {
     color: transparent;
 }
 
+/* Slideshow */
+
+.jmpress {
+    display: none;
+    position: absolute;
+    right: 20px;
+    bottom: -8px;
+    width: 500px;
+    max-width: 1400px;
+    min-width: 500px;
+    margin: 20px auto;
+    height: 270px;
+
+    .plain {
+        background-color: #ddd;
+    }
+
+    .lightblue, .blue, .yellow, .green, .red, .orange, .pink, .purple, .dark {
+        color: white;
+    }
+
+    .lightblue {
+        background-color: #49AFCD;
+    }
+
+    .blue {
+        background-color: #08c;
+    }
+
+    .yellow {
+        background-color: #FAA732;
+    }
+
+    .green {
+        background-color: #5BB75B;
+    }
+
+    .red {
+        background-color: #DA4F49;
+    }
+
+    .orange {
+        background-color: #f89406;
+    }
+
+    .pink {
+        background-color: #c3325f;
+    }
+
+    .purple {
+        background-color: #7a43b6;
+    }
+
+    .dark {
+        background-color: #363636;
+    }
+}
+
+.jmpress-wrapper {
+    width: auto;
+    min-width: 480px;
+    height: 250px;
+    background-color: #fff;
+    box-shadow: 0 2px 6px rgba(0, 0, 0, .2);
+    -webkit-background-clip: padding;
+    -moz-background-clip: padding;     
+    background-clip: padding-box;
+    border: 10px solid #fff;
+    border: 10px solid rgba(255, 255, 255, 0.9);
+    outline: none;
+    .transition(all 1s linear);
+}
+
+.step { 
+    width: 480px;
+    height: 250px;
+    display: block;
+    padding-top: 100px;
+    .transition(opacity 1s);
+
+    .title {
+        font-family: 'Germania One';
+        text-align: center;
+        margin-top: 0.5em;
+        margin-bottom: 0.5em;
+        font-size: 500%;
+        text-shadow: 1px 1px 3px rgba(0, 0, 0, 0.2);
+    }
+
+    p {
+        text-align: center;
+        font-size: 175%;
+        text-shadow: 1px 1px 3px rgba(0, 0, 0, 0.1);
+        line-height: 125%;
+    }
+}
+
+.step:not(.active) {
+    opacity: 0;
+}
+
 /* Print Stylesheet for recipes */
 
 @media print {

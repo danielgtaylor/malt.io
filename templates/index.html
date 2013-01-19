@@ -1,10 +1,12 @@
 {% extends 'page.html' %}
 
 {% block scripts %}
+    <script type="text/javascript" src="/static/scripts/jmpress.min.js"></script>
     <script type="text/javascript">
         $(document).ready(function () {
             Recipe.init();
-        })
+            Slideshow.init();
+        });
     </script>
 {% endblock %}
 
@@ -31,8 +33,125 @@
                 </div>
             </div>
         </div>
-        <img id="screenshots" src="/static/img/screenshots.png"/>
-        <a href="/about" style="position: absolute; right: 3em; bottom: 1em; font-size: 200%; background: white; border-radius: 5px; padding: 0.5em; box-shadow: 0px 0px 8px rgba(0, 0, 0, 0.5); text-decoration: none;">Learn more</a>
+        <div id="screenshotsContainer">
+            <img id="screenshots" src="/static/img/screenshots.png"/>
+            <a id="learnMoreButton" class="btn" href="#" style="position: absolute; right: 3em; bottom: 1em; font-size: 200%; padding: 0.5em; box-shadow: 1px 2px 6px rgba(0, 0, 0, 0.2);">Learn more</a>
+        </div>
+        <section id="jmpress" class="jmpress">
+            <div class="jmpress-wrapper">
+                <div class="step" data-color="plain">
+                    <div class="title">Craft Great Beer</div>
+                    <p>
+                        What does it take to craft a great beer?
+                    </p>
+                    <p style="margin-top: 1em;">
+                        <a id="startSlidesButton" class="btn btn-success" href="#"><i class="icon-play icon-white"></i> Play</a>
+                    </p>
+                </div>
+                <div class="step" data-color="blue" data-y="500" data-seconds="2.5">
+                    <div class="title">Water</div>
+                    <p>
+                        Fresh, clean, delisciously clear liquid
+                    </p>
+                </div>
+                <div class="step" data-color="orange" data-y="500" data-scale="0.1" data-rotate="90" data-seconds="2.5">
+                    <div class="title">Malt</div>
+                    <p>
+                        Sweet barley, wheat, rye, corn, and more
+                    </p>
+                </div>
+                <div class="step" data-color="green" data-y="500" data-scale="0.01" data-rotate="180" data-seconds="2.5">
+                    <div class="title">Hops</div>
+                    <p>
+                        Gloriously bitter herbal balance
+                    </p>
+                </div>
+                <div class="step" data-color="yellow" data-y="500" data-scale="0.001" data-rotate="270" data-seconds="2.5">
+                    <div class="title">And Yeast</div>
+                    <p>
+                        The real magic happens way down here
+                    </p>
+                </div>
+                <div class="step" data-color="purple" data-y="500" data-x="500" data-seconds="5.5">
+                    <div class="title" style="margin-top: 0.05em;">What Else?</div>
+                    <p>
+                        Man is a tool-using animal.<br/>
+                        Without tools he is nothing;<br/>
+                        With tools he is all.
+                    </p>
+                    <p style="font-size: 90%; padding-left: 150px">
+                        -Thomas Carlyle
+                    </p>
+                </div>
+                <div class="step" data-color="dark" data-y="1000" data-x="750" data-rotate="45" data-scale="1.5" data-seconds="2.5">
+                    <p>Introducing</p>
+                    <div class="title">Malt<span style="opacity: 0.5">.io</span></div>
+                    <p>
+                        the free community for brewers
+                    </p>
+                </div>
+                <div class="step" data-color="dark" data-y="1400" data-x="1000" data-rotate="20" data-seconds="3">
+                    <p>
+                        Online<br/>
+                        Modern<br/>
+                        Social<br/>
+                        Collaboration<br/>
+                        In the Cloud<br/>
+                    </p>
+                </div>
+                <div class="step" data-color="pink" data-x="0" data-y="500" data-rotate="30" data-seconds="3">
+                    <div class="title">Create</div>
+                    <p>
+                        A simple, cloud-based recipe editor
+                    </p>
+                </div>
+                <div class="step" data-color="lightblue" data-x="540" data-rotate="-30" data-seconds="3">
+                    <div class="title">Clone</div>
+                    <p>
+                        Get started by cloning existing recipes
+                    </p>
+                </div>
+                <div class="step" data-color="yellow" data-x="1080" data-y="500" data-seconds="3">
+                    <div class="title">Share</div>
+                    <p>
+                        Share your recipes for others to clone
+                    </p>
+                </div>
+                <div class="step" data-color="blue" data-x="1620" data-rotate="30" data-seconds="3">
+                    <div class="title">History</div>
+                    <p>
+                        See all changes to a recipe over time
+                    </p>
+                </div>
+                <div class="step" data-color="red" data-x="2160" data-y="500" data-rotate="-30" data-seconds="3">
+                    <div class="title">Brew</div>
+                    <p>
+                        Log when you brew your<br/>own and other's recipes
+                    </p>
+                </div>
+                <div class="step" data-color="dark" data-x="2600" data-seconds="3">
+                    <div class="title">Follow</div>
+                    <p>
+                        Know what your friends are<br/>creating, cloning, editing, and brewing
+                    </p>
+                </div>
+                <div class="step" data-color="lightblue" data-x="3140" data-y="500" data-rotate="30" data-seconds="3">
+                    <div class="title">Find</div>
+                    <p>
+                        Find brewers nearby or the<br/>perfect recipe for this weekend
+                    </p>
+                </div>
+                <div class="step" data-color="green" data-y="-800" data-rotate="45" data-scale="2.0" data-seconds="8">
+                    <div class="title">Free!</div>
+                    <p>
+                        And do it all for free
+                    </p>
+                    <p style="font-size: 90%;">
+                        (Donations welcome, of course)
+                    </p>
+                </div>
+            </div>
+        </section>
         <div class="clearfix"></div>
     </div>
     <div class="topsep"></div>
