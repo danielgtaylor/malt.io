@@ -55,6 +55,11 @@ class Util
 
         return valid
 
+    # Shortcut to calling setTimeout that makes it easier to write
+    # in CoffeeScript by reording parameters
+    @setTimeout: (ms, func) ->
+        setTimeout func, ms
+
     # Convert a time string into a number of minutes
     @timeToMin: (value) =>
         conversions =
