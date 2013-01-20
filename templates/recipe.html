@@ -89,30 +89,37 @@
             This is an old version of a recipe that has been updated. The latest version of this recipe can be found <a href="/users/{{ publicuser.name }}/recipes/{{ recipe.slug }}">here</a>.
         </div>
     {% endif %}
+    <div itemscope itemtype="http://schema.org/Recipe">
+    <meta itemprop="author" content="{{ recipe.owner.name }}"/>
+    <meta itemprop="recipeCategory" content="beverage"/>
+    <div itemprop="aggregateRating" itemscope itemtype="http://schema.org/AggregateRating">
+        <meta itemprop="ratingValue" content="{{ recipe.avg_review }}"/>
+        <meta itemprop="reviewCount" content="{{ recipe.review_count }}"/>
+    </div>
     <div class="hero-unit editable" style="padding: 30px 60px;">
         {% if cloned_from %}
             <p style="opacity: 0.5;">
                 Cloned from <a href="/users/{{ cloned_from.owner.name }}">{{ cloned_from.owner.name }}</a> / <a href="/users/{{ cloned_from.owner.name }}/recipes/{{ cloned_from.slug }}">{{ cloned_from.name }}</a>
             </p>
         {% endif %}
-        <div class="price-container">
+        <div class="price-container" itemprop="offers" itemscope itemtype="http://schema.org/Offer">
             <div class="price-tag">
-                $ <span id="total_cost">0.00</span>
+                $ <span id="total_cost" itemprop="price">0.00</span>
                 <br/>
                 <span class="small"><span id="bottle_cost">0</span>&#162; / <span title="12 oz / 0.3l">bottle</span></span>
             </div>
         </div>
-        <h1 id="recipeName">{% if recipe.old %}{{ recipe.oldname }}{% else %}{{ recipe.name }}{% endif %}</h1>
-        <p id="recipeDescription">{{ recipe.description }}</p>
-        <p style="font-size: 100%; line-height: 12pt;">
+        <h1 id="recipeName" itemprop="name">{% if recipe.old %}{{ recipe.oldname }}{% else %}{{ recipe.name }}{% endif %}</h1>
+        <p id="recipeDescription" itemprop="description">{{ recipe.description }}</p>
+        <div style="font-size: 100%; line-height: 12pt; margin-bottom: 0.5em;">
             Style: <span id="styleName" data-category="{{ recipe.category }}" data-style="{{ recipe.style }}">{{ recipe.style_display }}</span>
             <div class="edit-hide">
                 <br/>
-                Batch size: <span id="batchSize">{{ recipe.batch_size }}</span> gallons
+                Batch size: <span itemprop="recipeYield"><span id="batchSize">{{ recipe.batch_size }}</span> gallons</span>
                 <br/>
                 Boil size: <span id="boilSize">{{ recipe.boil_size }}</span> average gallons
             </div>
-        </p>
+        </div>
         <div class="btn-group edit-hide" style="float: left;">
             {% if not recipe.old %}
             {% if publicuser and user and user.name == publicuser.name %}
@@ -150,15 +157,25 @@
         <h2 class="edit-hide">Recent Brews</h2>
         <div class="row edit-hide">
         {% for brew in brews %}
-            <div class="brew span4 pull-left">
+            <div class="brew span4 pull-left" itemprop="review" itemscope itemtype="http://schema.org/Review">
                 <div class="brewContent">
-                    <div style="float: right">{{ brew|render_rating }}</div>
-                    <div><strong>{{ brew.started|format_date }}</strong> by <a href="/users/{{ brew.owner.name }}" title="{{ brew.owner.name }}">{{ brew.owner.name_crop() }}</a></div>
+                    <meta itemprop="itemReviewed" content="{{ recipe.name }}"/>
+                    <div style="float: right">
+                        {% if brew.rating %}
+                        <div itemprop="reviewRating" itemscope itemtype="http://schema.org/Rating">
+                            <meta itemprop="worstRating" content="1"/>
+                            <meta itemprop="bestRating" content="5"/>
+                            <meta itemprop="ratingValue" content="{{ brew.rating }}"/>
+                        </div>
+                        {% endif %}
+                        {{ brew|render_rating }}
+                    </div>
+                    <div><strong itemprop="datePublished" datetime="{{ brew.started|format_date('%Y-%m-%dT%H:%M') }}">{{ brew.started|format_date }}</strong> by <a href="/users/{{ brew.owner.name }}" title="{{ brew.owner.name }}" itemprop="author">{{ brew.owner.name_crop() }}</a></div>
                     {% if brew.owner.name == user.name %}
                         <a class="pull-right btn btn-inverse btn-mini" onclick="Brew.show('{{ brew.slug }}', '{{ brew.started|format_date('%H:%M') }}', '{{ brew.started|format_date('%d %b %Y') }}', '{{ brew.bottled|format_date('%H:%M') }}', '{{ brew.bottled|format_date('%d %b %Y') }}', {{ brew.og|fixed3 }}, {{ brew.fg|fixed3 }}, {{ brew.rating }}, '{{ brew.notes_safe }}');">edit</a>
                     {% endif %}
                     <div style="font-size: 80%;"><strong>OG</strong> {% if brew.og %}{{ brew.og|fixed3 }}{% else %}not measured{% endif %}&nbsp;&nbsp;<strong>FG</strong> {% if brew.fg %}{{ brew.fg|fixed3 }}{% else %}not measured{% endif %}</div>
-                    <div class="notes">{{ brew.notes.replace('\n', '<br/>') }}{% if brew.bottled %}<br/>Bottled on {{ brew.bottled|format_date }}.{% endif %}</div>
+                    <div class="notes" itemprop="reviewBody">{{ brew.notes.replace('\n', '<br/>') }}{% if brew.bottled %}<br/>Bottled on {{ brew.bottled|format_date }}.{% endif %}</div>
                 </div>
             </div>
         {% endfor %}
@@ -283,7 +300,7 @@
                             <td class="num percent">0</td>
                             <td class="num validate positive integer">{{ ingredient.weight|weight_whole }}</td>
                             <td class="num validate positive integer">{{ ingredient.weight|weight_fractional(16) }}</td>
-                            <td>{{ ingredient.description }}</td>
+                            <td itemprop="ingredients">{{ ingredient.description }}</td>
                             <td>{{ ingredient.late }}</td>
                             <td class="num validate positive integer">{{ ingredient.ppg }}</td>
                             <td class="num"><span class="srm" data-srm="{{ ingredient.color }}"></span> </td>
@@ -448,7 +465,7 @@
                             <td>{{ ingredient.use }}</td>
                             <td class="num">{{ ingredient.time }}</td>
                             <td class="num validate positive number">{{ ingredient.oz }}</td>
-                            <td>{{ ingredient.description }}</td>
+                            <td itemprop="ingredients">{{ ingredient.description }}</td>
                             <td>{{ ingredient.form }}</td>
                             <td class="num validate positive number">{{ ingredient.aa }}</td>
                             <td class="edit-show"><a href="#" class="remove"><i class="icon-remove"></i></a></td>
@@ -578,7 +595,7 @@
                 <tbody id="yeast_data">
                     {% for ingredient in recipe.ingredients.yeast %}
                         <tr>
-                            <td>{{ ingredient.description }}</td>
+                            <td itemprop="ingredients">{{ ingredient.description }}</td>
                             <td>{{ ingredient.type }}</td>
                             <td>{{ ingredient.form }}</td>
                             <td class="num validate positive number">{{ ingredient.attenuation }}</td>
@@ -588,14 +605,15 @@
                 </tbody>
             </table>
         </div>
-        <div class="span2">
+        <div class="span2" itemprop="nutrition" itemscope itemtype="http://schema.org/NutritionInformation">
+            <meta itemprop="servingSize" content="0.33l"/>
             <h6>Alcohol</h6>
             <p>
                 <span id="abv" title="">0.0</span>% <abbr title="Alcohol By Volume">ABV</abbr>
             </p>
             <h6>Calories</h6>
             <p>
-                <span id="calories">0</span> per <span title="12 oz / 0.3l">bottle</span>
+                <span id="calories" itemprop="calories">{{ recipe.calories }}</span> per <span title="12 oz / 0.3l">bottle</span>
             </p>
         </div>
     </div>
@@ -716,13 +734,14 @@
             <h6>Steep Efficiency</h6>
             <p><span id="steepEfficiency">{{ recipe.steep_efficiency }}</span>%</p>
             <h6>Brewday Time</h6>
-            <p id="brewTime">2.5 hours</p>
+            <p id="brewTime" itemprop="cookTime" datetime="PT2H30M">2.5 hours</p>
         </div>
         <input type="hidden" id="mashSteps" value="{{ recipe.mash }}"/>
         <input type="hidden" id="primaryDays" value="{{ recipe.primary_days }}"/>
         <input type="hidden" id="secondaryDays" value="{{ recipe.secondary_days }}"/>
         <input type="hidden" id="tertiaryDays" value="{{ recipe.tertiary_days }}"/>
         <input type="hidden" id="agingDays" value="{{ recipe.aging_days }}"/>
+    </div>
     </div>
     {% if not recipe.new and not recipe.old %}
         <div id="disqus_thread"></div>
