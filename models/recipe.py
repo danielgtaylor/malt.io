@@ -241,6 +241,13 @@ class RecipeBase(db.Model):
         fg = gu - ((gu - 1.0) * attenuation / 100.0)
         abv = ((1.05 * (gu - fg)) / fg) / 0.79 * 100.0
 
+        bottle = 3.55 # 355 ml, aka standard 12oz bottle
+        gu_plato = (-463.37) + (668.72 * gu) - (205.35 * (gu * gu))
+        fg_plato = (-463.37) + (668.72 * fg) - (205.35 * (fg * fg))
+        real_extract = (0.1808 * gu_plato) + (0.8192 * fg_plato)
+        abw = 0.79 * abv / fg
+        calories = max(0, ((6.9 * abw) + 4.0 * (real_extract - 0.10)) * fg * bottle)
+
         ibu = 0
         for hop in self.ingredients['spices']:
             if not hop['aa'] or hop['use'].lower() != 'boil':
@@ -257,6 +264,7 @@ class RecipeBase(db.Model):
         self.color = int(round(1.4922 * pow(mcu, 0.6859)))
         self.ibu = round(ibu, 1)
         self.alcohol = round(abv, 1)
+        self.calories = int(round(calories))
 
     def diff(self, other, full=True):
         """
@@ -465,9 +473,13 @@ class Recipe(RecipeBase):
     color = db.IntegerProperty(default=1)
     ibu = db.FloatProperty(default=0.0)
     alcohol = db.FloatProperty(default=0.0)
+    calories = db.IntegerProperty(default=0)
 
     # Grade: a generated rating for this recipe, see update_grade()
     grade = db.FloatProperty(default=0.0)
+
+    review_count = db.IntegerProperty(default=0)
+    avg_review = db.FloatProperty(default=0.0)
 
     @staticmethod
     def new_from_beerxml(data):
@@ -656,6 +668,7 @@ class Recipe(RecipeBase):
         # Grade average weighted reviews
         count = 0
         brewers = set()
+        avg_review = 0.0
         for i, brew in enumerate(brews):
             brew_grade = 0.0
 
@@ -672,8 +685,10 @@ class Recipe(RecipeBase):
                 brew_grade += 1.0
 
             # Brew rating
-            if brew.rating is not None:
+            if brew.rating:
                 brew_grade += brew.rating
+                avg_review += brew.rating
+                count += 1
 
             # Weighted average (0.5, 0.25, 0.125, ...)
             grade += brew_grade * (0.5 / (i + 1))
@@ -685,7 +700,14 @@ class Recipe(RecipeBase):
         grade += math.ceil(math.log(clone_count + 1, 3))
         grade += math.ceil(math.log(brew_count + 1, 3))
 
+        # Update values on this recipe
         self.grade = grade
+
+        self.review_count = brew_count
+        if count:
+            self.avg_review = avg_review / count
+        else:
+            self.avg_review = 0.0
 
 
 class RecipeHistory(RecipeBase):
