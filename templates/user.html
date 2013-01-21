@@ -33,7 +33,9 @@
             <a class="btn disabled"><i class="icon-flag"></i> Report user</a>
         {% endif %}
     </div>
-    <h2><img class="avatar-small" src="{{ publicuser.avatar_small }}"/> {{ publicuser.name }} {{ publicuser.awards|render_awards }}{% if user.is_admin %} ({{ publicuser.email }}){% endif %}</h2>
+    <div itemscope itemtype="http://schema.org/Person">
+    <meta itemprop="jobTitle" content="Brewer"/>
+    <h2><img class="avatar-small" itemprop="image" src="{{ publicuser.avatar_small }}"/> <span itemprop="name">{{ publicuser.name }}</span> <span itemprop="award">{{ publicuser.awards|render_awards }}</span>{% if user.is_admin %} ({{ publicuser.email }}){% endif %}</h2>
     <hr class="clear"/>
     <div class="span7 pull-right" style="margin-left: 0;">
         <h6>Public Actions</h6>
@@ -47,6 +49,12 @@
         {% if publicuser.location %}
             <h6>Location</h6>
             <div id="map_canvas" style="margin-top: 1em; margin-bottom: 1em;"></div>
+            <div itemprop="homeLocation" itemscope itemtype="http://schema.org/Place">
+                <div itemprop="geo" itemscope itemtype="http://schema.org/GeoCoordinates">
+                    <meta itemprop="latitude" content="{{ publicuser.location.lat }}"/>
+                    <meta itemprop="longitude" content="{{ publicuser.location.lon }}"/>
+                </div>
+            </div>
         {% endif %}
         <h6>Recipes ({{ recipes|length }} total)</h6>
         {% for recipe in recipes %}
@@ -55,6 +63,7 @@
         {% if user and user.user_id == publicuser.user_id and not recipes %}
             <a class="btn btn-large btn-primary" href="/new">Create new recipe</a>
         {% endif %}
+    </div>
     </div>
     <div class="clear"></div>
     <div id="messageModal" class="modal fade hide">
