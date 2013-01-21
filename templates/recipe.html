@@ -77,9 +77,9 @@
     {% if publicuser %}
         <ul class="breadcrumb">
             <li><a href="/">home</a><span class="divider">/</span></li>
-            <li><a href="/users">users</a><span class="divider">/</span></li>
-            <li><a href="/users/{{ publicuser.name }}">{{ publicuser.name }}</a><span class="divider">/</span></li>
-            <li><a href="/users/{{ publicuser.name }}/recipes">recipes</a><span class="divider">/</span></li>
+            <li><a href="/users" itemprop="breadcrumb">users</a><span class="divider">/</span></li>
+            <li><a href="/users/{{ publicuser.name }}" itemprop="breadcrumb">{{ publicuser.name }}</a><span class="divider">/</span></li>
+            <li><a href="/users/{{ publicuser.name }}/recipes" itemprop="breadcrumb">recipes</a><span class="divider">/</span></li>
             <li id="crumbName">{{ recipe.name }}</li>
         </ul>
     {% endif %}
