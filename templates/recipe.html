@@ -828,6 +828,11 @@
             <h3>Scale Recipe</h3>
         </div>
         <div class="modal-body">
+            {% if publicuser and user and user.name == publicuser.name %}
+                <div class="edit-hide alert">
+                    <strong>Note:</strong> You own this recipe. This dialog will only change the values below temporarily. If you would like to permanently scale them, please close this dialog and use the edit button to edit the recipe, scale, and then save.
+                </div>
+            {% endif %}
             <div>
                 Scaling this recipe will temporarily modify the ingredients to match new batch and boil sizes in gallons. Rounding may cause the values to change by a very small amount, but reasonable effort is taken to ensure the recipe stays true to the original pre-scaled version.<br/><br/>
             </div>
