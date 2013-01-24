@@ -54,7 +54,19 @@ class RecipeBase(db.Model):
     steep_efficiency = db.IntegerProperty(default=50)
 
     # Mash, ferment, and aging info
-    mash = db.StringProperty()
+    _mash = db.TextProperty(default=json.dumps({
+        'type': 'singleinfusion',
+        'water_ratio': 1.25,
+        'steps': [
+            {
+                'name': 'Starch conversion rest',
+                'duration': 60,
+                'temperature': 154
+            }
+        ],
+        'mashout': 170,
+        'sparge': 0.5
+    }))
     primary_days = db.IntegerProperty(default=14)
     secondary_days = db.IntegerProperty(default=0)
     tertiary_days = db.IntegerProperty(default=0)
@@ -66,6 +78,24 @@ class RecipeBase(db.Model):
         'spices': [],
         'yeast': []
     }))
+
+    @property
+    def mash(self):
+        """
+        Get deserialized object from the recipe mash JSON.
+        """
+        if not hasattr(self, '_mash_decoded'):
+            self._mash_decoded = json.loads(self._mash)
+
+        return self._mash_decoded
+
+    @mash.setter
+    def mash(self, value):
+        """
+        Automatically serialize a mash object to JSON.
+        """
+        self._mash = json.dumps(value)
+        self._mash_decoded = value
 
     @property
     def ingredients(self):

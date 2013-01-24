@@ -106,6 +106,31 @@ class Recipe
                 $('#boilGallonsValue').text(($('#boilGallonsSlider').noUiSlider('value')[1] / 2.0).toFixed(1))
         )
 
+        # Setup mash sliders
+        $('#quartsSlider').noUiSlider 'init',
+            knobs: 1
+            connect: 'lower'
+            scale: [1, 16]
+            start: parseFloat($('#quartsValue').text()) * 4
+            change: =>
+                $('#quartsValue').text(($('#quartsSlider').noUiSlider('value')[1] / 4.0).toFixed(2))
+
+        $('#mashoutSlider').noUiSlider 'init',
+            knobs: 1
+            connect: 'lower'
+            scale: [0, 200]
+            start: parseInt $('#mashoutValue').text()
+            change: =>
+                $('#mashoutValue').text $('#mashoutSlider').noUiSlider('value')[1]
+
+        $('#spargeSlider').noUiSlider 'init',
+            knobs: 1
+            connect: 'lower'
+            scale: [0, 16]
+            start: parseFloat($('#spargeValue').text()) * 4
+            change: =>
+                $('#spargeValue').text(($('#spargeSlider').noUiSlider('value')[1] / 4.0).toFixed(2))
+
         # Setup ferment sliders
         $('#primarySlider').noUiSlider 'init',
             knobs: 1
@@ -718,7 +743,11 @@ class Recipe
 
             return output
 
-        mash = $('#mashSteps').val()
+        mash = Mash.getFromPage()
+        firstTemp = 154
+        if mash.steps and mash.steps[0]
+            firstTemp = parseFloat mash.steps[0].temperature
+
         primaryDays = parseInt $('#primaryDays').val()
         secondaryDays = parseInt $('#secondaryDays').val()
         tertiaryDays = parseInt $('#tertiaryDays').val()
@@ -730,12 +759,21 @@ class Recipe
         if timeline_map.fermentables.mash.length
             boilName = 'wort'
             mashWeight = (item[0] + (item[1] / 16) for item in timeline_map.fermentables.mash).reduce((x, y) -> x + y)
-            mashGallons = 0.375 * mashWeight
-            strikeTemp = (0.2 / 1.5) * (154 - 70) + 154
-            timeline += '<li><span class="label label-info">mash</span> Bring ' + mashGallons.toFixed(1) + ' gallons of water to ' + Math.round(strikeTemp) + '&deg;F (~' + Math.round(mashGallons * 5) + ' minutes)<br/>Mash '
-            timeline += get_items(timeline_map.fermentables.mash, [], [])
-            timeline += ' for 60 minutes at 154&deg;F<br/>Mashout to 170&deg;F and sparge with ' + (mashGallons / 2).toFixed(1) + ' gallons of water.'
-            totalTime += Math.round(mashGallons * 5) + 60 + 15
+            mashGallons = mash.water_ratio / 4.0 * mashWeight
+            strikeTemp = (0.2 / 1.5) * (firstTemp - 70) + firstTemp
+            timeline += '<li><span class="label label-info">mash</span> Bring ' + mashGallons.toFixed(1) + ' gallons of water to ' + Math.round(strikeTemp) + '&deg;F (~' + Math.round(mashGallons * 5) + ' minutes)<br/>Add '
+            timeline += get_items(timeline_map.fermentables.mash, [], []) + '<br/>'
+
+            for step in mash.steps
+                timeline += step.name + ' for ' + step.duration + ' minutes at ' + step.temperature + ' &deg;F<br/>'
+                totalTime += parseFloat(step.duration)
+
+            if mash.sparge
+                timeline += 'Mashout to ' + mash.mashout + '&deg;F and sparge with ' + (mash.sparge / 4.0 * mashWeight).toFixed(1) + ' gallons of water at ' + mash.mashout + '&deg;F'
+            else
+                timeline += 'Mashout to ' + mash.mashout + '&deg;F'
+
+            totalTime += Math.round(mashGallons * 5) + 15
         
         if timeline_map.fermentables.steep.length
             boilName = 'wort'
@@ -954,6 +992,7 @@ class Recipe
             secondaryDays: parseInt($('#secondaryDays').val()) or 0
             tertiaryDays: parseInt($('#tertiaryDays').val()) or 0
             agingDays: parseInt($('#agingDays').val()) or 14
+            mash: Mash.getFromPage() or ''
             ingredients:
                 fermentables: []
                 spices: []
@@ -1069,5 +1108,8 @@ class Recipe
 
         for yeast in recipe.ingredients.yeast
             @addYeastRow(yeast.description, yeast.type, yeast.form, yeast.attenuation)
+
+        if recipe.mash
+            Mash.load recipe.mash
 
         @updateStats()

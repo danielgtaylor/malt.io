@@ -395,6 +395,7 @@ class RecipeHandler(BaseHandler):
         recipe.secondary_days = int(recipe_data['secondaryDays'])
         recipe.tertiary_days = int(recipe_data['tertiaryDays'])
         recipe.aging_days = int(recipe_data['agingDays'])
+        recipe.mash = recipe_data['mash']
         recipe.ingredients = recipe_data['ingredients']
 
         # Update slug

@@ -15,6 +15,7 @@
         $(document).ready(function () {
             Recipe.init();
             Recipe.updateStats();
+            Mash.init();
             BeerStyles.init();
             Brew.init();
         });
@@ -685,9 +686,9 @@
                 <span class="caret"></span>
             </a>
             <ul class="dropdown-menu">
-                <li><a><i class="icon-tasks icon-white"></i> Single infusion 154&deg;F</a></li>
-                <!--<li class="divider"></li>
-                <li><a><i class="icon-plus-sign icon-white"></i> Add mash profile</a></li>-->
+                <li><a id="singleInfusion154" href="#"><i class="icon-tasks icon-white"></i> Single infusion 154&deg;F</a></li>
+                <li class="divider"></li>
+                <li><a href="#mashModal" data-toggle="modal"><i class="icon-wrench icon-white"></i> Custom mash profile</a></li>
             </ul>
         </div>
         <div class="btn-group">
@@ -881,6 +882,66 @@
         </div>
         <div class="modal-footer">
             <a href="#" class="btn" data-dismiss="modal">Close</a>
+        </div>
+    </div>
+        <div id="mashModal" class="modal fade hide">
+        <div class="modal-header">
+            <button type="button" class="close" data-dismiss="modal">×</button>
+            <h3>Custom Mash Profile</h3>
+        </div>
+        <div class="modal-body">
+            <div>
+                Below you can customize the mash profile for your recipe. Choose the type of mash and fill in common parameters, or customize everything by writing out each step.<br/><br/>
+            </div>
+            <ul class="nav nav-tabs">
+                <li class="active"><a href="#mashSingleInfusion" data-toggle="tab">Single Infusion Step Mash</a></li>
+                <li><a href="#mashCustom" data-toggle="tab">Custom</a></li>
+            </ul>
+            <div class="tab-content">
+                <div id="mashSingleInfusion" class="tab-pane fade active in">
+                    <div class="scaler">
+                        <span>Liquid / lb:</span>
+                        <div id="quartsSlider" class="noUiSlider"></div>
+                        <span id="quartsValue">{{ recipe.mash.water_ratio }} </span>
+                        <span>qt</span>
+                    </div>
+                    <div class="mashSteps">
+                        <div id="singleInfusionSteps">
+                            {% for step in recipe.mash.steps %}
+                                <div class="mashStep">
+                                    <input type="text" value="{{ step.name }}"/>
+                                    <input type="text" value="{{ step.duration }}" style="width: 30px;"/><span> minutes at </span>
+                                    <input type="text" value="{{ step.temperature }}" style="width: 30px;"/><span> &deg;F</span>
+                                    <a class="remove" href="#"><i class="icon-remove"></i></a>
+                                </div>
+                            {% endfor %}
+                        </div>
+                        <div class="addStep">
+                            <a id="addSingleInfusionStep" href="#"><i class="icon-plus-sign"></i> Add mash step</a>
+                        </div>
+                    </div>
+                    <div class="scaler">
+                        <span>Mashout:</span>
+                        <div id="mashoutSlider" class="noUiSlider"></div>
+                        <span id="mashoutValue">{{ recipe.mash.mashout }}</span>
+                        <span>&deg;F</span>
+                    </div>
+                    <div class="scaler">
+                        <span>Sparge / lb:</span>
+                        <div id="spargeSlider" class="noUiSlider"></div>
+                        <span id="spargeValue">{{ recipe.mash.sparge }}</span>
+                        <span>qt</span>
+                    </div>
+                </div>
+                <div id="mashCustom" class="tab-pane fade">
+                    <div>
+                        Coming soon...
+                    </div>
+                </div>
+            </div>
+        </div>
+        <div class="modal-footer">
+            <a id="mash-button" href="#" class="btn btn-success" data-dismiss="modal"><i class="icon-tasks icon-white"></i> Save Mash</a>
         </div>
     </div>
     <div id="fermentModal" class="modal fade hide">
