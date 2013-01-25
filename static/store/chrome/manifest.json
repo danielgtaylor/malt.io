@@ -1,0 +1,23 @@
+{
+  "name": "Malt.io",
+  "description": "the free community for brewers",
+  "version": "1.0.0.1",
+  "icons": {
+    "128": "icon_128.png"
+  },
+  "app": {
+    "urls": [
+      "http://www.malt.io/",
+      "http://blog.malt.io/",
+      "http://developer.malt.io/"
+    ],
+    "launch": {
+      "web_url": "http://www.malt.io/"
+    }
+  },
+  "permissions": [
+    "unlimitedStorage",
+    "geolocation",
+    "notifications"
+  ]
+}
