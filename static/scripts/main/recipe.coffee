@@ -254,6 +254,8 @@ class Recipe
         $('#recipeName, #recipeDescription, #bottling_temp, #bottling_pressure, #mashEfficiency, #steepEfficiency').attr('contentEditable', 'true')
         $('#fermentables_data tr td:nth-child(2), #fermentables_data tr td:nth-child(3), #fermentables_data tr td:nth-child(4), #fermentables_data tr td:nth-child(5), #fermentables_data tr td:nth-child(6), #fermentables_data tr td:nth-child(8), #hops_data tr td:nth-child(1), #hops_data tr td:nth-child(2), #hops_data tr td:nth-child(3), #hops_data tr td:nth-child(4), #hops_data tr td:nth-child(5), #hops_data tr td:nth-child(6), #yeast_data tr td:nth-child(1), #yeast_data tr td:nth-child(2), #yeast_data tr td:nth-child(3), #yeast_data tr td:nth-child(4)').attr('contentEditable', 'true')
         $('#saveMsg, .edit-show').show()
+        $('#fermentmenu').css('display', 'inline-block')
+        $('#stylebtn').css('top', '8.5px')
         $('.edit-hide').hide()
 
         # Keyboard shortcuts
@@ -856,6 +858,24 @@ class Recipe
         styleName = $('#styleName').get(0)
         style = BeerStyles.get(styleName.getAttribute('data-category'), styleName.getAttribute('data-style'))
         if style
+            # Show the style button
+            # Currently this feature is DISABLED, to enable it, uncomment the below line
+            #$('#stylebtn').show()
+
+            # Force the modal dialog to be shown so we can get dimensions
+            styleGuideModal = $('#styleGuideModal')
+            display = styleGuideModal.css('display')
+            styleGuideModal.css('display', 'block')
+
+            @updateStyleGraph('gu', gu, style.gu, 3)
+            @updateStyleGraph('fg', fg, style.fg, 3)
+            @updateStyleGraph('srm', color, style.srm, 1)
+            @updateStyleGraph('ibu', ibu, style.ibu, 1)
+            @updateStyleGraph('abv', abv, style.abv, 1)
+
+            # Reset
+            styleGuideModal.css('display', display)
+
             og_element.attr('data-original-title', style.gu[0].toFixed(3) + ' - ' + style.gu[1].toFixed(3))
             fg_element.attr('data-original-title', style.fg[0].toFixed(3) + ' - ' + style.fg[1].toFixed(3))
             color_element.attr('data-original-title', style.srm[0].toFixed(1) + ' - ' + style.srm[1].toFixed(1))
@@ -903,9 +923,211 @@ class Recipe
             abv_element.attr('data-original-title', '')
             abv_element.removeClass('styleError')
 
+            # Hide style guide button
+            $('#stylebtn').show()
+
         # Save recipe to local storage if this is a new recipe being created
         if window.location.pathname is '/new'
             @saveLocal()
+
+    # Update the graph for the given property
+    @updateStyleGraph: (property, value, range, places) =>
+        # Get the container that holds all the graph's divs
+        container = $('#' + property + 'graph')
+
+        # Basic dimensions needed for positioning
+        width = container.width()
+        height = container.height()
+
+        # Set the text properties immediately so their calculated sizes can be
+        # used later
+        valText = $('.val', container)
+        minText = $('.min', container)
+        maxText = $('.max', container)
+        valText.html(value.toFixed(places))
+        minText.html(range[0].toFixed(places))
+        maxText.html(range[1].toFixed(places))
+
+        # The divs that make up the actual graph
+        goodline = $('.goodline', container)
+        badline = $('.badline', container)
+        cap1 = $('.cap1', container)
+        cap2 = $('.cap2', container)
+        triangle = $('.triangle', container)
+
+        # Edge offsets if triangle is at edge
+        triangleOffset = 3;
+        endCapTriangleOffset = 8;
+
+        # Triangle dimensions
+        triangleWidth = 6
+        halfTriangleWidth = 3
+
+        # Force rounding (can't round to a specific decimal, so multiply by
+        # 10^places then round)
+        places = Math.pow(10, places)
+        value = Math.round(value * places)
+        min = Math.round(range[0] * places)
+        max = Math.round(range[1] * places)
+
+        # Reset CSS for all elements to start with a clean slate
+        goodline.css({
+                'left': ''
+                'right': ''
+                'width': ''
+            })
+        badline.css({
+                'left': ''
+                'right': ''
+                'width': ''
+            })
+        cap1.css({
+                'left': ''
+                'right': ''
+            })
+        cap2.css({
+                'left': ''
+                'right': ''
+            })
+        triangle.css({
+                'left': ''
+                'right': ''
+            })
+        triangle.removeClass('badtriangle goodtriangle')
+        minText.css({
+                'top': ''
+                'left': ''
+            })
+        maxText.css({
+                'top': ''
+                'left': ''
+                'right': ''
+            })
+        valText.css('left', '');
+
+        if min <= value <= max
+            # In range
+            # Find how far to place the center (min is smallest, max is largest)
+            center = (value - min) / (max - min) * width
+
+            # Move the relevant divs around
+            goodline.css({
+                    'left': 0
+                    'right': 0
+                })
+            cap1.css('left', 0)
+            cap2.css('right', 0)
+            triangle.css('left', Math.max(0, Math.min(width - triangleWidth, center - halfTriangleWidth)))
+            triangle.removeClass('badtriangle').addClass('goodtriangle')
+
+            # Move text to proper locations
+            maxText.css('right', 0)
+            valText.css('left', Math.max(0, Math.min(width - valText.width(), center - (valText.width() / 2))));
+
+        else if value < min
+            # Less than min
+            # Find how far to place the center (value is smallest, max is largest)
+            percent = (min - value) / (max - value)
+            center = percent * (width - triangleOffset) + triangleOffset
+
+            # Make sure the end cap doesn't overlap with the triangle
+            center = Math.max(endCapTriangleOffset, Math.round(center))
+
+            # Move the relevant divs around
+            badline.css('width', center)
+            goodline.css({
+                    'left': center
+                    'right': 0
+                })
+            cap1.css('left', center)
+            cap2.css('right', 0)
+            triangle.removeClass('goodtriangle').addClass('badtriangle')
+
+            # Move text to proper locations
+            # If text would overlap, move min to top
+            maxText.css('right', 0)
+            minLeft = 0
+            minWidth = minText.width()
+            overlap = maxText.position().left - center
+            w2 = minWidth / 2
+            if (overlap < 0)
+                # Maximum overlap, move min text to top and set right edge
+                # to match up with center end cap
+                minLeft = center - minWidth + 2
+                minText.css('top', valText.position().top)
+
+            else if (overlap < 10)
+                # Some overlap, move min text to top and set min text
+                # centered on end cap
+                minLeft = center - w2
+                minText.css('top', valText.position().top)
+
+            else if (overlap - w2 < 10)
+                # No overlap, but getting close set right edge of min
+                # text to match with center end cap
+                minLeft = center - minWidth + 2
+
+            else
+                # No overlap, set min text to center on end cap making
+                # sure not to cover the triangle
+                minLeft = Math.max(center - w2, endCapTriangleOffset - 2)
+
+            # Make sure we don't go over the right edge
+            minText.css('left', Math.min(minLeft, width - minWidth))
+
+        else
+            # More than max
+            # Find how far to place the center (rante[0] is smallest, value is largest)
+            percent = (max - min) / (value - min);
+            center = percent * (width - triangleOffset)
+
+            # Make sure the end cap doesn't overlap with the triangle
+            center = Math.min(width - endCapTriangleOffset, Math.round(center))
+
+            # Move the relevant divs around
+            badline.css({
+                    'left': center
+                    'right': 0
+                })
+            goodline.css('width', center)
+            cap1.css('left', 0)
+            cap2.css('left', center)
+            triangle.css('right', 0)
+            triangle.removeClass('goodtriangle').addClass('badtriangle')
+
+            # Move text to proper locations
+            # If text would overlap, move min to top
+            minText.css('left', 0)
+            valText.css('left', width - valText.width())
+            maxLeft = 0
+            maxWidth = maxText.width()
+            overlap = center - minText.width()
+            w2 = maxWidth / 2
+            if (overlap < 0)
+                # Maximum overlap, move min text to top and set right edge
+                # to match up with center end cap
+                maxLeft = center - 2
+                maxText.css('top', valText.position().top)
+
+            else if (overlap < 10)
+                # Some overlap, move min text to top and set min text
+                # centered on end cap
+                maxLeft = center - w2
+                maxText.css('top', valText.position().top)
+
+            else if (overlap - w2 < 10)
+                # No overlap, but getting close set right edge of min
+                # text to match with center end cap
+                maxLeft = center - 2
+
+            else
+                # No overlap, set min text to center on end cap making
+                # sure not to cover the triangle
+                maxLeft = Math.min(center - w2, width - endCapTriangleOffset - maxWidth + 2)
+
+            # Make sure we don't go over the right edge
+            maxText.css('left', Math.max(maxLeft, 0))
+
 
     # Scale a recipe to a new batch and boil size, trying to keep the gravities
     # and bitterness the same if scaleIngredients is true.

@@ -929,6 +929,155 @@ div.btn-group[data-toggle=buttons-radio] button.active {
     color: transparent;
 }
 
+#stylebtn {
+    position: relative;
+    float: right;
+    top: 2px;
+    left: 29.5px;
+    height: 30px;
+    width: 93px;
+    display: none;
+
+    svg, span {
+        position: absolute;
+    }
+
+    polygon {
+        stroke-width: 1;
+        fill: none;
+    }
+
+    #bg {
+        // Red
+        // fill: #841919;
+        // stroke: #450000;
+        // Blue
+        // fill: #3b88d8;
+        // stroke: #1a4e94;
+        // Green
+        fill: #33aa4a;
+        stroke: #0f681f;
+        .transition(fill 0.5s);
+        cursor: pointer;
+    }
+
+    #bg:hover {
+        // Red
+        // fill: #8d1b1b;
+        // Blue
+        // fill: #4c92db;
+        // Green
+        fill: #37b850;
+    }
+
+    #hilight {
+        // Red
+        // stroke: #a75958;
+        // Blue
+        // stroke: #aac2f4;
+        // Green
+        stroke: #9ed496;
+        pointer-events: none;
+    }
+
+    #stitch {
+        // Red
+        // stroke: #700000;
+        // Blue
+        // stroke: #2a70d8;
+        // Green
+        stroke: #1f9236;
+        stroke-dasharray: 3,3;
+        pointer-events: none;
+    }
+
+    span {
+        pointer-events: none;
+        color: white;
+        line-height: 29px;
+        width: 99px;
+        text-align: center;
+    }
+}
+
+.stylegraph {
+    position: relative;
+    height: 10px;
+    width: 100%;
+
+    .line, .cap {
+        position: absolute;
+        box-shadow: 0px 1px 6px rgba(0,0,0,0.3);
+    }
+
+    .triangle {
+        position: absolute;
+        border-left: 3px solid transparent;
+        border-right: 3px solid transparent;
+        bottom: 50%;
+    }
+
+    .badtriangle {
+        border-bottom: 4px solid #b94a48;
+    }
+
+    .goodtriangle {
+        border-bottom: 4px solid #468847;
+    }
+
+    .line {
+        top: 50%;
+        height: 1px;
+    }
+
+    .badline {
+        background-color: #b94a48;
+    }
+
+    .goodline {
+        background-color: #468847;
+    }
+
+    .cap {
+        background-color: #468847;
+        height: 100%;
+        width: 1px;
+    }
+}
+
+#styleGuideModal .row {
+    .span1, .span2 {
+        text-align: right;
+        line-height: 48px;
+        font-size: 9pt;
+    }
+
+    .span1 {
+        width: 75px;
+    }
+
+    .span2 {
+        width: 95px;
+    }
+
+    .span3 {
+        position: relative;
+        margin-left: 12px;
+        height: 54px;
+        width: 140px;
+    }
+
+    .val {
+        position: relative;
+        font-size: 14px;
+    }
+
+    .min, .max {
+        position: absolute;
+        font-size: 10px;
+    }
+}
+
 /* Slideshow */
 
 .jmpress {

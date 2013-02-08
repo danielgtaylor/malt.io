@@ -182,10 +182,10 @@
         {% endfor %}
         </div>
     {% endif %}
-    <h2>
+    <h2 style="display:inline-block">
         Fermentable Sugars
     </h2>
-    <div class="btn-toolbar edit-show" style="display: none;">
+    <div class="btn-toolbar edit-show" style="display: none;" id="fermentmenu">
         <div class="btn-group">
             <a id="newFermentable" class="btn" data-description="New ingredient" data-ppg="32" data-srm="2" onclick="Recipe.addFermentableRowTemplate(this);"><i class="icon-plus-sign"></i></a>
         </div>
@@ -279,6 +279,16 @@
                 {{ ['D-180 candi syrup', 32, 180]|render_fermentable_template }}
             </ul>
         </div>
+    </div>
+    <div id="stylebtn">
+        <svg width="92" height="30" viewPort="0 0 92 30" version="1.1" xmlns="http://www.w3.org/2000/svg">
+            <a id="styleguide" onmousedown="return false;" data-toggle="modal" href="#styleGuideModal">
+                <polygon points="1,15 11,2.5 91.5,2.5 91.5,27.5 11,27.5" id="bg" />
+            </a>
+            <polygon points="2.5,15 11.5,3.5 90.5,3.5 90.5,26.5 11.5,26.5" id="hilight" />
+            <polygon points="5,15 12.5,5.5 88.5,5.5 88.5,24.5 12.5,24.5" id="stitch" />
+        </svg>
+        <span>Style Guide</span>
     </div>
     <div class="row">
         <div class="span10">
@@ -991,6 +1001,97 @@
         </div>
         <div class="modal-body">
             You are using a browser that does not support several features required by <strong>Malt.io</strong>. Please consider upgrading to at least Internet Explorer 10 or switching to Chrome, Firefox, or Safari.
+        </div>
+        <div class="modal-footer">
+            <a href="#" class="btn" data-dismiss="modal">Close</a>
+        </div>
+    </div>
+    <div id="styleGuideModal" class="modal fade hide">
+        <div class="modal-header">
+            <button type="button" class="close" data-dismiss="modal">×</button>
+            <h3>Style Guide</h3>
+        </div>
+        <div class="modal-body" style="padding-bottom: 5px">
+            <div>
+                Style guide information. I don't really know what to write here, so pick something! Do we have any background or history information about each style that we can put here? Maybe just explain styles in general and what they're looking at below?<br/><br/>
+            </div>
+            <div class="row">
+                <div class="span2">
+                    Original Gravity
+                </div>
+                <div class="span3" id="gugraph">
+                    <span class="val"></span>
+                    <div class="stylegraph">
+                        <div class="line badline"></div>
+                        <div class="line goodline"></div>
+                        <div class="cap cap1"></div>
+                        <div class="cap cap2"></div>
+                        <div class="triangle"></div>
+                    </div>
+                    <span class="min"></span>
+                    <span class="max"></span>
+                </div>
+                <div class="span1">
+                    Bitterness
+                </div>
+                <div class="span3" id="ibugraph">
+                    <span class="val"></span>
+                    <div class="stylegraph">
+                        <div class="line badline"></div>
+                        <div class="line goodline"></div>
+                        <div class="cap cap1"></div>
+                        <div class="cap cap2"></div>
+                        <div class="triangle"></div>
+                    </div>
+                    <span class="min"></span>
+                    <span class="max"></span>
+                </div>
+                <div class="span2">
+                    Final Gravity
+                </div>
+                <div class="span3" id="fggraph">
+                    <span class="val"></span>
+                    <div class="stylegraph">
+                        <div class="line badline"></div>
+                        <div class="line goodline"></div>
+                        <div class="cap cap1"></div>
+                        <div class="cap cap2"></div>
+                        <div class="triangle"></div>
+                    </div>
+                    <span class="min"></span>
+                    <span class="max"></span>
+                </div>
+                <div class="span1">
+                    Alcohol
+                </div>
+                <div class="span3" id="abvgraph">
+                    <span class="val"></span>
+                    <div class="stylegraph">
+                        <div class="line badline"></div>
+                        <div class="line goodline"></div>
+                        <div class="cap cap1"></div>
+                        <div class="cap cap2"></div>
+                        <div class="triangle"></div>
+                    </div>
+                    <span class="min"></span>
+                    <span class="max"></span>
+                </div>
+                <div class="span2">
+                    Color
+                </div>
+                <div class="span3" id="srmgraph">
+                    <span class="val"></span>
+                    <div class="stylegraph">
+                        <div class="line badline"></div>
+                        <div class="line goodline"></div>
+                        <div class="cap cap1"></div>
+                        <div class="cap cap2"></div>
+                        <div class="triangle"></div>
+                    </div>
+                    <span class="min"></span>
+                    <span class="max"></span>
+                </div>
+            </div>
         </div>
         <div class="modal-footer">
             <a href="#" class="btn" data-dismiss="modal">Close</a>
