@@ -860,7 +860,7 @@ class Recipe
         if style
             # Show the style button
             # Currently this feature is DISABLED, to enable it, uncomment the below line
-            #$('#stylebtn').show()
+            $('#stylebtn').show()
 
             # Force the modal dialog to be shown so we can get dimensions
             styleGuideModal = $('#styleGuideModal')
@@ -924,7 +924,7 @@ class Recipe
             abv_element.removeClass('styleError')
 
             # Hide style guide button
-            $('#stylebtn').show()
+            $('#stylebtn').hide()
 
         # Save recipe to local storage if this is a new recipe being created
         if window.location.pathname is '/new'
