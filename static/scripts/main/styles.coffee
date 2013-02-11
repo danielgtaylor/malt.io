@@ -341,7 +341,7 @@ class BeerStyles
                 ibu: [40, 60]
                 abv: [5, 7.5]
             'American IPA':
-                gu: [1.056, 10.75]
+                gu: [1.056, 1.075]
                 fg: [1.010, 1.018]
                 srm: [6, 15]
                 ibu: [40, 70]
