@@ -256,6 +256,7 @@ class Recipe
         $('#saveMsg, .edit-show').show()
         $('#fermentmenu').css('display', 'inline-block')
         $('#stylebtn').css('top', '8.5px')
+        @adjustStyleButton()
         $('.edit-hide').hide()
 
         # Keyboard shortcuts
@@ -861,6 +862,7 @@ class Recipe
             # Show the style button
             # Currently this feature is DISABLED, to enable it, uncomment the below line
             $('#stylebtn').show()
+            @adjustStyleButton()
 
             # Force the modal dialog to be shown so we can get dimensions
             styleGuideModal = $('#styleGuideModal')
@@ -1128,7 +1130,6 @@ class Recipe
             # Make sure we don't go over the right edge
             maxText.css('left', Math.max(maxLeft, 0))
 
-
     # Scale a recipe to a new batch and boil size, trying to keep the gravities
     # and bitterness the same if scaleIngredients is true.
     @scale: (newGallons, newBoilGallons, scaleIngredients) =>
@@ -1335,3 +1336,18 @@ class Recipe
             Mash.load recipe.mash
 
         @updateStats()
+
+    # Adjust the position of the style button by a half-pixel (if necessary)
+    # to make sure the lines are clear
+    @adjustStyleButton: =>
+        btn = $('#stylebtn')
+        svg = $('svg', btn).get(0)
+
+        if svg.getScreenCTM?
+            setTimeout((->
+                    matrix = svg.getScreenCTM()
+                    btn.css('left', '-=0.5') if Math.floor(matrix.e) < matrix.e
+                    btn.css('top', '-=0.5') if Math.floor(matrix.f) < matrix.f
+                    ),
+                1000
+            )
