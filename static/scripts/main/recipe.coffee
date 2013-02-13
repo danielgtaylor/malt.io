@@ -1344,10 +1344,8 @@ class Recipe
         svg = $('svg', btn).get(0)
 
         if svg.getScreenCTM?
-            setTimeout((->
-                    matrix = svg.getScreenCTM()
-                    btn.css('left', '-=0.5') if Math.floor(matrix.e) < matrix.e
-                    btn.css('top', '-=0.5') if Math.floor(matrix.f) < matrix.f
-                    ),
-                1000
-            )
+            f = ->
+                matrix = svg.getScreenCTM()
+                btn.css('left', '-=0.5') if Math.floor(matrix.e) < matrix.e
+                btn.css('top', '-=0.5') if Math.floor(matrix.f) < matrix.f
+            if window.loaded then f() else $(window).load(f)

@@ -20,6 +20,10 @@
             Brew.init();
         });
 
+        $(window).load(function () {
+            window.loaded = true;
+        });
+
         window.fbAsyncInit = function () {
             FB.init({
                 appId      : '414221561958592', // App ID
