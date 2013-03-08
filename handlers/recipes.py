@@ -215,8 +215,11 @@ class RecipeCloneHandler(BaseHandler):
             'steep_efficiency': recipe.steep_efficiency,
             'mash_efficiency': recipe.mash_efficiency,
             'primary_days': recipe.primary_days,
+            'primary_temp': recipe.primary_temp,
             'secondary_days': recipe.secondary_days,
+            'secondary_temp': recipe.secondary_temp,
             'tertiary_days': recipe.tertiary_days,
+            'tertiary_temp': recipe.tertiary_temp,
             'aging_days': recipe.aging_days,
             '_ingredients': recipe._ingredients
         })
@@ -392,8 +395,11 @@ class RecipeHandler(BaseHandler):
         recipe.mash_efficiency = int(recipe_data['mashEfficiency'])
         recipe.steep_efficiency = int(recipe_data['steepEfficiency'])
         recipe.primary_days = int(recipe_data['primaryDays'])
+        recipe.primary_temp = float(recipe_data['primaryTemp'])
         recipe.secondary_days = int(recipe_data['secondaryDays'])
+        recipe.secondary_temp = float(recipe_data['secondaryTemp'])
         recipe.tertiary_days = int(recipe_data['tertiaryDays'])
+        recipe.tertiary_temp = float(recipe_data['tertiaryTemp'])
         recipe.aging_days = int(recipe_data['agingDays'])
         recipe.mash = recipe_data['mash']
         recipe.ingredients = recipe_data['ingredients']

@@ -753,8 +753,11 @@
         </div>
         <input type="hidden" id="mashSteps" value="{{ recipe.mash }}"/>
         <input type="hidden" id="primaryDays" value="{{ recipe.primary_days }}"/>
+        <input type="hidden" id="primaryTemp" value="{{ recipe.primary_temp }}"/>
         <input type="hidden" id="secondaryDays" value="{{ recipe.secondary_days }}"/>
+        <input type="hidden" id="secondaryTemp" value="{{ recipe.secondary_temp }}"/>
         <input type="hidden" id="tertiaryDays" value="{{ recipe.tertiary_days }}"/>
+        <input type="hidden" id="tertiaryTemp" value="{{ recipe.tertiary_temp }}"/>
         <input type="hidden" id="agingDays" value="{{ recipe.aging_days }}"/>
     </div>
     </div>
@@ -980,16 +983,34 @@
                     <span>days</span>
                 </div>
                 <div class="scaler">
+                    <span></span>
+                    <div id="primaryTempSlider" class="noUiSlider"></div>
+                    <span id="primaryTempValue">{{ recipe.primary_temp }}</span>
+                    <span>&deg;F</span>
+                </div>
+                <div class="scaler">
                     <span>Secondary:</span>
                     <div id="secondarySlider" class="noUiSlider"></div>
                     <span id="secondaryValue">{{ recipe.secondary_days }}</span>
                     <span>days</span>
                 </div>
                 <div class="scaler">
+                    <span></span>
+                    <div id="secondaryTempSlider" class="noUiSlider"></div>
+                    <span id="secondaryTempValue">{{ recipe.secondary_temp }}</span>
+                    <span>&deg;F</span>
+                </div>
+                <div class="scaler">
                     <span>Tertiary:</span>
                     <div id="tertiarySlider" class="noUiSlider"></div>
                     <span id="tertiaryValue">{{ recipe.tertiary_days }}</span>
                     <span>days</span>
+                </div>
+                <div class="scaler">
+                    <span></span>
+                    <div id="tertiaryTempSlider" class="noUiSlider"></div>
+                    <span id="tertiaryTempValue">{{ recipe.tertiary_temp }}</span>
+                    <span>&deg;F</span>
                 </div>
             </div>
         </div>

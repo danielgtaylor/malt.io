@@ -68,8 +68,11 @@ class RecipeBase(db.Model):
         'sparge': 0.5
     }))
     primary_days = db.IntegerProperty(default=14)
+    primary_temp = db.FloatProperty(default=68.0)
     secondary_days = db.IntegerProperty(default=0)
+    secondary_temp = db.FloatProperty(default=32.0)
     tertiary_days = db.IntegerProperty(default=0)
+    tertiary_temp = db.FloatProperty(default=32.0)
     aging_days = db.IntegerProperty(default=14)
 
     # Serialized JSON data for the ingredients
@@ -338,8 +341,8 @@ class RecipeBase(db.Model):
         # First check the overall properties
         properties = ('name', 'description', 'type', 'category', 'style', 'batch_size',
                       'boil_size', 'bottling_temp', 'bottling_pressure', 'mash_efficiency',
-                      'steep_efficiency', 'primary_days', 'secondary_days', 'tertiary_days',
-                      'aging_days')
+                      'steep_efficiency', 'primary_days', 'primary_temp', 'secondary_days',
+                      'secondary_temp', 'tertiary_days', 'tertiary_temp', 'aging_days')
         for p in properties:
             oldVal = getattr(other, p, None)
             newVal = getattr(self, p, None)
