@@ -207,6 +207,7 @@ class RecipeCloneHandler(BaseHandler):
             'name': recipe.name,
             'description': recipe.description,
             'type': recipe.type,
+            'category': recipe.category,
             'style': recipe.style,
             'batch_size': recipe.batch_size,
             'boil_size': recipe.boil_size,
