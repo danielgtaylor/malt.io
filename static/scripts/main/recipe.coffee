@@ -91,7 +91,7 @@ class Recipe
         $('#gallonsSlider').noUiSlider('init',
             knobs: 1
             connect: 'lower'
-            scale: [0, 20]
+            scale: [0, 40]
             start: parseFloat($('#gallonsValue').text()) * 2
             change: =>
                 $('#gallonsValue').text(($('#gallonsSlider').noUiSlider('value')[1] / 2.0).toFixed(1))
@@ -100,7 +100,7 @@ class Recipe
         $('#boilGallonsSlider').noUiSlider('init',
             knobs: 1
             connect: 'lower'
-            scale: [0, 20]
+            scale: [0, 40]
             start: parseFloat($('#boilGallonsValue').text()) * 2
             change: =>
                 $('#boilGallonsValue').text(($('#boilGallonsSlider').noUiSlider('value')[1] / 2.0).toFixed(1))
