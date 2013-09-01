@@ -1203,7 +1203,7 @@ class Recipe
 
                 aa = parseFloat($(element.children[5]).text()) or 0.0
 
-                if aa
+                if (aa && time)
                     # This is a bittering ingredient, so scale using the bitterness formula
                     bitterness = 1.65 * Math.pow(0.000125, earlyGu - 1.0) * ((1 - Math.pow(2.718, -0.04 * time)) / 4.15) * ((aa / 100.0 * oz * 7490.0) / boilGallons) * utilization_factor
 
